@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Covenant — Prayer Journal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0b05;
+  --surface: #1c1409;
+  --surface-2: #261b0c;
+  --surface-3: #32230f;
+  --gold: #c8a44a;
+  --gold-dim: #8a6828;
+  --gold-faint: rgba(200,164,74,0.1);
+  --cream: #efe5c5;
+  --cream-dim: #b5a47a;
+  --muted: #7a6a48;
+  --border: rgba(200,164,74,0.12);
+  --border-strong: rgba(200,164,74,0.28);
+  --green: #4a8a50;
+  --green-text: #7acc80;
+  --blue-text: #7aaace;
+  --purple-text: #bb8aee;
+  --red-faint: rgba(140,60,60,0.3);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--cream);
+  font-family:'Crimson Text',Georgia,serif;
+  font-size:17px;
+  line-height:1.65;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background:radial-gradient(ellipse at 20% 0%, rgba(200,164,74,0.04) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 100%, rgba(200,164,74,0.03) 0%, transparent 50%);
+  pointer-events:none;z-index:0;
+}
+.app{max-width:680px;margin:0 auto;padding:0 18px;position:relative;z-index:1;}
+h1,h2,h3,h4{font-family:'Playfair Display',Georgia,serif;font-weight:600;}
+
+/* ── NAV ── */
+.nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(15,11,5,0.95);
+  border-top:1px solid var(--border);
+  display:flex;justify-content:space-around;
+  padding:7px 0 14px;z-index:100;
+  backdrop-filter:blur(16px);
+}
+.nav-btn{
+  background:none;border:none;color:var(--muted);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:4px 10px;transition:color 0.2s;
+  font-family:'Lato',sans-serif;font-size:10px;font-weight:400;
+  letter-spacing:0.06em;text-transform:uppercase;
+}
+.nav-btn .ico{font-size:19px;line-height:1;}
+.nav-btn.active{color:var(--gold);}
+.nav-btn:hover{color:var(--cream-dim);}
+.nav-badge{
+  position:absolute;top:-2px;right:-4px;
+  background:var(--gold);color:var(--bg);
+  border-radius:10px;padding:0 5px;
+  font-size:9px;font-weight:700;font-family:'Lato',sans-serif;
+  display:none;
+}
+.nav-inbox-wrap{position:relative;display:inline-block;}
+
+/* ── SCREENS ── */
+.screen{display:none;padding:20px 0 110px;animation:fadeUp 0.3s ease forwards;}
+.screen.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── HEADER ── */
+.screen-header{display:flex;align-items:center;gap:12px;margin-bottom:26px;padding-top:6px;}
+.back-btn{
+  background:none;border:1px solid var(--border);color:var(--gold);
+  cursor:pointer;font-size:16px;padding:6px 10px;border-radius:8px;
+  line-height:1;transition:all 0.2s;
+}
+.back-btn:hover{border-color:var(--border-strong);background:var(--surface);}
+.screen-title{font-family:'Playfair Display',serif;font-size:22px;color:var(--cream);flex:1;}
+
+/* ── CARDS ── */
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:18px;margin-bottom:12px;
+}
+.card.clickable{cursor:pointer;transition:all 0.2s;}
+.card.clickable:hover{border-color:var(--border-strong);background:var(--surface-2);}
+
+/* ── DIVIDER ── */
+.divider{
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);
+  margin:22px 0;
+}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 18px;border-radius:8px;border:none;
+  cursor:pointer;font-family:'Lato',sans-serif;
+  font-size:12px;font-weight:700;letter-spacing:0.09em;
+  text-transform:uppercase;transition:all 0.2s;
+}
+.btn-primary{background:var(--gold);color:var(--bg);}
+.btn-primary:hover{background:#dab85a;transform:translateY(-1px);}
+.btn-ghost{background:transparent;color:var(--gold);border:1px solid var(--border-strong);}
+.btn-ghost:hover{background:var(--surface-2);}
+.btn-dim{background:var(--surface-3);color:var(--muted);border:1px solid var(--border);}
+.btn-dim:hover{color:var(--cream-dim);}
+.btn-full{width:100%;justify-content:center;}
+.btn-sm{padding:6px 12px;font-size:11px;}
+
+/* ── INPUTS ── */
+textarea,input[type="text"],input[type="password"],select{
+  background:var(--surface-2);
+  border:1px solid var(--border);border-radius:8px;
+  color:var(--cream);
+  font-family:'Crimson Text',serif;font-size:16px;
+  padding:11px 14px;width:100%;outline:none;
+  transition:border-color 0.2s;resize:vertical;
+}
+textarea:focus,input:focus,select:focus{border-color:var(--gold-dim);background:var(--surface-3);}
+textarea::placeholder,input::placeholder{color:var(--muted);}
+select option{background:var(--surface-2);}
+label{
+  display:block;font-family:'Lato',sans-serif;
+  font-size:11px;font-weight:700;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:6px;
+}
+.field{margin-bottom:16px;}
+
+/* ── BADGES ── */
+.badge{
+  display:inline-block;padding:2px 8px;border-radius:4px;
+  font-family:'Lato',sans-serif;font-size:10px;
+  font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+}
+.badge-active{background:rgba(200,164,74,0.15);color:var(--gold);}
+.badge-answered{background:rgba(74,138,80,0.2);color:var(--green-text);}
+.badge-dormant{background:rgba(100,90,70,0.2);color:var(--muted);}
+.badge-watching{background:rgba(58,90,130,0.2);color:var(--blue-text);}
+
+/* ── TAGS ── */
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.tag{
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:20px;padding:4px 11px;
+  font-family:'Lato',sans-serif;font-size:11px;
+  color:var(--cream-dim);cursor:pointer;transition:all 0.2s;
+  user-select:none;
+}
+.tag.selected{background:var(--gold-faint);border-color:var(--gold-dim);color:var(--gold);}
+
+/* ══════════════════════════════════
+   SETUP SCREEN
+══════════════════════════════════ */
+.setup-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;min-height:100vh;
+  padding:40px 20px;text-align:center;
+}
+.setup-flame{font-size:56px;margin-bottom:22px;animation:flicker 3s ease-in-out infinite;}
+@keyframes flicker{0%,100%{opacity:1;}50%{opacity:0.8;}75%{opacity:0.95;}}
+.setup-title{font-size:36px;margin-bottom:10px;color:var(--cream);}
+.setup-sub{color:var(--muted);margin-bottom:34px;font-size:17px;max-width:380px;font-style:italic;}
+.setup-form{width:100%;max-width:400px;text-align:left;}
+.setup-note{
+  font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5;
+}
+.setup-note a{color:var(--gold);text-decoration:none;}
+
+/* ══════════════════════════════════
+   HOME SCREEN
+══════════════════════════════════ */
+.home-top{padding-top:36px;margin-bottom:28px;}
+.home-eyebrow{
+  font-family:'Lato',sans-serif;font-size:11px;
+  letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:7px;
+}
+.home-greeting{font-size:30px;line-height:1.2;margin-bottom:5px;}
+.home-verse{color:var(--muted);font-style:italic;font-size:15px;line-height:1.5;}
+
+.highlight-card{
+  background:linear-gradient(135deg,var(--surface-2),var(--surface-3));
+  border:1px solid var(--border-strong);border-radius:14px;
+  padding:20px;margin-bottom:12px;position:relative;overflow:hidden;
+  cursor:pointer;transition:border-color 0.2s;
+}
+.highlight-card:hover{border-color:var(--gold-dim);}
+.highlight-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);
+}
+.hc-label{
+  font-family:'Lato',sans-serif;font-size:10px;
+  letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--gold-dim);margin-bottom:6px;
+}
+.hc-value{font-family:'Playfair Display',serif;font-size:19px;color:var(--cream);}
+.hc-sub{font-size:14px;color:var(--muted);margin-top:4px;}
+
+.routine-card{
+  background:linear-gradient(135deg,#3a2808,#4a3210);
+  border:1px solid var(--gold-dim);border-radius:14px;
+  padding:20px 50px 20px 20px;width:100%;cursor:pointer;
+  text-align:left;color:var(--cream);margin-bottom:12px;
+  transition:all 0.25s;position:relative;overflow:hidden;
+}
+.routine-card:hover{border-color:var(--gold);box-shadow:0 4px 24px rgba(200,164,74,0.1);}
+.routine-card .arrow{
+  position:absolute;right:20px;top:50%;transform:translateY(-50%);
+  font-size:22px;color:var(--gold);transition:transform 0.2s;
+}
+.routine-card:hover .arrow{transform:translateY(-50%) translateX(4px);}
+.rc-label{font-family:'Lato',sans-serif;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:6px;}
+.rc-title{font-family:'Playfair Display',serif;font-size:21px;}
+
+.qc-box{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:18px;
+}
+.qc-label{
+  font-family:'Lato',sans-serif;font-size:10px;
+  letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--gold-dim);margin-bottom:10px;
+}
+
+/* ══════════════════════════════════
+   INBOX
+══════════════════════════════════ */
+.inbox-item{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:16px;margin-bottom:10px;
+}
+.inbox-raw{color:var(--cream-dim);font-style:italic;margin-bottom:8px;line-height:1.55;}
+.inbox-meta{font-family:'Lato',sans-serif;font-size:11px;color:var(--muted);margin-bottom:12px;}
+.ai-suggestion{
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:10px;padding:14px;margin-top:12px;
+}
+.ai-suggestion-label{
+  font-family:'Lato',sans-serif;font-size:10px;
+  letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--gold-dim);margin-bottom:8px;
+}
+.ai-thinking{
+  display:flex;align-items:center;gap:8px;
+  color:var(--gold-dim);font-family:'Lato',sans-serif;
+  font-size:12px;margin-top:12px;
+}
+.dots span{
+  display:inline-block;width:4px;height:4px;
+  background:var(--gold);border-radius:50%;
+  animation:dp 1.4s ease-in-out infinite;
+}
+.dots span:nth-child(2){animation-delay:0.2s;}
+.dots span:nth-child(3){animation-delay:0.4s;}
+@keyframes dp{0%,60%,100%{opacity:0.25;transform:scale(0.8);}30%{opacity:1;transform:scale(1);}}
+
+/* ══════════════════════════════════
+   THEMES
+══════════════════════════════════ */
+.theme-card{
+  display:flex;align-items:center;gap:14px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:17px;margin-bottom:10px;
+  cursor:pointer;transition:all 0.2s;
+}
+.theme-card:hover{border-color:var(--border-strong);background:var(--surface-2);}
+.theme-icon{font-size:28px;flex-shrink:0;}
+.theme-name{font-family:'Playfair Display',serif;font-size:19px;margin-bottom:3px;}
+.theme-stats{font-family:'Lato',sans-serif;font-size:11px;color:var(--muted);}
+.theme-arrow{font-size:18px;color:var(--muted);}
+
+/* ══════════════════════════════════
+   PRAYER DETAIL
+══════════════════════════════════ */
+.living-summary{
+  background:linear-gradient(135deg,rgba(200,164,74,0.07),rgba(200,164,74,0.02));
+  border:1px solid rgba(200,164,74,0.18);
+  border-radius:12px;padding:18px;margin-bottom:22px;
+  position:relative;
+}
+.living-summary::before{
+  content:'✦';position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+  background:var(--bg);padding:0 8px;color:var(--gold);font-size:13px;
+}
+.ls-label{
+  font-family:'Lato',sans-serif;font-size:10px;
+  letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--gold-dim);margin-bottom:8px;
+}
+.ls-text{color:var(--cream-dim);font-style:italic;line-height:1.7;font-size:16px;}
+
+/* Thread */
+.thread{margin-top:8px;}
+.entry{display:flex;gap:14px;margin-bottom:0;position:relative;}
+.entry+.entry{margin-top:0;}
+.thread-line-wrap{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+.entry-dot{
+  width:30px;height:30px;border-radius:50%;
+  background:var(--surface-2);border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;flex-shrink:0;
+}
+.entry-dot.t-request{border-color:var(--gold-dim);background:rgba(200,164,74,0.1);}
+.entry-dot.t-update{border-color:var(--blue-text);background:rgba(58,90,130,0.1);}
+.entry-dot.t-answer{border-color:var(--green-text);background:rgba(74,138,80,0.12);}
+.entry-dot.t-principle{border-color:var(--purple-text);background:rgba(180,130,240,0.1);}
+.entry-dot.t-observation{border-color:var(--muted);}
+.entry-line{flex:1;width:1px;background:var(--border);margin:4px 0;}
+.entry-body{flex:1;padding-bottom:22px;}
+.entry-type-label{
+  font-family:'Lato',sans-serif;font-size:10px;
+  letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);
+}
+.entry-date{font-family:'Lato',sans-serif;font-size:11px;color:var(--muted);}
+.entry-meta{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.entry-content{color:var(--cream);line-height:1.65;}
+.entry-scripture{
+  margin-top:9px;padding:9px 13px;
+  background:rgba(200,164,74,0.06);
+  border-left:2px solid var(--gold-dim);
+  font-style:italic;color:var(--cream-dim);font-size:15px;
+  border-radius:0 6px 6px 0;
+}
+.entry-actions{margin-top:6px;}
+.entry-del{
+  background:none;border:none;color:var(--muted);
+  cursor:pointer;font-size:12px;font-family:'Lato',sans-serif;
+  letter-spacing:0.05em;padding:2px 0;
+  transition:color 0.2s;
+}
+.entry-del:hover{color:var(--cream-dim);}
+
+/* ══════════════════════════════════
+   TESTIMONY
+══════════════════════════════════ */
+.testimony-card{
+  background:var(--surface);
+  border:1px solid rgba(74,138,80,0.25);
+  border-radius:12px;padding:18px;margin-bottom:12px;
+  cursor:pointer;transition:border-color 0.2s;
+}
+.testimony-card:hover{border-color:rgba(74,138,80,0.5);}
+.testimony-title{font-family:'Playfair Display',serif;font-size:19px;color:var(--green-text);margin-bottom:5px;}
+.testimony-date{font-family:'Lato',sans-serif;font-size:11px;color:var(--muted);margin-bottom:10px;}
+.testimony-quote{color:var(--cream-dim);font-style:italic;font-size:16px;line-height:1.6;}
+
+/* ══════════════════════════════════
+   PRINCIPLES
+══════════════════════════════════ */
+.principle-card{
+  background:var(--surface);
+  border:1px solid rgba(180,130,240,0.18);
+  border-radius:10px;padding:17px;margin-bottom:10px;
+}
+.principle-text{
+  font-family:'Playfair Display',serif;font-size:18px;
+  font-style:italic;color:var(--cream);margin-bottom:9px;
+  line-height:1.45;
+}
+.principle-meta{
+  display:flex;justify-content:space-between;align-items:center;
+}
+
+/* ══════════════════════════════════
+   EVENING ROUTINE OVERLAY
+══════════════════════════════════ */
+.routine-overlay{
+  position:fixed;inset:0;
+  background:var(--bg);z-index:300;
+  overflow-y:auto;display:none;
+}
+.routine-overlay.open{display:block;}
+.routine-inner{max-width:680px;margin:0 auto;padding:36px 18px 100px;}
+.routine-close{
+  background:none;border:none;color:var(--muted);
+  cursor:pointer;font-size:22px;transition:color 0.2s;
+}
+.routine-close:hover{color:var(--cream);}
+.routine-step{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;padding:24px;margin-bottom:16px;
+}
+.step-num{
+  font-family:'Lato',sans-serif;font-size:10px;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--gold-dim);margin-bottom:7px;
+}
+.step-title{font-family:'Playfair Display',serif;font-size:23px;margin-bottom:14px;}
+.step-verse{
+  color:var(--muted);font-style:italic;font-size:15px;
+  margin-bottom:16px;padding:10px 14px;
+  border-left:2px solid var(--gold-dim);
+  border-radius:0 6px 6px 0;
+}
+
+/* ══════════════════════════════════
+   MODAL
+══════════════════════════════════ */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.72);
+  z-index:200;display:none;
+  align-items:flex-end;justify-content:center;
+  padding:0;backdrop-filter:blur(6px);
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:var(--surface);
+  border:1px solid var(--border-strong);
+  border-radius:20px 20px 0 0;
+  padding:24px 20px 32px;
+  width:100%;max-width:680px;
+  max-height:88vh;overflow-y:auto;
+  animation:slideUp 0.25s ease;
+}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.modal-header{
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;
+}
+.modal-title{font-family:'Playfair Display',serif;font-size:22px;}
+.modal-x{background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;transition:color 0.2s;}
+.modal-x:hover{color:var(--cream);}
+
+/* ══════════════════════════════════
+   UTILITY
+══════════════════════════════════ */
+.mt4{margin-top:4px;}.mt8{margin-top:8px;}.mt16{margin-top:16px;}.mt24{margin-top:24px;}
+.mb8{margin-bottom:8px;}.mb16{margin-bottom:16px;}
+.flex{display:flex;}.flex-between{display:flex;justify-content:space-between;align-items:center;}
+.gap8{gap:8px;}.gap12{gap:12px;}
+.wrap{flex-wrap:wrap;}
+.text-muted{color:var(--muted);}
+.text-italic{font-style:italic;}
+.text-small{font-size:14px;}
+.text-gold{color:var(--gold);}
+.text-green{color:var(--green-text);}
+.text-center{text-align:center;}
+.empty-state{text-align:center;padding:48px 0;color:var(--muted);font-style:italic;font-size:16px;}
+
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<!-- ══ SETUP ══════════════════════════════════════════════ -->
+<div id="setup" style="display:none;">
+  <div class="setup-wrap">
+    <div class="setup-flame">🕯️</div>
+    <h1 class="setup-title">Covenant</h1>
+    <p class="setup-sub">A living record of your prayers, God's answers, and the wisdom you carry forward.</p>
+    <div class="setup-form">
+      <div class="field">
+        <label>Your Name</label>
+        <input type="text" id="s-name" placeholder="How should I greet you?" />
+      </div>
+      <div class="field">
+        <label>Anthropic API Key <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;">(optional — for AI features)</span></label>
+        <input type="password" id="s-key" placeholder="sk-ant-..." />
+      </div>
+      <p class="setup-note">
+        Your key is stored only on this device and sent only to Anthropic.
+        AI features include inbox processing, living summaries, and scripture suggestions.
+        <a href="https://console.anthropic.com" target="_blank">Get a free key →</a>
+      </p>
+      <button class="btn btn-primary btn-full" onclick="completeSetup()">Begin my Covenant →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ════════════════════════════════════════════ -->
+<div id="app" style="display:none;">
+<div class="app">
+
+  <!-- HOME -->
+  <div id="screen-home" class="screen active">
+    <div class="home-top">
+      <div class="home-eyebrow" id="h-date"></div>
+      <h1 class="home-greeting" id="h-greeting">Good evening</h1>
+      <div class="home-verse" id="h-verse"></div>
+    </div>
+    <div id="h-inbox-card" class="highlight-card" onclick="navigate('inbox')" style="display:none;">
+      <div class="hc-label">📥 Inbox</div>
+      <div class="hc-value" id="h-inbox-val"></div>
+      <div class="hc-sub">Tap to review and file</div>
+    </div>
+    <button class="routine-card" onclick="openRoutine()">
+      <div class="rc-label">🌙 Evening Routine</div>
+      <div class="rc-title">Begin tonight's practice</div>
+      <span class="arrow">→</span>
+    </button>
+    <div id="h-focus-card" class="highlight-card" style="display:none;">
+      <div class="hc-label">🙏 Tonight's Focus</div>
+      <div class="hc-value" id="h-focus-title"></div>
+      <div class="hc-sub" id="h-focus-sub"></div>
+    </div>
+    <div id="h-testimony-card" class="highlight-card" style="display:none;">
+      <div class="hc-label">✨ Last Answered Prayer</div>
+      <div class="hc-value" id="h-test-title"></div>
+      <div class="hc-sub" id="h-test-sub"></div>
+    </div>
+    <div class="divider"></div>
+    <div class="qc-box">
+      <div class="qc-label">⚡ Quick Capture</div>
+      <textarea id="qc-input" rows="3" placeholder="A thought, prayer, observation — anything. Don't think, just capture it."></textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+        <button id="qc-btn" class="btn btn-primary" onclick="quickCapture()">Capture →</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:16px;justify-content:center;">
+      <button class="btn btn-dim btn-sm" onclick="exportData()" title="Download a backup of all your Covenant data">↓ Export Backup</button>
+      <button class="btn btn-dim btn-sm" onclick="triggerImport()" title="Restore from a previous backup file">↑ Import Backup</button>
+    </div>
+    <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(event)">
+  </div>
+
+  <!-- INBOX -->
+  <div id="screen-inbox" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="navigate('home')">←</button>
+      <h2 class="screen-title">Inbox</h2>
+    </div>
+    <div id="inbox-list"></div>
+    <div id="inbox-empty" class="empty-state" style="display:none;">Your inbox is clear. 🕊️</div>
+  </div>
+
+  <!-- PRAYERS / THEMES -->
+  <div id="screen-themes" class="screen">
+    <div class="flex-between mb16" style="padding-top:6px;">
+      <h2 style="font-size:28px;font-family:'Playfair Display',serif;">Prayers</h2>
+      <button class="btn btn-ghost btn-sm" onclick="showNewPrayerModal()">+ New Prayer</button>
+    </div>
+    <div id="themes-list"></div>
+  </div>
+
+  <!-- PRAYER DETAIL -->
+  <div id="screen-prayer" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="navigate('themes')">←</button>
+      <div style="flex:1;">
+        <div class="screen-title" id="pd-title"></div>
+        <div id="pd-badges" class="tags" style="margin-top:5px;"></div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="showAddEntryModal()">+ Entry</button>
+    </div>
+    <div id="pd-summary"></div>
+    <div id="pd-thread"></div>
+    <div id="pd-actions" class="flex wrap gap8 mt16"></div>
+  </div>
+
+  <!-- TESTIMONY -->
+  <div id="screen-testimony" class="screen">
+    <div style="padding-top:6px;margin-bottom:24px;">
+      <h2 style="font-size:28px;font-family:'Playfair Display',serif;">Testimonies</h2>
+      <p class="text-muted text-italic text-small mt4">A record of God's faithfulness</p>
+    </div>
+    <div id="testimony-list"></div>
+    <div id="testimony-empty" class="empty-state" style="display:none;">Answered prayers will appear here. ✦</div>
+  </div>
+
+  <!-- PRINCIPLES -->
+  <div id="screen-principles" class="screen">
+    <div style="padding-top:6px;margin-bottom:24px;">
+      <h2 style="font-size:28px;font-family:'Playfair Display',serif;">Wisdom</h2>
+      <p class="text-muted text-italic text-small mt4">Principles extracted from lived experience</p>
+    </div>
+    <button class="btn btn-ghost btn-full mb16" onclick="showAddPrincipleModal()">+ Record a Principle</button>
+    <div id="principles-list"></div>
+    <div id="principles-empty" class="empty-state" style="display:none;">Your wisdom library grows with experience. ✦</div>
+  </div>
+
+</div><!-- .app -->
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-btn active" id="nav-home" onclick="navigate('home')">
+    <span class="ico">🏠</span>Home
+  </button>
+  <button class="nav-btn" id="nav-inbox" onclick="navigate('inbox')">
+    <span class="ico" style="position:relative;display:inline-block;">
+      📥<span id="inbox-badge" class="nav-badge"></span>
+    </span>Inbox
+  </button>
+  <button class="nav-btn" id="nav-themes" onclick="navigate('themes')">
+    <span class="ico">🙏</span>Prayers
+  </button>
+  <button class="nav-btn" id="nav-testimony" onclick="navigate('testimony')">
+    <span class="ico">✨</span>Testimony
+  </button>
+  <button class="nav-btn" id="nav-principles" onclick="navigate('principles')">
+    <span class="ico">📖</span>Wisdom
+  </button>
+</nav>
+</div><!-- #app -->
+
+<!-- ROUTINE OVERLAY -->
+<div class="routine-overlay" id="routine-overlay">
+  <div class="routine-inner">
+    <div class="flex-between mb16">
+      <h2 style="font-size:24px;font-family:'Playfair Display',serif;">🌙 Evening Routine</h2>
+      <button class="routine-close" onclick="closeRoutine()">✕</button>
+    </div>
+    <div id="routine-body"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="maybeCloseModal(event)">
+  <div class="modal" id="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-title-text"></h3>
+      <button class="modal-x" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════
+const STORE = 'covenant_v1';
+
+function load() {
+  try { const r = localStorage.getItem(STORE); if (r) return JSON.parse(r); } catch(e){}
+  return defaults();
+}
+
+function defaults() {
+  return {
+    settings: { name:'', apiKey:'' },
+    themes: [
+      {id:'work',   name:'Work & Calling',  icon:'💼'},
+      {id:'home',   name:'Home & Living',   icon:'🏡'},
+      {id:'marriage',name:'Marriage',       icon:'💑'},
+      {id:'health', name:'Health',          icon:'🌿'},
+      {id:'faith',  name:'Faith & Growth',  icon:'✨'},
+      {id:'finances',name:'Finances',       icon:'🌱'},
+    ],
+    prayers: [],
+    inbox: [],
+    principles: [],
+  };
+}
+
+let db = load();
+function persist() { localStorage.setItem(STORE, JSON.stringify(db)); }
+
+// ─── DATA EXPORT / IMPORT ───────────────────────────────────
+function exportData() {
+  const date = new Date().toISOString().split('T')[0];
+  const blob = new Blob([JSON.stringify(db, null, 2)], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `covenant-backup-${date}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function triggerImport() {
+  const input = document.getElementById('import-file');
+  input.value = ''; // reset so same file can be re-selected
+  input.click();
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    let parsed;
+    try { parsed = JSON.parse(ev.target.result); }
+    catch(err) {
+      alert('This file couldn\'t be read. Please make sure it\'s a valid Covenant backup (.json).');
+      return;
+    }
+    // basic structure check
+    if (typeof parsed !== 'object' || !parsed.settings) {
+      alert('This doesn\'t look like a Covenant backup file.');
+      return;
+    }
+    window._pendingImport = parsed;
+    showModal('Restore Backup', `
+      <div style="text-align:center;padding:8px 0 20px;">
+        <div style="font-size:42px;margin-bottom:16px;">⚠️</div>
+        <p style="color:var(--cream);font-size:18px;margin-bottom:10px;font-family:'Playfair Display',serif;">Replace all current data?</p>
+        <p style="color:var(--muted);font-size:15px;line-height:1.6;margin-bottom:26px;">
+          Any prayers, entries, or principles added since your last export will be lost.
+          This cannot be undone.
+        </p>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-dim btn-full" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary btn-full" onclick="confirmImport()">Restore Data</button>
+        </div>
+      </div>
+    `);
+  };
+  reader.readAsText(file);
+}
+
+function confirmImport() {
+  const parsed = window._pendingImport;
+  if (!parsed) return;
+  // ensure all required top-level keys exist (graceful migration)
+  db = {
+    settings:   parsed.settings   || {name:'', apiKey:''},
+    themes:     parsed.themes     || [],
+    prayers:    parsed.prayers    || [],
+    inbox:      parsed.inbox      || [],
+    principles: parsed.principles || [],
+  };
+  persist();
+  window._pendingImport = null;
+  closeModal();
+  boot();
+}
+// ────────────────────────────────────────────────────────────
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+
+function fmtDate(ts) {
+  return new Date(ts).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
+}
+function fmtRel(ts) {
+  const d = Math.floor((Date.now()-ts)/86400000);
+  if (d===0) return 'today'; if (d===1) return 'yesterday';
+  if (d<7) return d+'d ago'; return fmtDate(ts);
+}
+function esc(s) {
+  if(!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ═══════════════════════════════════════════════════════════
+// SETUP
+// ═══════════════════════════════════════════════════════════
+function boot() {
+  if (!db.settings.name) {
+    document.getElementById('setup').style.display = 'block';
+    document.getElementById('app').style.display = 'none';
+  } else {
+    document.getElementById('setup').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    renderHome();
+    updateInboxBadge();
+  }
+}
+
+function completeSetup() {
+  const name = document.getElementById('s-name').value.trim();
+  const key  = document.getElementById('s-key').value.trim();
+  if (!name) { alert('Please enter your name.'); return; }
+  db.settings.name = name;
+  if (key) db.settings.apiKey = key;
+  persist();
+  boot();
+}
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+let currentScreen = 'home';
+let currentPrayer = null;
+
+function navigate(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-'+screen).classList.add('active');
+  const navMap = {home:'home',inbox:'inbox',themes:'themes',prayer:'themes',testimony:'testimony',principles:'principles'};
+  const navId = 'nav-'+(navMap[screen]||screen);
+  if (document.getElementById(navId)) document.getElementById(navId).classList.add('active');
+  currentScreen = screen;
+  window.scrollTo(0,0);
+  if (screen==='home')       renderHome();
+  if (screen==='inbox')      renderInbox();
+  if (screen==='themes')     renderThemes();
+  if (screen==='testimony')  renderTestimony();
+  if (screen==='principles') renderPrinciples();
+  updateInboxBadge();
+}
+
+function updateInboxBadge() {
+  const n = db.inbox.filter(i=>!i.processed).length;
+  const b = document.getElementById('inbox-badge');
+  if (b) { b.textContent = n; b.style.display = n > 0 ? 'inline-block' : 'none'; }
+}
+
+// ═══════════════════════════════════════════════════════════
+// HOME
+// ═══════════════════════════════════════════════════════════
+const VERSES = [
+  '"Be anxious for nothing, but in everything by prayer..." — Phil 4:6',
+  '"The Lord is near to all who call on Him in truth." — Ps 145:18',
+  '"Ask and it shall be given to you; seek and you will find." — Matt 7:7',
+  '"Cast all your anxiety on Him because He cares for you." — 1 Pet 5:7',
+  '"In everything give thanks; this is God\'s will for you." — 1 Thess 5:18',
+  '"Your word is a lamp to my feet and a light to my path." — Ps 119:105',
+  '"Draw near to God and He will draw near to you." — James 4:8',
+  '"Trust in the Lord with all your heart." — Prov 3:5',
+  '"I can do all things through Christ who strengthens me." — Phil 4:13',
+  '"The prayer of a righteous person is powerful and effective." — James 5:16',
+  '"Seek first the kingdom of God and His righteousness." — Matt 6:33',
+  '"He makes all things work together for good." — Romans 8:28',
+];
+
+function renderHome() {
+  const h = new Date().getHours();
+  const greeting = h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  const name = db.settings.name ? `, ${db.settings.name}` : '';
+  document.getElementById('h-date').textContent =
+    new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('h-greeting').textContent = greeting + name;
+
+  const doy = Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/86400000);
+  document.getElementById('h-verse').textContent = VERSES[doy % VERSES.length];
+
+  // Inbox card
+  const unread = db.inbox.filter(i=>!i.processed).length;
+  const ic = document.getElementById('h-inbox-card');
+  if (unread > 0) {
+    ic.style.display = 'block';
+    document.getElementById('h-inbox-val').textContent =
+      unread + ' unprocessed capture'+(unread>1?'s':'');
+  } else ic.style.display = 'none';
+
+  // Focus prayer
+  const active = db.prayers.filter(p=>p.status==='active');
+  const fc = document.getElementById('h-focus-card');
+  if (active.length > 0) {
+    const focus = active[doy % active.length];
+    fc.style.display = 'block';
+    document.getElementById('h-focus-title').textContent = focus.title;
+    const last = focus.entries[focus.entries.length-1];
+    document.getElementById('h-focus-sub').textContent =
+      last ? 'Last update '+fmtRel(last.createdAt) : 'No entries yet';
+    fc.onclick = () => openPrayer(focus.id);
+  } else fc.style.display = 'none';
+
+  // Testimony card
+  const answered = db.prayers.filter(p=>p.status==='answered')
+    .sort((a,b)=>(b.answeredAt||0)-(a.answeredAt||0));
+  const tc = document.getElementById('h-testimony-card');
+  if (answered.length > 0) {
+    tc.style.display = 'block';
+    document.getElementById('h-test-title').textContent = answered[0].title;
+    document.getElementById('h-test-sub').textContent = fmtRel(answered[0].answeredAt||answered[0].createdAt);
+    tc.onclick = () => openPrayer(answered[0].id);
+  } else tc.style.display = 'none';
+}
+
+function quickCapture() {
+  const t = document.getElementById('qc-input').value.trim();
+  if (!t) return;
+  db.inbox.push({id:uid(), rawText:t, createdAt:Date.now(), processed:false});
+  persist();
+  document.getElementById('qc-input').value = '';
+  const btn = document.getElementById('qc-btn');
+  btn.textContent = '✓ Saved';
+  setTimeout(()=>{ btn.textContent='Capture →'; }, 1400);
+  updateInboxBadge();
+  renderHome();
+}
+
+// ═══════════════════════════════════════════════════════════
+// INBOX
+// ═══════════════════════════════════════════════════════════
+function renderInbox() {
+  const list = document.getElementById('inbox-list');
+  const empty = document.getElementById('inbox-empty');
+  const items = db.inbox.filter(i=>!i.processed).sort((a,b)=>b.createdAt-a.createdAt);
+  if (!items.length) { list.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+  list.innerHTML = items.map(item => `
+    <div class="inbox-item" id="ii-${item.id}">
+      <div class="inbox-raw">"${esc(item.rawText)}"</div>
+      <div class="inbox-meta">${fmtDate(item.createdAt)}</div>
+      <div id="ir-${item.id}"></div>
+      <div class="flex wrap gap8 mt8">
+        ${db.settings.apiKey
+          ? `<button class="btn btn-primary btn-sm" onclick="processInbox('${item.id}')">✦ Process with AI</button>`
+          : ''}
+        <button class="btn btn-ghost btn-sm" onclick="fileManually('${item.id}')">File Manually</button>
+        <button class="btn btn-dim btn-sm" onclick="dismissItem('${item.id}')">Dismiss</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function processInbox(id) {
+  const item = db.inbox.find(i=>i.id===id);
+  if (!item) return;
+  const r = document.getElementById('ir-'+id);
+  r.innerHTML = `<div class="ai-thinking">✦ Processing <div class="dots"><span></span><span></span><span></span></div></div>`;
+
+  const pTitles = db.prayers.map(p=>p.title).join(', ') || 'none yet';
+  const tNames  = db.themes.map(t=>t.name).join(', ');
+
+  const prompt = `You are a spiritual journal assistant. Process this raw capture and return ONLY a valid JSON object with no markdown or preamble.
+
+Raw capture: "${item.rawText}"
+Existing prayers: ${pTitles}
+Themes available: ${tNames}
+
+Return JSON:
+{
+  "entryDraft": "A thoughtful journal entry (2-4 sentences) in first person expanding the raw thought meaningfully",
+  "suggestedPrayer": "exact title of most relevant existing prayer, or null",
+  "newPrayerTitle": "suggested title if creating new prayer, or null",
+  "suggestedTheme": "most relevant theme name",
+  "entryType": "request or update or observation or principle or answer",
+  "scripture": "one relevant verse reference and brief quote e.g. Phil 4:6 — Be anxious for nothing",
+  "principle": "if this contains a life lesson state it as one clear sentence, else null"
+}`;
+
+  try {
+    const raw = await callAI(prompt);
+    let data;
+    try { data = JSON.parse(raw); }
+    catch(e) { const m = raw.match(/\{[\s\S]*\}/); data = m ? JSON.parse(m[0]) : null; }
+    if (!data) throw new Error('parse fail');
+
+    const pTitle = data.suggestedPrayer || data.newPrayerTitle || 'New Prayer';
+    r.innerHTML = `
+      <div class="ai-suggestion">
+        <div class="ai-suggestion-label">✦ AI Suggestion</div>
+        <p style="color:var(--cream-dim);font-style:italic;margin-bottom:8px;line-height:1.6;">${esc(data.entryDraft)}</p>
+        ${data.scripture ? `<div class="entry-scripture">${esc(data.scripture)}</div>` : ''}
+        ${data.principle ? `<div style="margin-top:10px;padding:9px 12px;background:rgba(180,130,240,0.08);border-radius:7px;font-size:14px;color:var(--purple-text);"><strong>Principle detected:</strong> ${esc(data.principle)}</div>` : ''}
+        <div style="margin-top:4px;font-family:'Lato',sans-serif;font-size:11px;color:var(--muted);">
+          Filing to: <strong style="color:var(--cream-dim);">${esc(pTitle)}</strong> · Type: ${esc(data.entryType||'observation')}
+        </div>
+        <div class="flex wrap gap8 mt8">
+          <button class="btn btn-primary btn-sm" onclick='acceptAI("${id}", ${JSON.stringify(JSON.stringify(data))})'>Accept & File</button>
+          <button class="btn btn-ghost btn-sm" onclick="fileManually('${id}')">Edit Manually</button>
+        </div>
+      </div>`;
+  } catch(e) {
+    r.innerHTML = `<div class="text-muted text-small mt8">Processing failed. Check your API key, or file manually.</div>`;
+  }
+}
+
+function acceptAI(id, dataStr) {
+  const item = db.inbox.find(i=>i.id===id);
+  if (!item) return;
+  const data = JSON.parse(dataStr);
+
+  let prayer = db.prayers.find(p=>p.title===data.suggestedPrayer);
+  if (!prayer) {
+    const theme = db.themes.find(t=>t.name===data.suggestedTheme);
+    prayer = {
+      id:uid(), title:data.newPrayerTitle||data.entryDraft.substring(0,50),
+      themeIds:theme?[theme.id]:[], status:'active',
+      createdAt:Date.now(), entries:[], livingSummary:'', linkedPrayerIds:[]
+    };
+    db.prayers.push(prayer);
+  }
+
+  prayer.entries.push({
+    id:uid(), type:data.entryType||'observation',
+    content:data.entryDraft, scripture:data.scripture||'', createdAt:Date.now()
+  });
+
+  if (data.principle) {
+    db.principles.push({id:uid(), text:data.principle, prayerIds:[prayer.id], createdAt:Date.now()});
+  }
+  if (data.entryType==='answer') { prayer.status='answered'; prayer.answeredAt=Date.now(); }
+
+  item.processed = true;
+  persist();
+  renderInbox();
+  updateInboxBadge();
+}
+
+// ─── selectedThemesManual: tracks theme tag state for manual filing ───
+let _mThemes = [];
+function toggleMTheme(id, el) {
+  if (_mThemes.includes(id)) { _mThemes=_mThemes.filter(t=>t!==id); el.classList.remove('selected'); }
+  else { _mThemes.push(id); el.classList.add('selected'); }
+}
+
+function fileManually(id) {
+  _mThemes = [];
+  const item = db.inbox.find(i=>i.id===id);
+  if (!item) return;
+  showModal('File to Prayer', `
+    <div class="field"><label>Your Capture</label>
+      <div style="color:var(--cream-dim);font-style:italic;margin-bottom:12px;">"${esc(item.rawText)}"</div>
+    </div>
+    <div class="field"><label>Entry Text</label>
+      <textarea id="m-content" rows="4">${esc(item.rawText)}</textarea></div>
+    <div class="field"><label>Entry Type</label>
+      <select id="m-type">
+        <option value="observation">Observation</option>
+        <option value="request">Prayer Request</option>
+        <option value="update">Update</option>
+        <option value="answer">Answered Prayer</option>
+        <option value="principle">Principle Learned</option>
+      </select></div>
+    <div class="field"><label>File to Existing Prayer</label>
+      <select id="m-prayer" onchange="toggleNewPrayer(this.value)">
+        <option value="">— Create New Prayer —</option>
+        ${db.prayers.map(p=>`<option value="${p.id}">${esc(p.title)}</option>`).join('')}
+      </select></div>
+    <div id="m-new-fields">
+      <div class="field"><label>New Prayer Title</label>
+        <input type="text" id="m-title" placeholder="Name this prayer..." /></div>
+      <div class="field"><label>Themes</label>
+        <div class="tags">${db.themes.map(t=>`<span class="tag" onclick="toggleMTheme('${t.id}',this)">${t.icon} ${t.name}</span>`).join('')}</div>
+      </div>
+    </div>
+    <div class="field"><label>Scripture (optional)</label>
+      <input type="text" id="m-scripture" placeholder="e.g. Phil 4:6 — Be anxious for nothing..." /></div>
+    <button class="btn btn-primary btn-full" onclick="submitManual('${id}')">File Entry</button>
+  `);
+}
+
+function toggleNewPrayer(val) {
+  document.getElementById('m-new-fields').style.display = val ? 'none' : 'block';
+}
+
+function submitManual(id) {
+  const item = db.inbox.find(i=>i.id===id); if (!item) return;
+  const content   = document.getElementById('m-content').value.trim();
+  const type      = document.getElementById('m-type').value;
+  const prayerId  = document.getElementById('m-prayer').value;
+  const scripture = document.getElementById('m-scripture')?.value.trim()||'';
+  if (!content) return;
+
+  let prayer;
+  if (prayerId) {
+    prayer = db.prayers.find(p=>p.id===prayerId);
+  } else {
+    const title = document.getElementById('m-title')?.value.trim();
+    if (!title) { alert('Please name this prayer.'); return; }
+    prayer = {id:uid(), title, themeIds:[..._mThemes], status:'active',
+              createdAt:Date.now(), entries:[], livingSummary:'', linkedPrayerIds:[]};
+    db.prayers.push(prayer);
+  }
+
+  prayer.entries.push({id:uid(), type, content, scripture, createdAt:Date.now()});
+  if (type==='answer') { prayer.status='answered'; prayer.answeredAt=Date.now(); }
+  item.processed = true;
+  persist(); closeModal(); renderInbox(); updateInboxBadge();
+}
+
+function dismissItem(id) {
+  const i = db.inbox.find(x=>x.id===id);
+  if (i) { i.processed=true; persist(); renderInbox(); updateInboxBadge(); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// THEMES
+// ═══════════════════════════════════════════════════════════
+function renderThemes() {
+  const list = document.getElementById('themes-list');
+  list.innerHTML = db.themes.map(theme => {
+    const prayers = db.prayers.filter(p=>p.themeIds&&p.themeIds.includes(theme.id));
+    const active  = prayers.filter(p=>p.status==='active').length;
+    const answered= prayers.filter(p=>p.status==='answered').length;
+    const stats = [
+      active   ? active+' active'   : '',
+      answered ? answered+' answered': '',
+      !prayers.length ? 'No prayers yet' : prayers.length+' total',
+    ].filter(Boolean).join(' · ');
+    return `
+      <div class="theme-card" onclick="openThemeModal('${theme.id}')">
+        <div class="theme-icon">${theme.icon}</div>
+        <div style="flex:1;">
+          <div class="theme-name">${esc(theme.name)}</div>
+          <div class="theme-stats">${stats}</div>
+        </div>
+        <div class="theme-arrow">›</div>
+      </div>`;
+  }).join('');
+
+  const unthemed = db.prayers.filter(p=>!p.themeIds||!p.themeIds.length);
+  if (unthemed.length) {
+    list.innerHTML += `
+      <div class="theme-card" onclick="openThemeModal('__none__')">
+        <div class="theme-icon">📋</div>
+        <div style="flex:1;">
+          <div class="theme-name">Other Prayers</div>
+          <div class="theme-stats">${unthemed.length} prayer${unthemed.length>1?'s':''}</div>
+        </div>
+        <div class="theme-arrow">›</div>
+      </div>`;
+  }
+}
+
+function openThemeModal(themeId) {
+  let prayers, name;
+  if (themeId==='__none__') {
+    prayers = db.prayers.filter(p=>!p.themeIds||!p.themeIds.length);
+    name = '📋 Other Prayers';
+  } else {
+    prayers = db.prayers.filter(p=>p.themeIds&&p.themeIds.includes(themeId));
+    const t = db.themes.find(t=>t.id===themeId);
+    name = t ? t.icon+' '+t.name : themeId;
+  }
+
+  const order = {active:0,watching:1,dormant:2,answered:3};
+  prayers.sort((a,b)=>(order[a.status]||0)-(order[b.status]||0));
+
+  showModal(name, `
+    <button class="btn btn-ghost btn-full mb16" onclick="closeModal();showNewPrayerModal('${themeId}')">+ New Prayer in this Theme</button>
+    ${!prayers.length ? '<div class="empty-state">No prayers in this theme yet.</div>' : ''}
+    ${prayers.map(p=>`
+      <div class="card clickable" onclick="closeModal();openPrayer('${p.id}')">
+        <div class="flex-between">
+          <div style="font-family:'Playfair Display',serif;font-size:18px;">${esc(p.title)}</div>
+          <span class="badge badge-${p.status}">${p.status}</span>
+        </div>
+        <div class="text-muted text-small mt4">
+          ${p.entries.length} entr${p.entries.length===1?'y':'ies'}
+          ${p.entries.length ? ' · '+fmtRel(p.entries[p.entries.length-1].createdAt) : ''}
+        </div>
+      </div>`).join('')}
+  `);
+}
+
+// ═══════════════════════════════════════════════════════════
+// PRAYER DETAIL
+// ═══════════════════════════════════════════════════════════
+function openPrayer(id) {
+  currentPrayer = db.prayers.find(p=>p.id===id);
+  if (!currentPrayer) return;
+  navigate('prayer');
+  renderPrayerDetail();
+}
+
+function renderPrayerDetail() {
+  const p = currentPrayer;
+  document.getElementById('pd-title').textContent = p.title;
+
+  // Badges
+  const themeBadges = (p.themeIds||[]).map(tid=>{
+    const t = db.themes.find(th=>th.id===tid);
+    return t ? `<span class="tag selected" style="cursor:default;">${t.icon} ${t.name}</span>` : '';
+  }).join('');
+  document.getElementById('pd-badges').innerHTML =
+    `<span class="badge badge-${p.status}">${p.status}</span>${themeBadges}`;
+
+  // Living summary
+  const sd = document.getElementById('pd-summary');
+  if (p.livingSummary) {
+    sd.innerHTML = `
+      <div class="living-summary">
+        <div class="ls-label">Living Summary</div>
+        <div class="ls-text">${esc(p.livingSummary)}</div>
+        ${db.settings.apiKey ? `<button class="btn btn-ghost btn-sm mt8" onclick="refreshSummary()">↻ Refresh</button>` : ''}
+      </div>`;
+  } else if (db.settings.apiKey) {
+    sd.innerHTML = `
+      <div class="living-summary" style="text-align:center;">
+        <button class="btn btn-ghost" onclick="refreshSummary()">✦ Generate Living Summary</button>
+      </div>`;
+  } else sd.innerHTML = '';
+
+  // Thread
+  renderThread(p);
+
+  // Status actions
+  const ad = document.getElementById('pd-actions');
+  const btns = [];
+  if (p.status!=='answered') btns.push(`<button class="btn btn-ghost btn-sm" onclick="markAnswered()">✨ Mark Answered</button>`);
+  if (p.status!=='watching') btns.push(`<button class="btn btn-dim btn-sm" onclick="setStatus('watching')">Set Watching</button>`);
+  if (p.status!=='dormant')  btns.push(`<button class="btn btn-dim btn-sm" onclick="setStatus('dormant')">Set Dormant</button>`);
+  if (p.status!=='active')   btns.push(`<button class="btn btn-dim btn-sm" onclick="setStatus('active')">Set Active</button>`);
+  btns.push(`<button class="btn btn-dim btn-sm" onclick="confirmDeletePrayer()">Delete Prayer</button>`);
+  ad.innerHTML = btns.join('');
+}
+
+const ENTRY_ICONS = {request:'🙏',update:'📝',observation:'👁',answer:'✨',principle:'📖'};
+
+function renderThread(p) {
+  const td = document.getElementById('pd-thread');
+  if (!p.entries.length) {
+    td.innerHTML = `<div class="empty-state">Begin with your first entry above.</div>`;
+    return;
+  }
+  td.innerHTML = `<div class="thread">`+p.entries.map((e,i)=>{
+    const isLast = i===p.entries.length-1;
+    return `
+      <div class="entry">
+        <div class="thread-line-wrap">
+          <div class="entry-dot t-${e.type}">${ENTRY_ICONS[e.type]||'·'}</div>
+          ${!isLast ? '<div class="entry-line"></div>' : ''}
+        </div>
+        <div class="entry-body">
+          <div class="entry-meta">
+            <span class="entry-type-label">${e.type}</span>
+            <span class="entry-date">${fmtDate(e.createdAt)}</span>
+          </div>
+          <div class="entry-content">${esc(e.content)}</div>
+          ${e.scripture ? `<div class="entry-scripture">${esc(e.scripture)}</div>` : ''}
+          <div class="entry-actions">
+            <button class="entry-del" onclick="deleteEntry('${e.id}')">Delete entry</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('')+`</div>`;
+}
+
+async function refreshSummary() {
+  const p = currentPrayer;
+  if (!p || !db.settings.apiKey) return;
+  document.getElementById('pd-summary').innerHTML =
+    `<div class="living-summary"><div class="ai-thinking">✦ Generating <div class="dots"><span></span><span></span><span></span></div></div></div>`;
+
+  const entries = p.entries.map(e=>`[${e.type} · ${fmtDate(e.createdAt)}]: ${e.content}`).join('\n');
+  const prompt = `You are a spiritual journal assistant. Write a warm, concise living summary (3-5 sentences) for this prayer. Write in second person ("You began this prayer..."). Capture the arc, current status, and any key insights. End with where things stand now.
+
+Prayer: "${p.title}"
+Status: ${p.status}
+Entries:\n${entries}
+
+Return ONLY the summary text, nothing else.`;
+
+  try {
+    p.livingSummary = await callAI(prompt);
+    persist();
+    renderPrayerDetail();
+  } catch(e) {
+    document.getElementById('pd-summary').innerHTML =
+      `<div class="living-summary"><p class="text-muted">Could not generate. Check API key.</p></div>`;
+  }
+}
+
+function showAddEntryModal() {
+  showModal('Add Entry', `
+    <div class="field"><label>Entry Type</label>
+      <select id="e-type">
+        <option value="update">Update</option>
+        <option value="observation">Observation</option>
+        <option value="request">Prayer Request</option>
+        <option value="answer">Answered Prayer</option>
+        <option value="principle">Principle Learned</option>
+      </select></div>
+    <div class="field"><label>Entry</label>
+      <textarea id="e-content" rows="5" placeholder="What happened? What did you notice? What is God saying?"></textarea></div>
+    <div class="field"><label>Scripture (optional)</label>
+      <input type="text" id="e-scripture" placeholder="e.g. Romans 8:28..." /></div>
+    <button class="btn btn-primary btn-full" onclick="submitEntry()">Add Entry</button>
+  `);
+}
+
+function submitEntry() {
+  if (!currentPrayer) return;
+  const type      = document.getElementById('e-type').value;
+  const content   = document.getElementById('e-content').value.trim();
+  const scripture = document.getElementById('e-scripture').value.trim();
+  if (!content) return;
+  currentPrayer.entries.push({id:uid(), type, content, scripture, createdAt:Date.now()});
+  if (type==='answer') { currentPrayer.status='answered'; currentPrayer.answeredAt=Date.now(); }
+  persist(); closeModal(); renderPrayerDetail();
+}
+
+function deleteEntry(entryId) {
+  if (!confirm('Delete this entry?')) return;
+  currentPrayer.entries = currentPrayer.entries.filter(e=>e.id!==entryId);
+  persist(); renderThread(currentPrayer);
+}
+
+function markAnswered() {
+  showModal('✨ Mark as Answered', `
+    <p style="color:var(--muted);font-style:italic;margin-bottom:16px;">How did God answer? Write your testimony.</p>
+    <div class="field"><textarea id="ans-text" rows="5" placeholder="Describe how God answered this prayer..."></textarea></div>
+    <button class="btn btn-primary btn-full" onclick="submitAnswer()">Record Testimony</button>
+  `);
+}
+
+function submitAnswer() {
+  const text = document.getElementById('ans-text').value.trim();
+  if (!text || !currentPrayer) return;
+  currentPrayer.entries.push({id:uid(), type:'answer', content:text, scripture:'', createdAt:Date.now()});
+  currentPrayer.status = 'answered';
+  currentPrayer.answeredAt = Date.now();
+  persist(); closeModal(); renderPrayerDetail();
+}
+
+function setStatus(status) {
+  if (!currentPrayer) return;
+  currentPrayer.status = status;
+  persist(); renderPrayerDetail();
+}
+
+function confirmDeletePrayer() {
+  if (!confirm('Delete "'+currentPrayer.title+'"? This cannot be undone.')) return;
+  db.prayers = db.prayers.filter(p=>p.id!==currentPrayer.id);
+  persist(); navigate('themes');
+}
+
+// ═══════════════════════════════════════════════════════════
+// NEW PRAYER MODAL
+// ═══════════════════════════════════════════════════════════
+let _npThemes = [];
+function toggleNPTheme(id, el) {
+  if (_npThemes.includes(id)) { _npThemes=_npThemes.filter(t=>t!==id); el.classList.remove('selected'); }
+  else { _npThemes.push(id); el.classList.add('selected'); }
+}
+
+function showNewPrayerModal(preTheme='') {
+  _npThemes = preTheme && preTheme!=='__none__' ? [preTheme] : [];
+  showModal('New Prayer', `
+    <div class="field"><label>Prayer Title</label>
+      <input type="text" id="np-title" placeholder="e.g. Job & Career, Our Future Home..." /></div>
+    <div class="field"><label>Initial Request</label>
+      <textarea id="np-content" rows="4" placeholder="Write your prayer request..."></textarea></div>
+    <div class="field"><label>Scripture (optional)</label>
+      <input type="text" id="np-scripture" placeholder="e.g. Jeremiah 29:11..." /></div>
+    <div class="field"><label>Themes</label>
+      <div class="tags">${db.themes.map(t=>`
+        <span class="tag ${t.id===preTheme?'selected':''}" onclick="toggleNPTheme('${t.id}',this)">${t.icon} ${t.name}</span>`).join('')}
+      </div></div>
+    <div class="field"><label>Status</label>
+      <select id="np-status">
+        <option value="active">Active</option>
+        <option value="watching">Watching</option>
+        <option value="dormant">Dormant</option>
+      </select></div>
+    <button class="btn btn-primary btn-full" onclick="submitNewPrayer()">Create Prayer</button>
+  `);
+}
+
+function submitNewPrayer() {
+  const title     = document.getElementById('np-title').value.trim();
+  const content   = document.getElementById('np-content').value.trim();
+  const scripture = document.getElementById('np-scripture').value.trim();
+  const status    = document.getElementById('np-status').value;
+  if (!title) { alert('Please name this prayer.'); return; }
+
+  const selectedThemes = [..._npThemes];
+  const prayer = {
+    id:uid(), title, themeIds:selectedThemes, status,
+    createdAt:Date.now(), entries:[], livingSummary:'', linkedPrayerIds:[]
+  };
+  if (content) prayer.entries.push({id:uid(), type:'request', content, scripture, createdAt:Date.now()});
+  db.prayers.push(prayer);
+  persist(); closeModal(); openPrayer(prayer.id);
+}
+
+// ═══════════════════════════════════════════════════════════
+// TESTIMONY
+// ═══════════════════════════════════════════════════════════
+function renderTestimony() {
+  const list  = document.getElementById('testimony-list');
+  const empty = document.getElementById('testimony-empty');
+  const items = db.prayers.filter(p=>p.status==='answered')
+    .sort((a,b)=>(b.answeredAt||0)-(a.answeredAt||0));
+  if (!items.length) { list.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+  list.innerHTML = items.map(p=>{
+    const ans = [...p.entries].reverse().find(e=>e.type==='answer');
+    return `
+      <div class="testimony-card" onclick="openPrayer('${p.id}')">
+        <div class="testimony-title">✨ ${esc(p.title)}</div>
+        <div class="testimony-date">Answered ${fmtDate(p.answeredAt||p.createdAt)}</div>
+        ${ans ? `<div class="testimony-quote">"${esc(ans.content.length>220?ans.content.slice(0,220)+'...':ans.content)}"</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// PRINCIPLES
+// ═══════════════════════════════════════════════════════════
+function renderPrinciples() {
+  const list  = document.getElementById('principles-list');
+  const empty = document.getElementById('principles-empty');
+  if (!db.principles.length) { list.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+  list.innerHTML = db.principles
+    .sort((a,b)=>b.createdAt-a.createdAt)
+    .map(p=>`
+      <div class="principle-card">
+        <div class="principle-text">"${esc(p.text)}"</div>
+        <div class="principle-meta">
+          <div class="text-muted text-small">${fmtDate(p.createdAt)}</div>
+          <button class="entry-del" onclick="deletePrinciple('${p.id}')">Delete</button>
+        </div>
+      </div>`).join('');
+}
+
+function showAddPrincipleModal() {
+  showModal('Record a Principle', `
+    <p style="color:var(--muted);font-style:italic;font-size:15px;margin-bottom:16px;">
+      Wisdom you've extracted from lived experience — something that will guide future decisions.
+    </p>
+    <div class="field">
+      <textarea id="pr-text" rows="4" placeholder='e.g. "When I lose presence with my wife, I have likely left God's rhythm."'></textarea>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="submitPrinciple()">Record Principle</button>
+  `);
+}
+
+function submitPrinciple() {
+  const text = document.getElementById('pr-text').value.trim();
+  if (!text) return;
+  db.principles.push({id:uid(), text, prayerIds:[], createdAt:Date.now()});
+  persist(); closeModal(); renderPrinciples();
+}
+
+function deletePrinciple(id) {
+  if (!confirm('Delete this principle?')) return;
+  db.principles = db.principles.filter(p=>p.id!==id);
+  persist(); renderPrinciples();
+}
+
+// ═══════════════════════════════════════════════════════════
+// EVENING ROUTINE
+// ═══════════════════════════════════════════════════════════
+function openRoutine() {
+  const overlay = document.getElementById('routine-overlay');
+  overlay.classList.add('open');
+
+  const unread  = db.inbox.filter(i=>!i.processed).length;
+  const active  = db.prayers.filter(p=>p.status==='active');
+  const doy     = Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/86400000);
+  const focus   = active.length ? active[doy % active.length] : null;
+
+  document.getElementById('routine-body').innerHTML = `
+    <div class="routine-step">
+      <div class="step-num">Step 1 of 3</div>
+      <div class="step-title">Give Thanks</div>
+      <div class="step-verse">"In everything give thanks; for this is the will of God." — 1 Thess 5:18</div>
+      <div class="field">
+        <label>What did you see God do today?</label>
+        <textarea id="r-thanks" rows="3" placeholder="One thing, however small..."></textarea>
+      </div>
+    </div>
+    <div class="routine-step">
+      <div class="step-num">Step 2 of 3</div>
+      <div class="step-title">Inbox ${unread > 0 ? `<span style="color:var(--gold);font-size:20px;">(${unread})</span>` : '✓'}</div>
+      ${unread > 0
+        ? `<p style="color:var(--muted);margin-bottom:14px;">You have <strong style="color:var(--gold);">${unread}</strong> unprocessed capture${unread>1?'s':''} waiting to be filed.</p>
+           <button class="btn btn-ghost btn-full" onclick="closeRoutine();navigate('inbox')">Review Inbox →</button>`
+        : `<p style="color:var(--green-text);">✓ Your inbox is clear.</p>`}
+    </div>
+    <div class="routine-step">
+      <div class="step-num">Step 3 of 3</div>
+      <div class="step-title">Pray Forward</div>
+      ${focus
+        ? `<p class="text-muted text-small" style="margin-bottom:10px;">Tomorrow's focus prayer:</p>
+           <div class="living-summary" style="margin-bottom:16px;">
+             <div class="ls-label">🙏 ${esc(focus.title)}</div>
+             <div class="ls-text">${focus.livingSummary || 'Bring this before God tomorrow.'}</div>
+           </div>`
+        : `<p class="text-muted" style="margin-bottom:14px;">Add your first prayer to activate a daily focus.</p>`}
+      <div class="field">
+        <label>Anything to surrender tonight?</label>
+        <textarea id="r-surrender" rows="3" placeholder="Whatever is on your heart..."></textarea>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="completeRoutine()">Complete Evening ✦</button>
+  `;
+}
+
+function completeRoutine() {
+  const thanks    = document.getElementById('r-thanks')?.value.trim();
+  const surrender = document.getElementById('r-surrender')?.value.trim();
+  if (thanks)    db.inbox.push({id:uid(), rawText:'[Gratitude] '+thanks,   createdAt:Date.now(), processed:false});
+  if (surrender) db.inbox.push({id:uid(), rawText:'[Surrender] '+surrender, createdAt:Date.now(), processed:false});
+  persist(); closeRoutine(); renderHome(); updateInboxBadge();
+}
+
+function closeRoutine() {
+  document.getElementById('routine-overlay').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════════
+function showModal(title, html) {
+  document.getElementById('modal-title-text').textContent = title;
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+function maybeCloseModal(e) {
+  if (e.target===document.getElementById('modal-overlay')) closeModal();
+}
+
+// ═══════════════════════════════════════════════════════════
+// AI
+// ═══════════════════════════════════════════════════════════
+async function callAI(prompt) {
+  const key = db.settings.apiKey;
+  if (!key) throw new Error('No API key');
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key': key,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:1000,
+      messages:[{role:'user',content:prompt}]
+    })
+  });
+  if (!res.ok) throw new Error('API '+res.status);
+  const data = await res.json();
+  return data.content.map(b=>b.type==='text'?b.text:'').join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', boot);
+</script>
+</body>
+</html>
