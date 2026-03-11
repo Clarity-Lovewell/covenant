@@ -2,8 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Covenant — Prayer Journal</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Covenant">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0f0b05">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -34,6 +39,7 @@ body{
   font-size:17px;
   line-height:1.65;
   min-height:100vh;
+  min-height:-webkit-fill-available;
   overflow-x:hidden;
 }
 body::after{
@@ -52,7 +58,7 @@ h1,h2,h3,h4{font-family:'Playfair Display',Georgia,serif;font-weight:600;}
   background:rgba(15,11,5,0.95);
   border-top:1px solid var(--border);
   display:flex;justify-content:space-around;
-  padding:7px 0 14px;z-index:100;
+  padding:7px 0 max(14px, env(safe-area-inset-bottom));z-index:100;
   backdrop-filter:blur(16px);
 }
 .nav-btn{
@@ -379,6 +385,47 @@ label{
 /* ══════════════════════════════════
    EVENING ROUTINE OVERLAY
 ══════════════════════════════════ */
+.routine-done-badge{
+  position:absolute;top:12px;right:52px;
+  font-family:'Lato',sans-serif;font-size:10px;
+  font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--green-text);opacity:0.85;
+}
+/* Prayer description */
+.prayer-description{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;padding:14px 16px;margin-bottom:18px;
+  position:relative;
+}
+.prayer-description-text{
+  color:var(--cream-dim);line-height:1.65;font-size:16px;
+  font-style:italic;
+}
+.prayer-description-empty{
+  color:var(--muted);font-style:italic;font-size:15px;
+}
+.prayer-description-actions{
+  display:flex;justify-content:flex-end;margin-top:8px;
+}
+/* Dynamic note rows */
+.note-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;}
+.note-row textarea{flex:1;}
+.note-remove{
+  background:none;border:none;color:var(--muted);cursor:pointer;
+  font-size:18px;padding:10px 6px;line-height:1;transition:color 0.2s;flex-shrink:0;
+}
+.note-remove:hover{color:var(--cream-dim);}
+/* Focus prayer picker */
+.focus-prayer-pick{
+  display:flex;flex-direction:column;gap:8px;margin-top:12px;
+}
+.focus-pick-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.2s;
+}
+.focus-pick-card:hover,.focus-pick-card.chosen{
+  border-color:var(--gold-dim);background:var(--gold-faint);color:var(--gold);
+}
 .routine-overlay{
   position:fixed;inset:0;
   background:var(--bg);z-index:300;
@@ -495,14 +542,22 @@ label{
       <h1 class="home-greeting" id="h-greeting">Good evening</h1>
       <div class="home-verse" id="h-verse"></div>
     </div>
+    <div class="qc-box" style="margin-bottom:12px;">
+      <div class="qc-label">⚡ Quick Capture</div>
+      <textarea id="qc-input" rows="3" placeholder="A thought, prayer, observation — anything. Don't think, just capture it."></textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+        <button id="qc-btn" class="btn btn-primary" onclick="quickCapture()">Capture →</button>
+      </div>
+    </div>
     <div id="h-inbox-card" class="highlight-card" onclick="navigate('inbox')" style="display:none;">
       <div class="hc-label">📥 Inbox</div>
       <div class="hc-value" id="h-inbox-val"></div>
       <div class="hc-sub">Tap to review and file</div>
     </div>
-    <button class="routine-card" onclick="openRoutine()">
+    <button class="routine-card" id="routine-card-btn" onclick="openRoutine()">
       <div class="rc-label">🌙 Evening Routine</div>
       <div class="rc-title">Begin tonight's practice</div>
+      <span id="routine-done-badge" class="routine-done-badge" style="display:none;">✓ Done today</span>
       <span class="arrow">→</span>
     </button>
     <div id="h-focus-card" class="highlight-card" style="display:none;">
@@ -516,14 +571,7 @@ label{
       <div class="hc-sub" id="h-test-sub"></div>
     </div>
     <div class="divider"></div>
-    <div class="qc-box">
-      <div class="qc-label">⚡ Quick Capture</div>
-      <textarea id="qc-input" rows="3" placeholder="A thought, prayer, observation — anything. Don't think, just capture it."></textarea>
-      <div style="display:flex;justify-content:flex-end;margin-top:8px;">
-        <button id="qc-btn" class="btn btn-primary" onclick="quickCapture()">Capture →</button>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;margin-top:16px;justify-content:center;">
+    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px;">
       <button class="btn btn-dim btn-sm" onclick="exportData()" title="Download a backup of all your Covenant data">↓ Export Backup</button>
       <button class="btn btn-dim btn-sm" onclick="triggerImport()" title="Restore from a previous backup file">↑ Import Backup</button>
     </div>
@@ -572,6 +620,12 @@ label{
     </div>
     <div id="testimony-list"></div>
     <div id="testimony-empty" class="empty-state" style="display:none;">Answered prayers will appear here. ✦</div>
+    <div id="testimony-milestones-section" style="display:none;">
+      <div class="divider"></div>
+      <h3 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:6px;color:var(--cream-dim);">Along the Way</h3>
+      <p class="text-muted text-italic text-small" style="margin-bottom:16px;">Partial answers and milestones within ongoing prayers</p>
+      <div id="testimony-milestones"></div>
+    </div>
   </div>
 
   <!-- PRINCIPLES -->
@@ -638,20 +692,40 @@ label{
 const STORE = 'covenant_v1';
 
 function load() {
-  try { const r = localStorage.getItem(STORE); if (r) return JSON.parse(r); } catch(e){}
+  try {
+    const r = localStorage.getItem(STORE);
+    if (r) {
+      const d = JSON.parse(r);
+      // migrate settings
+      if (!d.settings.routineCompletedDate) d.settings.routineCompletedDate = '';
+      if (!d.settings.tomorrowFocusPrayerId) d.settings.tomorrowFocusPrayerId = '';
+      // migrate themes — add description if missing
+      const defThemes = defaults().themes;
+      d.themes = d.themes.map(t => {
+        if (!t.description) {
+          const def = defThemes.find(dt=>dt.id===t.id);
+          t.description = def ? def.description : '';
+        }
+        return t;
+      });
+      // migrate prayers — add description if missing
+      d.prayers = d.prayers.map(p => { if (!p.description) p.description=''; return p; });
+      return d;
+    }
+  } catch(e){}
   return defaults();
 }
 
 function defaults() {
   return {
-    settings: { name:'', apiKey:'' },
+    settings: { name:'', apiKey:'', routineCompletedDate:'', tomorrowFocusPrayerId:'' },
     themes: [
-      {id:'work',   name:'Work & Calling',  icon:'💼'},
-      {id:'home',   name:'Home & Living',   icon:'🏡'},
-      {id:'marriage',name:'Marriage',       icon:'💑'},
-      {id:'health', name:'Health',          icon:'🌿'},
-      {id:'faith',  name:'Faith & Growth',  icon:'✨'},
-      {id:'finances',name:'Finances',       icon:'🌱'},
+      {id:'work',    name:'Work & Calling',  icon:'💼', description:'Prayers about vocation, purpose, and daily work.'},
+      {id:'home',    name:'Home & Living',   icon:'🏡', description:'Prayers about your home, environment, and practical provision.'},
+      {id:'marriage',name:'Marriage',        icon:'💑', description:'Prayers for your relationship, unity, and growth together.'},
+      {id:'health',  name:'Health',          icon:'🌿', description:'Prayers for physical, mental, and emotional wellbeing.'},
+      {id:'faith',   name:'Faith & Growth',  icon:'✨', description:'Prayers for spiritual depth, character, and closeness with God.'},
+      {id:'finances',name:'Finances',        icon:'🌱', description:'Prayers about provision, stewardship, and financial wisdom.'},
     ],
     prayers: [],
     inbox: [],
@@ -808,18 +882,22 @@ function updateInboxBadge() {
 // HOME
 // ═══════════════════════════════════════════════════════════
 const VERSES = [
-  '"Be anxious for nothing, but in everything by prayer..." — Phil 4:6',
-  '"The Lord is near to all who call on Him in truth." — Ps 145:18',
-  '"Ask and it shall be given to you; seek and you will find." — Matt 7:7',
+  '"Be anxious for nothing, but in everything by prayer and supplication, with thanksgiving, let your requests be made known to God." — Phil 4:6',
+  '"The Lord is near to all who call on Him, to all who call on Him in truth." — Ps 145:18',
+  '"Ask and it will be given to you; seek and you will find; knock and the door will be opened to you." — Matt 7:7',
   '"Cast all your anxiety on Him because He cares for you." — 1 Pet 5:7',
-  '"In everything give thanks; this is God\'s will for you." — 1 Thess 5:18',
+  '"In everything give thanks; for this is the will of God in Christ Jesus for you." — 1 Thess 5:18',
   '"Your word is a lamp to my feet and a light to my path." — Ps 119:105',
-  '"Draw near to God and He will draw near to you." — James 4:8',
-  '"Trust in the Lord with all your heart." — Prov 3:5',
+  '"Draw near to God, and He will draw near to you." — James 4:8',
+  '"Trust in the Lord with all your heart, and lean not on your own understanding." — Prov 3:5',
   '"I can do all things through Christ who strengthens me." — Phil 4:13',
   '"The prayer of a righteous person is powerful and effective." — James 5:16',
-  '"Seek first the kingdom of God and His righteousness." — Matt 6:33',
-  '"He makes all things work together for good." — Romans 8:28',
+  '"But seek first His kingdom and His righteousness, and all these things will be given to you as well." — Matt 6:33',
+  '"And we know that in all things God works for the good of those who love Him, who have been called according to His purpose." — Romans 8:28',
+  '"Come to me, all you who are weary and burdened, and I will give you rest." — Matt 11:28',
+  '"The Lord your God is with you, the Mighty Warrior who saves. He will take great delight in you." — Zeph 3:17',
+  '"Have I not commanded you? Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you." — Josh 1:9',
+  '"For I know the plans I have for you, declares the Lord — plans to prosper you and not to harm you, plans to give you hope and a future." — Jer 29:11',
 ];
 
 function renderHome() {
@@ -833,6 +911,11 @@ function renderHome() {
   const doy = Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/86400000);
   document.getElementById('h-verse').textContent = VERSES[doy % VERSES.length];
 
+  // Routine done badge
+  const todayStr = new Date().toISOString().split('T')[0];
+  const doneBadge = document.getElementById('routine-done-badge');
+  if (doneBadge) doneBadge.style.display = db.settings.routineCompletedDate === todayStr ? 'block' : 'none';
+
   // Inbox card
   const unread = db.inbox.filter(i=>!i.processed).length;
   const ic = document.getElementById('h-inbox-card');
@@ -842,11 +925,14 @@ function renderHome() {
       unread + ' unprocessed capture'+(unread>1?'s':'');
   } else ic.style.display = 'none';
 
-  // Focus prayer
+  // Focus prayer — use chosen focus if set, else round-robin
   const active = db.prayers.filter(p=>p.status==='active');
   const fc = document.getElementById('h-focus-card');
   if (active.length > 0) {
-    const focus = active[doy % active.length];
+    let focus = db.settings.tomorrowFocusPrayerId
+      ? db.prayers.find(p=>p.id===db.settings.tomorrowFocusPrayerId && p.status==='active')
+      : null;
+    if (!focus) focus = active[doy % active.length];
     fc.style.display = 'block';
     document.getElementById('h-focus-title').textContent = focus.title;
     const last = focus.entries[focus.entries.length-1];
@@ -1086,6 +1172,7 @@ function renderThemes() {
         <div class="theme-icon">${theme.icon}</div>
         <div style="flex:1;">
           <div class="theme-name">${esc(theme.name)}</div>
+          ${theme.description ? `<div style="font-size:13px;color:var(--muted);margin-bottom:2px;font-style:italic;">${esc(theme.description)}</div>` : ''}
           <div class="theme-stats">${stats}</div>
         </div>
         <div class="theme-arrow">›</div>
@@ -1159,21 +1246,35 @@ function renderPrayerDetail() {
   document.getElementById('pd-badges').innerHTML =
     `<span class="badge badge-${p.status}">${p.status}</span>${themeBadges}`;
 
-  // Living summary
+  // Prayer description
   const sd = document.getElementById('pd-summary');
+  const descHtml = `
+    <div class="prayer-description" id="pd-desc-box">
+      ${p.description
+        ? `<div class="prayer-description-text">${esc(p.description)}</div>`
+        : `<div class="prayer-description-empty">No description yet — tap Edit to add one.</div>`}
+      <div class="prayer-description-actions">
+        <button class="btn btn-dim btn-sm" onclick="editPrayerDescription()">Edit Description</button>
+      </div>
+    </div>`;
+
+  // Living summary
+  let summaryHtml = '';
   if (p.livingSummary) {
-    sd.innerHTML = `
+    summaryHtml = `
       <div class="living-summary">
         <div class="ls-label">Living Summary</div>
         <div class="ls-text">${esc(p.livingSummary)}</div>
         ${db.settings.apiKey ? `<button class="btn btn-ghost btn-sm mt8" onclick="refreshSummary()">↻ Refresh</button>` : ''}
       </div>`;
   } else if (db.settings.apiKey) {
-    sd.innerHTML = `
+    summaryHtml = `
       <div class="living-summary" style="text-align:center;">
         <button class="btn btn-ghost" onclick="refreshSummary()">✦ Generate Living Summary</button>
       </div>`;
-  } else sd.innerHTML = '';
+  }
+
+  sd.innerHTML = descHtml + summaryHtml;
 
   // Thread
   renderThread(p);
@@ -1189,7 +1290,34 @@ function renderPrayerDetail() {
   ad.innerHTML = btns.join('');
 }
 
-const ENTRY_ICONS = {request:'🙏',update:'📝',observation:'👁',answer:'✨',principle:'📖'};
+function editPrayerDescription() {
+  if (!currentPrayer) return;
+  showModal('Edit Description', `
+    <p style="color:var(--muted);font-style:italic;font-size:15px;margin-bottom:16px;">
+      A short note about what you're praying for and where things stand. Updating this adds an entry to the thread.
+    </p>
+    <div class="field">
+      <textarea id="desc-text" rows="4" placeholder="e.g. Praying for clarity about the next role — specifically whether to pursue the management track or stay technical.">${esc(currentPrayer.description||'')}</textarea>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="submitPrayerDescription()">Save Description</button>
+  `);
+}
+
+function submitPrayerDescription() {
+  const text = document.getElementById('desc-text').value.trim();
+  if (!currentPrayer) return;
+  const old = currentPrayer.description || '';
+  currentPrayer.description = text;
+  // Only add entry if description actually changed and isn't empty
+  if (text && text !== old) {
+    currentPrayer.entries.push({
+      id:uid(), type:'update',
+      content:'Description updated: '+text,
+      scripture:'', createdAt:Date.now()
+    });
+  }
+  persist(); closeModal(); renderPrayerDetail();
+}
 
 function renderThread(p) {
   const td = document.getElementById('pd-thread');
@@ -1323,6 +1451,8 @@ function showNewPrayerModal(preTheme='') {
   showModal('New Prayer', `
     <div class="field"><label>Prayer Title</label>
       <input type="text" id="np-title" placeholder="e.g. Job & Career, Our Future Home..." /></div>
+    <div class="field"><label>Description <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;">(optional — what are you praying about?)</span></label>
+      <textarea id="np-desc" rows="2" placeholder="A short note about what you're trusting God for..."></textarea></div>
     <div class="field"><label>Initial Request</label>
       <textarea id="np-content" rows="4" placeholder="Write your prayer request..."></textarea></div>
     <div class="field"><label>Scripture (optional)</label>
@@ -1343,6 +1473,7 @@ function showNewPrayerModal(preTheme='') {
 
 function submitNewPrayer() {
   const title     = document.getElementById('np-title').value.trim();
+  const desc      = document.getElementById('np-desc').value.trim();
   const content   = document.getElementById('np-content').value.trim();
   const scripture = document.getElementById('np-scripture').value.trim();
   const status    = document.getElementById('np-status').value;
@@ -1350,7 +1481,7 @@ function submitNewPrayer() {
 
   const selectedThemes = [..._npThemes];
   const prayer = {
-    id:uid(), title, themeIds:selectedThemes, status,
+    id:uid(), title, description:desc, themeIds:selectedThemes, status,
     createdAt:Date.now(), entries:[], livingSummary:'', linkedPrayerIds:[]
   };
   if (content) prayer.entries.push({id:uid(), type:'request', content, scripture, createdAt:Date.now()});
@@ -1364,19 +1495,47 @@ function submitNewPrayer() {
 function renderTestimony() {
   const list  = document.getElementById('testimony-list');
   const empty = document.getElementById('testimony-empty');
-  const items = db.prayers.filter(p=>p.status==='answered')
+
+  // Fully answered prayers
+  const answered = db.prayers.filter(p=>p.status==='answered')
     .sort((a,b)=>(b.answeredAt||0)-(a.answeredAt||0));
-  if (!items.length) { list.innerHTML=''; empty.style.display='block'; return; }
-  empty.style.display = 'none';
-  list.innerHTML = items.map(p=>{
-    const ans = [...p.entries].reverse().find(e=>e.type==='answer');
-    return `
-      <div class="testimony-card" onclick="openPrayer('${p.id}')">
-        <div class="testimony-title">✨ ${esc(p.title)}</div>
-        <div class="testimony-date">Answered ${fmtDate(p.answeredAt||p.createdAt)}</div>
-        ${ans ? `<div class="testimony-quote">"${esc(ans.content.length>220?ans.content.slice(0,220)+'...':ans.content)}"</div>` : ''}
-      </div>`;
-  }).join('');
+
+  if (!answered.length) { list.innerHTML=''; empty.style.display='block'; }
+  else {
+    empty.style.display = 'none';
+    list.innerHTML = answered.map(p=>{
+      const ans = [...p.entries].reverse().find(e=>e.type==='answer');
+      return `
+        <div class="testimony-card" onclick="openPrayer('${p.id}')">
+          <div class="testimony-title">✨ ${esc(p.title)}</div>
+          <div class="testimony-date">Answered ${fmtDate(p.answeredAt||p.createdAt)}</div>
+          ${ans ? `<div class="testimony-quote">"${esc(ans.content.length>220?ans.content.slice(0,220)+'...':ans.content)}"</div>` : ''}
+        </div>`;
+    }).join('');
+  }
+
+  // Partial answers — active/watching prayers that have at least one 'answer' entry
+  const partial = db.prayers
+    .filter(p=>p.status!=='answered' && p.entries.some(e=>e.type==='answer'))
+    .sort((a,b)=>b.createdAt-a.createdAt);
+
+  const msSection = document.getElementById('testimony-milestones-section');
+  const msList    = document.getElementById('testimony-milestones');
+
+  if (partial.length) {
+    msSection.style.display = 'block';
+    msList.innerHTML = partial.map(p=>{
+      const answerEntries = p.entries.filter(e=>e.type==='answer');
+      return `
+        <div class="testimony-card" style="border-color:rgba(122,170,206,0.25);" onclick="openPrayer('${p.id}')">
+          <div class="testimony-title" style="color:var(--blue-text);">🌿 ${esc(p.title)}</div>
+          <div class="testimony-date">${answerEntries.length} milestone${answerEntries.length>1?'s':''} · ${p.status}</div>
+          ${answerEntries.slice(-1).map(e=>`<div class="testimony-quote">"${esc(e.content.length>180?e.content.slice(0,180)+'...':e.content)}"</div>`).join('')}
+        </div>`;
+    }).join('');
+  } else {
+    msSection.style.display = 'none';
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1427,24 +1586,37 @@ function deletePrinciple(id) {
 // ═══════════════════════════════════════════════════════════
 // EVENING ROUTINE
 // ═══════════════════════════════════════════════════════════
+let _routineThanksCount = 1;
+let _routineSurrenderCount = 1;
+let _routineChosenFocusId = '';
+
 function openRoutine() {
   const overlay = document.getElementById('routine-overlay');
   overlay.classList.add('open');
+  _routineThanksCount = 1;
+  _routineSurrenderCount = 1;
+  _routineChosenFocusId = db.settings.tomorrowFocusPrayerId || '';
 
   const unread  = db.inbox.filter(i=>!i.processed).length;
   const active  = db.prayers.filter(p=>p.status==='active');
   const doy     = Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/86400000);
-  const focus   = active.length ? active[doy % active.length] : null;
+  let focus = _routineChosenFocusId ? db.prayers.find(p=>p.id===_routineChosenFocusId && p.status==='active') : null;
+  if (!focus) focus = active.length ? active[doy % active.length] : null;
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const doneToday = db.settings.routineCompletedDate === todayStr;
 
   document.getElementById('routine-body').innerHTML = `
+    ${doneToday ? `<div style="text-align:center;margin-bottom:16px;font-family:'Lato',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-text);">✓ Already completed today — going again is fine</div>` : ''}
     <div class="routine-step">
       <div class="step-num">Step 1 of 3</div>
       <div class="step-title">Give Thanks</div>
       <div class="step-verse">"In everything give thanks; for this is the will of God." — 1 Thess 5:18</div>
-      <div class="field">
-        <label>What did you see God do today?</label>
-        <textarea id="r-thanks" rows="3" placeholder="One thing, however small..."></textarea>
+      <label>What did you see God do today?</label>
+      <div id="thanks-rows">
+        <div class="note-row"><textarea class="r-thanks" rows="2" placeholder="One thing, however small..."></textarea></div>
       </div>
+      <button class="btn btn-dim btn-sm mt8" onclick="addNoteRow('thanks-rows','r-thanks')">＋ Add another gratitude</button>
     </div>
     <div class="routine-step">
       <div class="step-num">Step 2 of 3</div>
@@ -1457,27 +1629,70 @@ function openRoutine() {
     <div class="routine-step">
       <div class="step-num">Step 3 of 3</div>
       <div class="step-title">Pray Forward</div>
-      ${focus
-        ? `<p class="text-muted text-small" style="margin-bottom:10px;">Tomorrow's focus prayer:</p>
-           <div class="living-summary" style="margin-bottom:16px;">
-             <div class="ls-label">🙏 ${esc(focus.title)}</div>
-             <div class="ls-text">${focus.livingSummary || 'Bring this before God tomorrow.'}</div>
-           </div>`
+      ${active.length > 0 ? `
+        <p class="text-muted text-small" style="margin-bottom:10px;">Tomorrow's focus prayer:</p>
+        <div class="living-summary" style="margin-bottom:12px;">
+          <div class="ls-label" id="focus-pick-label">🙏 ${esc(focus ? focus.title : 'None selected')}</div>
+          <div class="ls-text" id="focus-pick-summary">${focus ? (focus.livingSummary || 'Bring this before God tomorrow.') : ''}</div>
+        </div>
+        <button class="btn btn-dim btn-sm btn-full mb16" onclick="toggleFocusPicker()">⇄ Choose different prayer</button>
+        <div id="focus-picker" style="display:none;" class="focus-prayer-pick">
+          ${active.map(p=>`
+            <div class="focus-pick-card ${p.id===_routineChosenFocusId?'chosen':''}" id="fpc-${p.id}" onclick="pickFocusPrayer('${p.id}')">
+              <div style="font-family:'Playfair Display',serif;font-size:16px;">${esc(p.title)}</div>
+              ${p.description?`<div style="font-size:13px;color:var(--muted);margin-top:3px;">${esc(p.description)}</div>`:''}
+            </div>`).join('')}
+        </div>` 
         : `<p class="text-muted" style="margin-bottom:14px;">Add your first prayer to activate a daily focus.</p>`}
-      <div class="field">
-        <label>Anything to surrender tonight?</label>
-        <textarea id="r-surrender" rows="3" placeholder="Whatever is on your heart..."></textarea>
+      <label style="margin-top:8px;">Anything to surrender tonight?</label>
+      <div id="surrender-rows">
+        <div class="note-row"><textarea class="r-surrender" rows="2" placeholder="Whatever is on your heart..."></textarea></div>
       </div>
+      <button class="btn btn-dim btn-sm mt8" onclick="addNoteRow('surrender-rows','r-surrender')">＋ Add another note</button>
     </div>
     <button class="btn btn-primary btn-full" onclick="completeRoutine()">Complete Evening ✦</button>
   `;
 }
 
+function addNoteRow(containerId, cls) {
+  const row = document.createElement('div');
+  row.className = 'note-row';
+  row.innerHTML = `<textarea class="${cls}" rows="2" placeholder="Another note..."></textarea>
+    <button class="note-remove" onclick="this.parentElement.remove()">×</button>`;
+  document.getElementById(containerId).appendChild(row);
+}
+
+function toggleFocusPicker() {
+  const p = document.getElementById('focus-picker');
+  p.style.display = p.style.display === 'none' ? 'flex' : 'none';
+}
+
+function pickFocusPrayer(id) {
+  _routineChosenFocusId = id;
+  const prayer = db.prayers.find(p=>p.id===id);
+  // update display
+  document.querySelectorAll('.focus-pick-card').forEach(c=>c.classList.remove('chosen'));
+  const card = document.getElementById('fpc-'+id);
+  if (card) card.classList.add('chosen');
+  if (prayer) {
+    document.getElementById('focus-pick-label').textContent = '🙏 '+prayer.title;
+    document.getElementById('focus-pick-summary').textContent = prayer.livingSummary || 'Bring this before God tomorrow.';
+  }
+  toggleFocusPicker();
+}
+
 function completeRoutine() {
-  const thanks    = document.getElementById('r-thanks')?.value.trim();
-  const surrender = document.getElementById('r-surrender')?.value.trim();
-  if (thanks)    db.inbox.push({id:uid(), rawText:'[Gratitude] '+thanks,   createdAt:Date.now(), processed:false});
-  if (surrender) db.inbox.push({id:uid(), rawText:'[Surrender] '+surrender, createdAt:Date.now(), processed:false});
+  const thanks    = [...document.querySelectorAll('.r-thanks')].map(t=>t.value.trim()).filter(Boolean);
+  const surrender = [...document.querySelectorAll('.r-surrender')].map(t=>t.value.trim()).filter(Boolean);
+  thanks.forEach(t    => db.inbox.push({id:uid(), rawText:'[Gratitude] '+t,   createdAt:Date.now(), processed:false}));
+  surrender.forEach(s => db.inbox.push({id:uid(), rawText:'[Surrender] '+s, createdAt:Date.now(), processed:false}));
+
+  // Save focus prayer choice
+  db.settings.tomorrowFocusPrayerId = _routineChosenFocusId || '';
+
+  // Mark routine completed today
+  db.settings.routineCompletedDate = new Date().toISOString().split('T')[0];
+
   persist(); closeRoutine(); renderHome(); updateInboxBadge();
 }
 
