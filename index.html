@@ -9,9 +9,13 @@
 <meta name="apple-mobile-web-app-title" content="Covenant">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f0b05">
+<link id="app-touch-icon" rel="apple-touch-icon" href="">
+<link rel="manifest" href='data:application/manifest+json,{"name":"Covenant","short_name":"Covenant","display":"standalone","background_color":"%230f0b05","theme_color":"%230f0b05","start_url":"."}'>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
-:root {
+/* ══ THEMES ══════════════════════════════════════════════ */
+:root,
+[data-theme="candlelight"] {
   --bg: #0f0b05;
   --surface: #1c1409;
   --surface-2: #261b0c;
@@ -29,6 +33,79 @@
   --blue-text: #7aaace;
   --purple-text: #bb8aee;
   --red-faint: rgba(140,60,60,0.3);
+  --routine-grad-1: #3a2808;
+  --routine-grad-2: #4a3210;
+  --glow-1: rgba(200,164,74,0.04);
+  --glow-2: rgba(200,164,74,0.03);
+}
+[data-theme="parchment"] {
+  --bg: #f5edd8;
+  --surface: #fffbf0;
+  --surface-2: #ede4cc;
+  --surface-3: #e0d5b8;
+  --gold: #7a5c18;
+  --gold-dim: #5a4010;
+  --gold-faint: rgba(122,92,24,0.1);
+  --cream: #2a1e08;
+  --cream-dim: #5a4828;
+  --muted: #9a8860;
+  --border: rgba(122,92,24,0.15);
+  --border-strong: rgba(122,92,24,0.38);
+  --green: #3a6a3a;
+  --green-text: #2a5a2a;
+  --blue-text: #2a4a7a;
+  --purple-text: #5a3a8a;
+  --red-faint: rgba(140,60,60,0.15);
+  --routine-grad-1: #e8dcc0;
+  --routine-grad-2: #ddd0a8;
+  --glow-1: rgba(122,92,24,0.05);
+  --glow-2: rgba(122,92,24,0.03);
+}
+[data-theme="midnight"] {
+  --bg: #080c18;
+  --surface: #0e1428;
+  --surface-2: #141c38;
+  --surface-3: #1c2848;
+  --gold: #7aaace;
+  --gold-dim: #4a6a9a;
+  --gold-faint: rgba(122,170,206,0.1);
+  --cream: #d8e8f8;
+  --cream-dim: #8aaac8;
+  --muted: #4a6080;
+  --border: rgba(122,170,206,0.12);
+  --border-strong: rgba(122,170,206,0.28);
+  --green: #3a7a6a;
+  --green-text: #60c8b0;
+  --blue-text: #9ac8e8;
+  --purple-text: #b09ae8;
+  --red-faint: rgba(120,60,80,0.3);
+  --routine-grad-1: #0e1830;
+  --routine-grad-2: #142040;
+  --glow-1: rgba(122,170,206,0.04);
+  --glow-2: rgba(122,170,206,0.03);
+}
+[data-theme="ember"] {
+  --bg: #0c0503;
+  --surface: #180a05;
+  --surface-2: #221008;
+  --surface-3: #2e160a;
+  --gold: #e07830;
+  --gold-dim: #a05020;
+  --gold-faint: rgba(224,120,48,0.1);
+  --cream: #f8e8d8;
+  --cream-dim: #c09878;
+  --muted: #806050;
+  --border: rgba(224,120,48,0.12);
+  --border-strong: rgba(224,120,48,0.28);
+  --green: #4a7a50;
+  --green-text: #80c888;
+  --blue-text: #80aac8;
+  --purple-text: #c090e8;
+  --red-faint: rgba(160,60,40,0.3);
+  --routine-grad-1: #2a1008;
+  --routine-grad-2: #381808;
+  --glow-1: rgba(224,120,48,0.05);
+  --glow-2: rgba(224,120,48,0.03);
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
@@ -39,14 +116,14 @@ body{
   font-size:17px;
   line-height:1.65;
   min-height:100vh;
-  min-height:-webkit-fill-available;
+  min-height:100dvh;
   overflow-x:hidden;
 }
 body::after{
   content:'';
   position:fixed;inset:0;
-  background:radial-gradient(ellipse at 20% 0%, rgba(200,164,74,0.04) 0%, transparent 60%),
-              radial-gradient(ellipse at 80% 100%, rgba(200,164,74,0.03) 0%, transparent 50%);
+  background:radial-gradient(ellipse at 20% 0%, var(--glow-1) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 100%, var(--glow-2) 0%, transparent 50%);
   pointer-events:none;z-index:0;
 }
 .app{max-width:680px;margin:0 auto;padding:0 18px;position:relative;z-index:1;}
@@ -81,7 +158,7 @@ h1,h2,h3,h4{font-family:'Playfair Display',Georgia,serif;font-weight:600;}
 .nav-inbox-wrap{position:relative;display:inline-block;}
 
 /* ── SCREENS ── */
-.screen{display:none;padding:20px 0 110px;animation:fadeUp 0.3s ease forwards;}
+.screen{display:none;padding:20px 0 130px;animation:fadeUp 0.3s ease forwards;}
 .screen.active{display:block;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
@@ -218,7 +295,7 @@ label{
 .hc-sub{font-size:14px;color:var(--muted);margin-top:4px;}
 
 .routine-card{
-  background:linear-gradient(135deg,#3a2808,#4a3210);
+  background:linear-gradient(135deg,var(--routine-grad-1),var(--routine-grad-2));
   border:1px solid var(--gold-dim);border-radius:14px;
   padding:20px 50px 20px 20px;width:100%;cursor:pointer;
   text-align:left;color:var(--cream);margin-bottom:12px;
@@ -426,6 +503,65 @@ label{
 .focus-pick-card:hover,.focus-pick-card.chosen{
   border-color:var(--gold-dim);background:var(--gold-faint);color:var(--gold);
 }
+/* Settings overlay */
+.settings-overlay{
+  position:fixed;inset:0;
+  background:var(--bg);z-index:300;
+  overflow-y:auto;display:none;
+}
+.settings-overlay.open{display:block;}
+.settings-inner{max-width:680px;margin:0 auto;padding:36px 18px 120px;}
+.settings-section{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:20px;margin-bottom:16px;
+}
+.settings-section-title{
+  font-family:'Lato',sans-serif;font-size:10px;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--gold-dim);margin-bottom:16px;
+}
+/* Theme picker */
+.theme-swatches{display:flex;gap:10px;flex-wrap:wrap;}
+.theme-swatch{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  cursor:pointer;padding:6px;border-radius:10px;
+  border:2px solid transparent;transition:all 0.2s;
+  font-family:'Lato',sans-serif;font-size:10px;
+  letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);
+}
+.theme-swatch.active{border-color:var(--gold);color:var(--gold);}
+.theme-swatch-preview{
+  width:52px;height:52px;border-radius:10px;
+  border:1px solid rgba(255,255,255,0.1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+}
+/* Entry expansion */
+.entry-body{flex:1;padding-bottom:22px;cursor:pointer;}
+.entry-body:hover .entry-content{color:var(--cream);}
+.entry-expand-hint{
+  font-family:'Lato',sans-serif;font-size:10px;
+  color:var(--muted);margin-top:4px;letter-spacing:0.05em;
+}
+/* Gratitude entry dot */
+.entry-dot.t-gratitude{border-color:#c880c0;background:rgba(200,128,192,0.1);}
+/* Settings gear button on home */
+.home-settings-btn{
+  position:absolute;top:36px;right:0;
+  background:none;border:none;color:var(--muted);
+  cursor:pointer;font-size:20px;padding:4px;
+  transition:color 0.2s;
+}
+.home-settings-btn:hover{color:var(--gold);}
+/* Focus card change link */
+.focus-change-link{
+  font-family:'Lato',sans-serif;font-size:10px;
+  letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--gold-dim);cursor:pointer;
+  background:none;border:none;padding:0;margin-top:6px;
+  display:inline-block;text-decoration:underline;
+}
+.focus-change-link:hover{color:var(--gold);}
 .routine-overlay{
   position:fixed;inset:0;
   background:var(--bg);z-index:300;
@@ -537,10 +673,11 @@ label{
 
   <!-- HOME -->
   <div id="screen-home" class="screen active">
-    <div class="home-top">
+    <div class="home-top" style="position:relative;">
       <div class="home-eyebrow" id="h-date"></div>
       <h1 class="home-greeting" id="h-greeting">Good evening</h1>
       <div class="home-verse" id="h-verse"></div>
+      <button class="home-settings-btn" onclick="openSettings()" title="Settings">⚙️</button>
     </div>
     <div class="qc-box" style="margin-bottom:12px;">
       <div class="qc-label">⚡ Quick Capture</div>
@@ -561,9 +698,10 @@ label{
       <span class="arrow">→</span>
     </button>
     <div id="h-focus-card" class="highlight-card" style="display:none;">
-      <div class="hc-label">🙏 Tonight's Focus</div>
+      <div class="hc-label">🙏 Today's Focus</div>
       <div class="hc-value" id="h-focus-title"></div>
       <div class="hc-sub" id="h-focus-sub"></div>
+      <button class="focus-change-link" onclick="event.stopPropagation();showFocusChangePicker()">Change prayer →</button>
     </div>
     <div id="h-testimony-card" class="highlight-card" style="display:none;">
       <div class="hc-label">✨ Last Answered Prayer</div>
@@ -572,8 +710,8 @@ label{
     </div>
     <div class="divider"></div>
     <div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px;">
-      <button class="btn btn-dim btn-sm" onclick="exportData()" title="Download a backup of all your Covenant data">↓ Export Backup</button>
-      <button class="btn btn-dim btn-sm" onclick="triggerImport()" title="Restore from a previous backup file">↑ Import Backup</button>
+      <button class="btn btn-dim btn-sm" onclick="exportData()">↓ Export Backup</button>
+      <button class="btn btn-dim btn-sm" onclick="triggerImport()">↑ Import Backup</button>
     </div>
     <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(event)">
   </div>
@@ -605,7 +743,10 @@ label{
         <div class="screen-title" id="pd-title"></div>
         <div id="pd-badges" class="tags" style="margin-top:5px;"></div>
       </div>
-      <button class="btn btn-ghost btn-sm" onclick="showAddEntryModal()">+ Entry</button>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-dim btn-sm" onclick="editPrayerTags()">✎ Edit</button>
+        <button class="btn btn-ghost btn-sm" onclick="showAddEntryModal()">+ Entry</button>
+      </div>
     </div>
     <div id="pd-summary"></div>
     <div id="pd-thread"></div>
@@ -663,6 +804,73 @@ label{
 </nav>
 </div><!-- #app -->
 
+<!-- SETTINGS OVERLAY -->
+<div class="settings-overlay" id="settings-overlay">
+  <div class="settings-inner">
+    <div class="flex-between mb16">
+      <h2 style="font-size:24px;font-family:'Playfair Display',serif;">⚙️ Settings</h2>
+      <button class="routine-close" onclick="closeSettings()">✕</button>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Profile</div>
+      <div class="field">
+        <label>Your Name</label>
+        <input type="text" id="set-name" placeholder="Your name" />
+      </div>
+      <div class="field">
+        <label>Anthropic API Key <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
+        <input type="password" id="set-key" placeholder="sk-ant-..." />
+      </div>
+      <button class="btn btn-primary btn-full" onclick="saveProfileSettings()">Save Profile</button>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Appearance</div>
+      <div class="theme-swatches" id="theme-swatches">
+        <div class="theme-swatch" data-theme="candlelight" onclick="setTheme('candlelight')">
+          <div class="theme-swatch-preview" style="background:#1c1409;">🕯️</div>
+          Candlelight
+        </div>
+        <div class="theme-swatch" data-theme="parchment" onclick="setTheme('parchment')">
+          <div class="theme-swatch-preview" style="background:#fffbf0;border-color:#c8a44a;">📜</div>
+          Parchment
+        </div>
+        <div class="theme-swatch" data-theme="midnight" onclick="setTheme('midnight')">
+          <div class="theme-swatch-preview" style="background:#0e1428;">🌙</div>
+          Midnight
+        </div>
+        <div class="theme-swatch" data-theme="ember" onclick="setTheme('ember')">
+          <div class="theme-swatch-preview" style="background:#180a05;">🔥</div>
+          Ember
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Data</div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost btn-full" onclick="exportData()">↓ Export Backup</button>
+        <button class="btn btn-dim btn-full" onclick="triggerImport()">↑ Import Backup</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">📝 Dev Notes for Chris</div>
+      <p style="color:var(--muted);font-size:14px;font-style:italic;margin-bottom:12px;">Jot anything here — bugs, ideas, things to fix. These live in your data export so you can share them with Claude next session.</p>
+      <div id="dev-notes-list" style="margin-bottom:12px;"></div>
+      <textarea id="dev-note-input" rows="3" placeholder="e.g. The prayer list needs better search, or the inbox button is hard to tap..."></textarea>
+      <button class="btn btn-ghost btn-full" style="margin-top:8px;" onclick="addDevNote()">+ Add Note</button>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">🗺 Planned Improvements</div>
+      <div id="future-improvements-list"></div>
+    </div>
+
+  </div>
+</div>
+
 <!-- ROUTINE OVERLAY -->
 <div class="routine-overlay" id="routine-overlay">
   <div class="routine-inner">
@@ -696,11 +904,16 @@ function load() {
     const r = localStorage.getItem(STORE);
     if (r) {
       const d = JSON.parse(r);
-      // migrate settings
       if (!d.settings.routineCompletedDate) d.settings.routineCompletedDate = '';
       if (!d.settings.tomorrowFocusPrayerId) d.settings.tomorrowFocusPrayerId = '';
-      // migrate themes — add description if missing
+      if (!d.settings.theme) d.settings.theme = 'candlelight';
+      if (!d.devNotes) d.devNotes = [];
+      // merge in any new default themes not present in saved data
       const defThemes = defaults().themes;
+      const existingIds = d.themes.map(t=>t.id);
+      defThemes.forEach(dt => {
+        if (!existingIds.includes(dt.id)) d.themes.push(dt);
+      });
       d.themes = d.themes.map(t => {
         if (!t.description) {
           const def = defThemes.find(dt=>dt.id===t.id);
@@ -708,7 +921,6 @@ function load() {
         }
         return t;
       });
-      // migrate prayers — add description if missing
       d.prayers = d.prayers.map(p => { if (!p.description) p.description=''; return p; });
       return d;
     }
@@ -718,18 +930,23 @@ function load() {
 
 function defaults() {
   return {
-    settings: { name:'', apiKey:'', routineCompletedDate:'', tomorrowFocusPrayerId:'' },
+    settings: { name:'', apiKey:'', routineCompletedDate:'', tomorrowFocusPrayerId:'', theme:'candlelight' },
     themes: [
-      {id:'work',    name:'Work & Calling',  icon:'💼', description:'Prayers about vocation, purpose, and daily work.'},
-      {id:'home',    name:'Home & Living',   icon:'🏡', description:'Prayers about your home, environment, and practical provision.'},
-      {id:'marriage',name:'Marriage',        icon:'💑', description:'Prayers for your relationship, unity, and growth together.'},
-      {id:'health',  name:'Health',          icon:'🌿', description:'Prayers for physical, mental, and emotional wellbeing.'},
-      {id:'faith',   name:'Faith & Growth',  icon:'✨', description:'Prayers for spiritual depth, character, and closeness with God.'},
-      {id:'finances',name:'Finances',        icon:'🌱', description:'Prayers about provision, stewardship, and financial wisdom.'},
+      {id:'work',         name:'Work & Calling',     icon:'💼', description:'Prayers about vocation, purpose, and daily work.'},
+      {id:'home',         name:'Home & Living',      icon:'🏡', description:'Prayers about your home, environment, and practical provision.'},
+      {id:'marriage',     name:'Marriage',           icon:'💑', description:'Prayers for your relationship, unity, and growth together.'},
+      {id:'family',       name:'Family',             icon:'👨‍👩‍👧‍👦', description:'Prayers for family members, relationships, and household.'},
+      {id:'relationships',name:'Relationships',      icon:'🤝', description:'Prayers for friendships, colleagues, and community connections.'},
+      {id:'church',       name:'Church & Community', icon:'⛪', description:'Prayers for your church, its leaders, and wider community.'},
+      {id:'health',       name:'Health',             icon:'🌿', description:'Prayers for physical, mental, and emotional wellbeing.'},
+      {id:'faith',        name:'Faith & Growth',     icon:'✨', description:'Prayers for spiritual depth, character, and closeness with God.'},
+      {id:'finances',     name:'Finances',           icon:'🌱', description:'Prayers about provision, stewardship, and financial wisdom.'},
+      {id:'theology',     name:'Theology',           icon:'📚', description:'Questions, study notes, and prayers about doctrine and belief.'},
     ],
     prayers: [],
     inbox: [],
     principles: [],
+    devNotes: [],
   };
 }
 
@@ -801,6 +1018,7 @@ function confirmImport() {
     prayers:    parsed.prayers    || [],
     inbox:      parsed.inbox      || [],
     principles: parsed.principles || [],
+    devNotes:   parsed.devNotes   || [],
   };
   persist();
   window._pendingImport = null;
@@ -824,10 +1042,53 @@ function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t || 'candlelight');
+  // update theme-color meta tag
+  const bgMap = {candlelight:'#0f0b05',parchment:'#f5edd8',midnight:'#080c18',ember:'#0c0503'};
+  document.querySelector('meta[name="theme-color"]').content = bgMap[t]||'#0f0b05';
+  // update swatch active state if settings open
+  document.querySelectorAll('.theme-swatch').forEach(s => {
+    s.classList.toggle('active', s.dataset.theme === t);
+  });
+}
+
+function generateAppIcon() {
+  try {
+    const c = document.createElement('canvas');
+    c.width = 180; c.height = 180;
+    const ctx = c.getContext('2d');
+    // background
+    ctx.fillStyle = '#1c1409';
+    ctx.beginPath(); ctx.roundRect(0,0,180,180,32); ctx.fill();
+    // candle body
+    ctx.fillStyle = '#6a4818';
+    ctx.fillRect(72,94,36,64); 
+    // candle top band
+    ctx.fillStyle = '#c8a44a';
+    ctx.fillRect(70,88,40,10);
+    // wick
+    ctx.strokeStyle = '#32230f'; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(90,88); ctx.lineTo(90,68); ctx.stroke();
+    // outer flame
+    ctx.fillStyle = '#c8a44a';
+    ctx.beginPath(); ctx.ellipse(90,52,18,28,0,0,Math.PI*2); ctx.fill();
+    // mid flame
+    ctx.fillStyle = '#f0a030';
+    ctx.beginPath(); ctx.ellipse(90,58,10,18,0,0,Math.PI*2); ctx.fill();
+    // inner flame
+    ctx.fillStyle = '#fff8d0';
+    ctx.beginPath(); ctx.ellipse(90,63,5,10,0,0,Math.PI*2); ctx.fill();
+    document.getElementById('app-touch-icon').href = c.toDataURL('image/png');
+  } catch(e){}
+}
+
 // ═══════════════════════════════════════════════════════════
 // SETUP
 // ═══════════════════════════════════════════════════════════
 function boot() {
+  applyTheme(db.settings.theme || 'candlelight');
+  generateAppIcon();
   if (!db.settings.name) {
     document.getElementById('setup').style.display = 'block';
     document.getElementById('app').style.display = 'none';
@@ -847,6 +1108,104 @@ function completeSetup() {
   if (key) db.settings.apiKey = key;
   persist();
   boot();
+}
+
+// ═══════════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════════
+function openSettings() {
+  document.getElementById('set-name').value = db.settings.name || '';
+  document.getElementById('set-key').value = db.settings.apiKey || '';
+  applyTheme(db.settings.theme || 'candlelight');
+  renderDevNotes();
+  renderFutureImprovements();
+  document.getElementById('settings-overlay').classList.add('open');
+}
+function closeSettings() {
+  document.getElementById('settings-overlay').classList.remove('open');
+}
+function saveProfileSettings() {
+  const name = document.getElementById('set-name').value.trim();
+  const key  = document.getElementById('set-key').value.trim();
+  if (!name) { alert('Name cannot be empty.'); return; }
+  db.settings.name = name;
+  db.settings.apiKey = key;
+  persist(); closeSettings(); renderHome();
+}
+function setTheme(t) {
+  db.settings.theme = t;
+  persist(); applyTheme(t);
+}
+
+// ─── DEV NOTES ───────────────────────────────────────────────
+function addDevNote() {
+  const text = document.getElementById('dev-note-input').value.trim();
+  if (!text) return;
+  if (!db.devNotes) db.devNotes = [];
+  db.devNotes.push({ id:uid(), text, createdAt:Date.now() });
+  persist();
+  document.getElementById('dev-note-input').value = '';
+  renderDevNotes();
+}
+function deleteDevNote(id) {
+  db.devNotes = (db.devNotes||[]).filter(n=>n.id!==id);
+  persist(); renderDevNotes();
+}
+function renderDevNotes() {
+  const el = document.getElementById('dev-notes-list');
+  if (!el) return;
+  const notes = db.devNotes || [];
+  if (!notes.length) { el.innerHTML = '<div style="color:var(--muted);font-style:italic;font-size:14px;">No notes yet.</div>'; return; }
+  el.innerHTML = notes.map(n=>`
+    <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;">
+      <div style="color:var(--cream-dim);font-size:15px;line-height:1.55;margin-bottom:5px;">${esc(n.text)}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-family:'Lato',sans-serif;font-size:11px;color:var(--muted);">${fmtDate(n.createdAt)}</span>
+        <button class="entry-del" onclick="deleteDevNote('${n.id}')">Remove</button>
+      </div>
+    </div>`).join('');
+}
+
+const FUTURE_IMPROVEMENTS = [
+  { area:'Search', text:'Search across all prayers, entries, and principles' },
+  { area:'Prayer Linking', text:'Link prayers together (e.g. Job + House)' },
+  { area:'Custom Themes', text:'Rename, reorder, and customise prayer categories' },
+  { area:'PDF Export', text:'Export your journal as a formatted PDF' },
+  { area:'Scripture Browser', text:'Search scripture by keyword or reference' },
+  { area:'Weekly Review', text:'AI-generated weekly summary of your prayer life' },
+  { area:'Doctrine & Theology', text:'A section to record theological notes and explanations (e.g. Baptism, Grace)' },
+  { area:'Shared Testimony', text:'Export an anonymised testimony for sharing' },
+  { area:'Prayer Groups', text:'Group prayers across categories for focused sessions' },
+];
+function renderFutureImprovements() {
+  const el = document.getElementById('future-improvements-list');
+  if (!el) return;
+  el.innerHTML = FUTURE_IMPROVEMENTS.map(f=>`
+    <div style="padding:8px 0;border-bottom:1px solid var(--border);">
+      <span style="font-family:'Lato',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold-dim);">${f.area}</span>
+      <div style="color:var(--cream-dim);font-size:15px;margin-top:2px;">${f.text}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// FOCUS CHANGE PICKER (Home)
+// ═══════════════════════════════════════════════════════════
+function showFocusChangePicker() {
+  const active = db.prayers.filter(p=>p.status==='active');
+  if (!active.length) return;
+  showModal('Change Today\'s Focus', `
+    <p style="color:var(--muted);font-size:15px;margin-bottom:16px;">Select a prayer to focus on today.</p>
+    ${active.map(p=>`
+      <div class="card clickable" onclick="setHomeFocus('${p.id}')" style="margin-bottom:8px;">
+        <div style="font-family:'Playfair Display',serif;font-size:17px;">${esc(p.title)}</div>
+        ${p.description?`<div style="font-size:14px;color:var(--muted);margin-top:3px;">${esc(p.description)}</div>`:''}
+      </div>`).join('')}
+    <button class="btn btn-dim btn-full mt8" onclick="setHomeFocus('')">↺ Auto-rotate</button>
+  `);
+}
+function setHomeFocus(id) {
+  db.settings.tomorrowFocusPrayerId = id;
+  persist(); closeModal(); renderHome();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1087,6 +1446,26 @@ function fileManually(id) {
   _mThemes = [];
   const item = db.inbox.find(i=>i.id===id);
   if (!item) return;
+
+  // Build grouped prayer options
+  let prayerOptions = '<option value="">— Create New Prayer —</option>';
+  db.themes.forEach(theme => {
+    const themed = db.prayers.filter(p=>p.themeIds&&p.themeIds.includes(theme.id));
+    if (themed.length) {
+      prayerOptions += `<optgroup label="${theme.icon} ${theme.name}">`;
+      themed.forEach(p => {
+        prayerOptions += `<option value="${p.id}">[${p.status}] ${esc(p.title)}</option>`;
+      });
+      prayerOptions += `</optgroup>`;
+    }
+  });
+  const unthemed = db.prayers.filter(p=>!p.themeIds||!p.themeIds.length);
+  if (unthemed.length) {
+    prayerOptions += `<optgroup label="📋 Other">`;
+    unthemed.forEach(p => { prayerOptions += `<option value="${p.id}">${esc(p.title)}</option>`; });
+    prayerOptions += `</optgroup>`;
+  }
+
   showModal('File to Prayer', `
     <div class="field"><label>Your Capture</label>
       <div style="color:var(--cream-dim);font-style:italic;margin-bottom:12px;">"${esc(item.rawText)}"</div>
@@ -1098,14 +1477,12 @@ function fileManually(id) {
         <option value="observation">Observation</option>
         <option value="request">Prayer Request</option>
         <option value="update">Update</option>
+        <option value="gratitude">Gratitude</option>
         <option value="answer">Answered Prayer</option>
         <option value="principle">Principle Learned</option>
       </select></div>
-    <div class="field"><label>File to Existing Prayer</label>
-      <select id="m-prayer" onchange="toggleNewPrayer(this.value)">
-        <option value="">— Create New Prayer —</option>
-        ${db.prayers.map(p=>`<option value="${p.id}">${esc(p.title)}</option>`).join('')}
-      </select></div>
+    <div class="field"><label>File to Prayer</label>
+      <select id="m-prayer" onchange="toggleNewPrayer(this.value)">${prayerOptions}</select></div>
     <div id="m-new-fields">
       <div class="field"><label>New Prayer Title</label>
         <input type="text" id="m-title" placeholder="Name this prayer..." /></div>
@@ -1319,6 +1696,8 @@ function submitPrayerDescription() {
   persist(); closeModal(); renderPrayerDetail();
 }
 
+const ENTRY_ICONS = {request:'🙏',update:'📝',observation:'👁',answer:'✨',principle:'📖',gratitude:'💛'};
+
 function renderThread(p) {
   const td = document.getElementById('pd-thread');
   if (!p.entries.length) {
@@ -1327,25 +1706,55 @@ function renderThread(p) {
   }
   td.innerHTML = `<div class="thread">`+p.entries.map((e,i)=>{
     const isLast = i===p.entries.length-1;
+    const timeStr = new Date(e.createdAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
     return `
       <div class="entry">
         <div class="thread-line-wrap">
           <div class="entry-dot t-${e.type}">${ENTRY_ICONS[e.type]||'·'}</div>
           ${!isLast ? '<div class="entry-line"></div>' : ''}
         </div>
-        <div class="entry-body">
+        <div class="entry-body" onclick="openEntryDetail('${p.id}','${e.id}')">
           <div class="entry-meta">
             <span class="entry-type-label">${e.type}</span>
-            <span class="entry-date">${fmtDate(e.createdAt)}</span>
+            <span class="entry-date">${fmtDate(e.createdAt)} · ${timeStr}</span>
           </div>
           <div class="entry-content">${esc(e.content)}</div>
           ${e.scripture ? `<div class="entry-scripture">${esc(e.scripture)}</div>` : ''}
+          <div class="entry-expand-hint">Tap to expand</div>
           <div class="entry-actions">
-            <button class="entry-del" onclick="deleteEntry('${e.id}')">Delete entry</button>
+            <button class="entry-del" onclick="event.stopPropagation();deleteEntry('${e.id}')">Delete entry</button>
           </div>
         </div>
       </div>`;
   }).join('')+`</div>`;
+}
+
+function openEntryDetail(prayerId, entryId) {
+  const prayer = db.prayers.find(p=>p.id===prayerId);
+  if (!prayer) return;
+  const e = prayer.entries.find(e=>e.id===entryId);
+  if (!e) return;
+  const dt = new Date(e.createdAt);
+  const dateStr = dt.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const timeStr = dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  showModal('Entry', `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+      <span style="font-size:24px;">${ENTRY_ICONS[e.type]||'·'}</span>
+      <div>
+        <div style="font-family:'Lato',sans-serif;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">${e.type}</div>
+        <div style="font-family:'Lato',sans-serif;font-size:12px;color:var(--cream-dim);">${dateStr} at ${timeStr}</div>
+      </div>
+    </div>
+    <div style="color:var(--cream);line-height:1.7;font-size:17px;margin-bottom:${e.scripture?'0':'8px'};">${esc(e.content)}</div>
+    ${e.scripture ? `
+      <div style="margin-top:16px;padding:14px 16px;background:rgba(200,164,74,0.06);border-left:3px solid var(--gold-dim);border-radius:0 8px 8px 0;">
+        <div style="font-family:'Lato',sans-serif;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:6px;">Scripture</div>
+        <div style="font-style:italic;color:var(--cream-dim);font-size:16px;line-height:1.65;">${esc(e.scripture)}</div>
+      </div>` : ''}
+    <div style="margin-top:18px;">
+      <button class="btn btn-dim btn-sm" onclick="closeModal();deleteEntry('${e.id}')">Delete this entry</button>
+    </div>
+  `);
 }
 
 async function refreshSummary() {
@@ -1380,6 +1789,7 @@ function showAddEntryModal() {
         <option value="update">Update</option>
         <option value="observation">Observation</option>
         <option value="request">Prayer Request</option>
+        <option value="gratitude">Gratitude</option>
         <option value="answer">Answered Prayer</option>
         <option value="principle">Principle Learned</option>
       </select></div>
@@ -1389,6 +1799,44 @@ function showAddEntryModal() {
       <input type="text" id="e-scripture" placeholder="e.g. Romans 8:28..." /></div>
     <button class="btn btn-primary btn-full" onclick="submitEntry()">Add Entry</button>
   `);
+}
+
+// ─── EDIT PRAYER TAGS & TITLE ────────────────────────────────
+let _editTags = [];
+function editPrayerTags() {
+  if (!currentPrayer) return;
+  _editTags = [...(currentPrayer.themeIds||[])];
+  showModal('Edit Prayer', `
+    <div class="field"><label>Prayer Title</label>
+      <input type="text" id="edit-title" value="${esc(currentPrayer.title)}" /></div>
+    <div class="field"><label>Themes</label>
+      <div class="tags">${db.themes.map(t=>`
+        <span class="tag ${_editTags.includes(t.id)?'selected':''}" onclick="toggleEditTag('${t.id}',this)">${t.icon} ${t.name}</span>`).join('')}
+      </div></div>
+    <div class="field"><label>Status</label>
+      <select id="edit-status">
+        <option value="active" ${currentPrayer.status==='active'?'selected':''}>Active</option>
+        <option value="watching" ${currentPrayer.status==='watching'?'selected':''}>Watching</option>
+        <option value="dormant" ${currentPrayer.status==='dormant'?'selected':''}>Dormant</option>
+        <option value="answered" ${currentPrayer.status==='answered'?'selected':''}>Answered</option>
+      </select></div>
+    <button class="btn btn-primary btn-full" onclick="submitEditPrayer()">Save Changes</button>
+  `);
+}
+function toggleEditTag(id, el) {
+  if (_editTags.includes(id)) { _editTags=_editTags.filter(t=>t!==id); el.classList.remove('selected'); }
+  else { _editTags.push(id); el.classList.add('selected'); }
+}
+function submitEditPrayer() {
+  if (!currentPrayer) return;
+  const title = document.getElementById('edit-title').value.trim();
+  const status = document.getElementById('edit-status').value;
+  if (!title) { alert('Please enter a title.'); return; }
+  currentPrayer.title = title;
+  currentPrayer.themeIds = [..._editTags];
+  currentPrayer.status = status;
+  if (status==='answered' && !currentPrayer.answeredAt) currentPrayer.answeredAt = Date.now();
+  persist(); closeModal(); renderPrayerDetail();
 }
 
 function submitEntry() {
