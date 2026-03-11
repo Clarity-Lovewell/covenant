@@ -1,4 +1,4 @@
-# Covenant — Prayer Journal · SPEC v1.2
+# Covenant — Prayer Journal · SPEC v1.3
 
 > **This document is the single source of truth for the Covenant app.**
 > Upload this file alongside index.html at the start of every Claude session.
@@ -17,11 +17,12 @@ The core difference from existing apps: prayers are *living threads* that evolve
 ## Design Decisions
 
 ### Aesthetic
-- Four selectable visual themes (set in Settings):
+- Five selectable visual themes (set in Settings):
   - **Candlelight** (default): warm dark brown bg #0f0b05, gold accents #c8a44a, cream text
   - **Parchment**: warm light bg #f5edd8, dark brown accents — day/light mode
   - **Midnight**: deep blue-black bg #080c18, cool blue accents #7aaace
   - **Ember**: very dark warm bg #0c0503, orange-red accents #e07830
+  - **Cocoa**: chocolate brown bg #1a0e08, warm tan accents #d4a060, ivory text
 - All theme colours defined as CSS custom properties on [data-theme="..."] selectors on html element
 - Theme persists in settings.theme
 - Fonts: Playfair Display (headings) + Crimson Text (body) + Lato (UI labels)
@@ -43,13 +44,25 @@ The core difference from existing apps: prayers are *living threads* that evolve
 - Each entry is tappable to open a full detail modal (date, time, scripture beautifully rendered)
 
 ### Prayer Tags / Edit
-- "Edit" button in prayer detail header opens modal for: title, theme tags (multi-select), and status
+- "✎ Edit" button (gold ghost style — clearly interactive) in prayer detail header opens modal for: title, theme tags (multi-select), and status
+- Status badge in prayer detail is also directly tappable (shows ✎ icon) → opens quick status picker
+
+### Entry Filtering
+- "⊟ Filter" button next to Edit in prayer detail header
+- Opens an inline filter bar with pill buttons for each entry type (with icons)
+- Active filters highlighted in gold; "✕ Clear" button to reset
+- Thread updates live as types are toggled
 
 ### AI Layer
 - Requires Anthropic API key (stored in localStorage)
 - AI features: inbox processing, living summary generation, scripture suggestion, principle extraction
 - All AI is assistive — user reviews before anything is filed
 - Manual mode available for all features without API key
+
+### Scripture Expansion
+- Entries with a scripture reference show a "📖 Load passage" button in the detail modal
+- Tapping it fetches the passage from bible-api.com (WEB translation) and displays it inline
+- No API key required for scripture expansion
 
 ---
 
@@ -87,7 +100,7 @@ devNotes: [{ id, text, createdAt }]
 
 ### Today's Focus (Home)
 - "Today's Focus" card shows current focus prayer
-- "Change prayer" link opens picker modal for any active prayer
+- "Change prayer" link opens picker modal grouped by theme category (same visual language as prayer tags)
 - Auto-rotate option returns to round-robin by day-of-year
 - Choice also settable in Step 3 of Evening Routine
 
@@ -97,15 +110,18 @@ devNotes: [{ id, text, createdAt }]
 
 ### Entries
 - Tappable to open full detail modal (type icon, date, time, scripture)
+- Scripture reference shows "📖 Load passage" → fetches full passage from bible-api.com
 - Delete available from thread view and detail modal
 
 ### Dev Notes (Settings)
 - Saved to db.devNotes[] — survives export/import
+- Each note has Edit + Remove buttons; Edit enables inline textarea editing
 - Chris jots bugs/ideas here; shares with Claude by uploading backup JSON next session
 
 ### App Icon
 - Generated at boot via Canvas API (candle with flame on dark background)
-- Set as apple-touch-icon so Covenant appears correctly on home screen
+- Used in apple-touch-icon and injected into a dynamically-created manifest Blob URL
+- Manifest includes icons array so Chrome Android shows the "Add to Home Screen" install prompt
 
 ---
 
@@ -117,7 +133,12 @@ devNotes: [{ id, text, createdAt }]
 
 ---
 
-## Mobile / Firefox Fix
+## PWA / Mobile
+
+- **Manifest**: Dynamically generated as Blob URL at boot with proper icons array (from canvas icon) — Chrome Android shows "Add to Home Screen" install prompt
+- **Service Worker**: Registered at boot via Blob URL — caches the app for offline use
+- **Recommended install flow**: Open in Chrome on Android → tap ⋮ menu → "Add to Home Screen" → launches fullscreen, no browser chrome
+- **Firefox Note**: Firefox Android has limited PWA support; Chrome is recommended for installability
 - Nav uses padding-bottom: max(14px, env(safe-area-inset-bottom))
 - Screen content uses padding-bottom: 130px (increased to clear Firefox URL bar)
 - min-height: 100dvh (dynamic viewport height) on body
@@ -141,6 +162,7 @@ Workflow: Edit locally -> commit via GitHub Desktop -> push to main -> live ~60 
 | v1.1 — 2026-03-11 | Export/import backup |
 | v1.1 — 2026-03-12 | Quick capture top; routine tracking; multiple notes; focus picker; prayer descriptions; theme descriptions; testimony milestones; 16 verses; PWA meta tags |
 | v1.2 — 2026-03-12 | 10 prayer themes (added Family, Relationships, Church & Community, Theology); 4 visual themes (Candlelight, Parchment, Midnight, Ember) in Settings overlay; canvas app icon; Settings screen; Today's Focus rename + change picker; prayer edit modal (title/tags/status); gratitude entry type; grouped prayer picker; entry expansion modal with scripture; bug fix: ENTRY_ICONS restored; Firefox nav fix |
+| v1.3 — 2026-03-12 | PWA: dynamic manifest with icon + service worker for offline/install; Cocoa theme (chocolate brown); Focus change picker grouped by theme category; Entry filter bar (per-type toggles with icons); Scripture passage expansion in entry detail (bible-api.com); Dev note editing inline; Status badge clickable (quick status picker); Edit button changed to gold ghost style |
 
 ---
 
@@ -148,9 +170,10 @@ Workflow: Edit locally -> commit via GitHub Desktop -> push to main -> live ~60 
 
 - No cross-device sync (data stays on one browser/device)
 - No PDF or Markdown export (JSON backup only)
-- Theme colours not user-customisable (4 presets only)
+- Theme colours not user-customisable (5 presets only)
 - No search across all prayers yet
 - No prayer linking UI yet
+- Service worker Blob URL may not persist after page close on some browsers; full offline requires deploying a sw.js file alongside index.html
 
 ---
 
@@ -169,4 +192,4 @@ Workflow: Edit locally -> commit via GitHub Desktop -> push to main -> live ~60 
 
 ---
 
-*Covenant SPEC v1.2 — Built with Claude Sonnet, March 2026*
+*Covenant SPEC v1.3 — Built with Claude Sonnet, March 2026*

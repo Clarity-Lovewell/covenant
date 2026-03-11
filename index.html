@@ -107,6 +107,29 @@
   --glow-1: rgba(224,120,48,0.05);
   --glow-2: rgba(224,120,48,0.03);
 }
+[data-theme="cocoa"] {
+  --bg: #1a0e08;
+  --surface: #2a1a10;
+  --surface-2: #3a2418;
+  --surface-3: #4a3020;
+  --gold: #d4a060;
+  --gold-dim: #9a6830;
+  --gold-faint: rgba(212,160,96,0.12);
+  --cream: #f5efe6;
+  --cream-dim: #c8b090;
+  --muted: #8a7060;
+  --border: rgba(212,160,96,0.14);
+  --border-strong: rgba(212,160,96,0.32);
+  --green: #4a7a50;
+  --green-text: #80c888;
+  --blue-text: #90b8d0;
+  --purple-text: #c8a0e0;
+  --red-faint: rgba(140,60,40,0.3);
+  --routine-grad-1: #3a2010;
+  --routine-grad-2: #4a2c18;
+  --glow-1: rgba(212,160,96,0.06);
+  --glow-2: rgba(212,160,96,0.03);
+}
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{
@@ -635,6 +658,45 @@ label{
 .text-center{text-align:center;}
 .empty-state{text-align:center;padding:48px 0;color:var(--muted);font-style:italic;font-size:16px;}
 
+/* ── ENTRY FILTER ── */
+.entry-filter-bar{
+  display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;
+}
+.filter-pill{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:5px 11px;border-radius:20px;
+  border:1px solid var(--border);background:var(--surface);
+  font-family:'Lato',sans-serif;font-size:11px;color:var(--cream-dim);
+  cursor:pointer;transition:all 0.2s;user-select:none;
+}
+.filter-pill.active{
+  border-color:var(--gold-dim);background:var(--gold-faint);color:var(--gold);
+}
+.filter-pill:hover{border-color:var(--border-strong);}
+.pill-icon{font-size:13px;}
+
+/* ── STATUS BADGE CLICKABLE ── */
+.badge-clickable{cursor:pointer;transition:opacity 0.15s;}
+.badge-clickable:hover{opacity:0.75;}
+.badge-clickable::after{content:' ✎';font-size:8px;opacity:0.6;}
+
+/* ── SCRIPTURE PASSAGE EXPAND ── */
+.scripture-expand-btn{
+  background:none;border:none;
+  color:var(--gold-dim);font-family:'Lato',sans-serif;
+  font-size:10px;letter-spacing:0.08em;cursor:pointer;
+  padding:4px 0 0;display:block;transition:color 0.2s;
+  text-decoration:underline;text-underline-offset:3px;
+}
+.scripture-expand-btn:hover{color:var(--gold);}
+.scripture-passage{
+  margin-top:10px;padding:14px 16px;
+  background:rgba(200,164,74,0.06);
+  border-left:3px solid var(--gold-dim);
+  border-radius:0 8px 8px 0;
+  font-style:italic;color:var(--cream-dim);
+  font-size:15px;line-height:1.75;
+}
 ::-webkit-scrollbar{width:3px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:2px;}
@@ -744,10 +806,12 @@ label{
         <div id="pd-badges" class="tags" style="margin-top:5px;"></div>
       </div>
       <div style="display:flex;gap:6px;">
-        <button class="btn btn-dim btn-sm" onclick="editPrayerTags()">✎ Edit</button>
+        <button class="btn btn-ghost btn-sm" onclick="editPrayerTags()">✎ Edit</button>
+        <button class="btn btn-dim btn-sm" onclick="toggleEntryFilter()" id="filter-btn" title="Filter entries">⊟ Filter</button>
         <button class="btn btn-ghost btn-sm" onclick="showAddEntryModal()">+ Entry</button>
       </div>
     </div>
+    <div id="entry-filter-bar" class="entry-filter-bar" style="display:none;"></div>
     <div id="pd-summary"></div>
     <div id="pd-thread"></div>
     <div id="pd-actions" class="flex wrap gap8 mt16"></div>
@@ -843,6 +907,10 @@ label{
         <div class="theme-swatch" data-theme="ember" onclick="setTheme('ember')">
           <div class="theme-swatch-preview" style="background:#180a05;">🔥</div>
           Ember
+        </div>
+        <div class="theme-swatch" data-theme="cocoa" onclick="setTheme('cocoa')">
+          <div class="theme-swatch-preview" style="background:#2a1a10;">🍫</div>
+          Cocoa
         </div>
       </div>
     </div>
@@ -1045,7 +1113,7 @@ function esc(s) {
 function applyTheme(t) {
   document.documentElement.setAttribute('data-theme', t || 'candlelight');
   // update theme-color meta tag
-  const bgMap = {candlelight:'#0f0b05',parchment:'#f5edd8',midnight:'#080c18',ember:'#0c0503'};
+  const bgMap = {candlelight:'#0f0b05',parchment:'#f5edd8',midnight:'#080c18',ember:'#0c0503',cocoa:'#1a0e08'};
   document.querySelector('meta[name="theme-color"]').content = bgMap[t]||'#0f0b05';
   // update swatch active state if settings open
   document.querySelectorAll('.theme-swatch').forEach(s => {
@@ -1079,8 +1147,66 @@ function generateAppIcon() {
     // inner flame
     ctx.fillStyle = '#fff8d0';
     ctx.beginPath(); ctx.ellipse(90,63,5,10,0,0,Math.PI*2); ctx.fill();
-    document.getElementById('app-touch-icon').href = c.toDataURL('image/png');
+    const iconData = c.toDataURL('image/png');
+    document.getElementById('app-touch-icon').href = iconData;
+
+    // Build a proper manifest with the canvas-generated icon so Chrome shows install prompt
+    const manifest = {
+      name: 'Covenant',
+      short_name: 'Covenant',
+      description: 'A living prayer & faith journal',
+      display: 'standalone',
+      orientation: 'portrait',
+      background_color: '#0f0b05',
+      theme_color: '#0f0b05',
+      start_url: '.',
+      icons: [
+        { src: iconData, sizes: '180x180', type: 'image/png' },
+        { src: iconData, sizes: '192x192', type: 'image/png' },
+        { src: iconData, sizes: '512x512', type: 'image/png' },
+      ]
+    };
+    const mBlob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
+    const mURL = URL.createObjectURL(mBlob);
+    let mLink = document.querySelector('link[rel="manifest"]');
+    if (!mLink) { mLink = document.createElement('link'); mLink.rel='manifest'; document.head.appendChild(mLink); }
+    mLink.href = mURL;
   } catch(e){}
+}
+
+// ── SERVICE WORKER (offline caching) ──────────────────────────
+function registerServiceWorker() {
+  if (!('serviceWorker' in navigator)) return;
+  const swCode = `
+const CACHE = 'covenant-v1';
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll([self.location.pathname])).catch(()=>{}));
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys =>
+    Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))
+  ));
+  self.clients.claim();
+});
+self.addEventListener('fetch', e => {
+  if (e.request.method !== 'GET') return;
+  e.respondWith(
+    caches.match(e.request).then(cached => cached ||
+      fetch(e.request).then(res => {
+        const clone = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+        return res;
+      }).catch(() => cached)
+    )
+  );
+});`;
+  const blob = new Blob([swCode], {type:'text/javascript'});
+  const url  = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(url, {scope: '/'}).catch(()=>{
+    // Blob-URL SW may not work on all platforms; fail silently
+    navigator.serviceWorker.register(url).catch(()=>{});
+  });
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1089,6 +1215,7 @@ function generateAppIcon() {
 function boot() {
   applyTheme(db.settings.theme || 'candlelight');
   generateAppIcon();
+  registerServiceWorker();
   if (!db.settings.name) {
     document.getElementById('setup').style.display = 'block';
     document.getElementById('app').style.display = 'none';
@@ -1151,6 +1278,25 @@ function deleteDevNote(id) {
   db.devNotes = (db.devNotes||[]).filter(n=>n.id!==id);
   persist(); renderDevNotes();
 }
+function editDevNote(id) {
+  const note = (db.devNotes||[]).find(n=>n.id===id);
+  if (!note) return;
+  const el = document.getElementById('dev-note-text-'+id);
+  const actions = document.getElementById('dev-note-actions-'+id);
+  if (!el) return;
+  el.innerHTML = `<textarea id="dev-note-edit-${id}" rows="3" style="width:100%;background:var(--surface-3);border:1px solid var(--gold-dim);border-radius:6px;color:var(--cream);font-family:'Crimson Text',serif;font-size:15px;padding:8px;resize:vertical;">${esc(note.text)}</textarea>`;
+  actions.innerHTML = `
+    <button class="entry-del" style="color:var(--gold);" onclick="saveDevNote('${id}')">Save</button>
+    <button class="entry-del" onclick="renderDevNotes()">Cancel</button>`;
+}
+function saveDevNote(id) {
+  const note = (db.devNotes||[]).find(n=>n.id===id);
+  if (!note) return;
+  const val = document.getElementById('dev-note-edit-'+id)?.value.trim();
+  if (!val) return;
+  note.text = val;
+  persist(); renderDevNotes();
+}
 function renderDevNotes() {
   const el = document.getElementById('dev-notes-list');
   if (!el) return;
@@ -1158,10 +1304,13 @@ function renderDevNotes() {
   if (!notes.length) { el.innerHTML = '<div style="color:var(--muted);font-style:italic;font-size:14px;">No notes yet.</div>'; return; }
   el.innerHTML = notes.map(n=>`
     <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;">
-      <div style="color:var(--cream-dim);font-size:15px;line-height:1.55;margin-bottom:5px;">${esc(n.text)}</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div id="dev-note-text-${n.id}" style="color:var(--cream-dim);font-size:15px;line-height:1.55;margin-bottom:5px;">${esc(n.text)}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;" id="dev-note-actions-${n.id}">
         <span style="font-family:'Lato',sans-serif;font-size:11px;color:var(--muted);">${fmtDate(n.createdAt)}</span>
-        <button class="entry-del" onclick="deleteDevNote('${n.id}')">Remove</button>
+        <div style="display:flex;gap:10px;">
+          <button class="entry-del" style="color:var(--gold-dim);" onclick="editDevNote('${n.id}')">Edit</button>
+          <button class="entry-del" onclick="deleteDevNote('${n.id}')">Remove</button>
+        </div>
       </div>
     </div>`).join('');
 }
@@ -1193,15 +1342,48 @@ function renderFutureImprovements() {
 function showFocusChangePicker() {
   const active = db.prayers.filter(p=>p.status==='active');
   if (!active.length) return;
-  showModal('Change Today\'s Focus', `
-    <p style="color:var(--muted);font-size:15px;margin-bottom:16px;">Select a prayer to focus on today.</p>
-    ${active.map(p=>`
-      <div class="card clickable" onclick="setHomeFocus('${p.id}')" style="margin-bottom:8px;">
-        <div style="font-family:'Playfair Display',serif;font-size:17px;">${esc(p.title)}</div>
-        ${p.description?`<div style="font-size:14px;color:var(--muted);margin-top:3px;">${esc(p.description)}</div>`:''}
-      </div>`).join('')}
-    <button class="btn btn-dim btn-full mt8" onclick="setHomeFocus('')">↺ Auto-rotate</button>
-  `);
+
+  // Group by first theme
+  const grouped = {};
+  const ungrouped = [];
+  active.forEach(p => {
+    if (p.themeIds && p.themeIds.length) {
+      const tid = p.themeIds[0];
+      if (!grouped[tid]) grouped[tid] = [];
+      grouped[tid].push(p);
+    } else {
+      ungrouped.push(p);
+    }
+  });
+
+  let html = `<p style="color:var(--muted);font-size:14px;margin-bottom:16px;">Select a prayer to bring before God today.</p>`;
+
+  db.themes.forEach(theme => {
+    const prayers = grouped[theme.id];
+    if (!prayers || !prayers.length) return;
+    html += `<div style="margin-bottom:14px;">
+      <div style="font-family:'Lato',sans-serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:6px;">${theme.icon} ${theme.name}</div>
+      ${prayers.map(p=>`
+        <div class="focus-pick-card ${p.id===db.settings.tomorrowFocusPrayerId?'chosen':''}" onclick="setHomeFocus('${p.id}')" style="margin-bottom:6px;">
+          <div style="font-family:'Playfair Display',serif;font-size:16px;">${esc(p.title)}</div>
+          ${p.description?`<div style="font-size:13px;color:var(--muted);margin-top:2px;">${esc(p.description)}</div>`:''}
+        </div>`).join('')}
+    </div>`;
+  });
+
+  if (ungrouped.length) {
+    html += `<div style="margin-bottom:14px;">
+      <div style="font-family:'Lato',sans-serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:6px;">📋 Other</div>
+      ${ungrouped.map(p=>`
+        <div class="focus-pick-card ${p.id===db.settings.tomorrowFocusPrayerId?'chosen':''}" onclick="setHomeFocus('${p.id}')" style="margin-bottom:6px;">
+          <div style="font-family:'Playfair Display',serif;font-size:16px;">${esc(p.title)}</div>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  html += `<button class="btn btn-dim btn-full mt8" onclick="setHomeFocus('')">↺ Auto-rotate daily</button>`;
+
+  showModal('Change Today\'s Focus', html);
 }
 function setHomeFocus(id) {
   db.settings.tomorrowFocusPrayerId = id;
@@ -1607,6 +1789,7 @@ function openThemeModal(themeId) {
 function openPrayer(id) {
   currentPrayer = db.prayers.find(p=>p.id===id);
   if (!currentPrayer) return;
+  _activeEntryFilters = [];
   navigate('prayer');
   renderPrayerDetail();
 }
@@ -1614,6 +1797,13 @@ function openPrayer(id) {
 function renderPrayerDetail() {
   const p = currentPrayer;
   document.getElementById('pd-title').textContent = p.title;
+  // Reset filter bar on detail re-render (not on filter toggle)
+  const filterBar = document.getElementById('pd-filter-bar');
+  if (filterBar && !_activeEntryFilters.length) {
+    filterBar.style.display = 'none';
+    const fb = document.getElementById('filter-btn');
+    if (fb) fb.classList.remove('active');
+  }
 
   // Badges
   const themeBadges = (p.themeIds||[]).map(tid=>{
@@ -1621,7 +1811,7 @@ function renderPrayerDetail() {
     return t ? `<span class="tag selected" style="cursor:default;">${t.icon} ${t.name}</span>` : '';
   }).join('');
   document.getElementById('pd-badges').innerHTML =
-    `<span class="badge badge-${p.status}">${p.status}</span>${themeBadges}`;
+    `<span class="badge badge-${p.status} badge-clickable" onclick="quickChangeStatus()" title="Tap to change status">${p.status}</span>${themeBadges}`;
 
   // Prayer description
   const sd = document.getElementById('pd-summary');
@@ -1696,16 +1886,104 @@ function submitPrayerDescription() {
   persist(); closeModal(); renderPrayerDetail();
 }
 
+// ─── QUICK STATUS CHANGE ──────────────────────────────────────
+function quickChangeStatus() {
+  if (!currentPrayer) return;
+  const statuses = [
+    {v:'active',   label:'Active',   desc:'Currently praying'},
+    {v:'watching', label:'Watching', desc:'Waiting on God\'s timing'},
+    {v:'dormant',  label:'Dormant',  desc:'Paused for now'},
+    {v:'answered', label:'Answered', desc:'God has answered this prayer'},
+  ];
+  showModal('Change Status', `
+    ${statuses.map(s=>`
+      <div class="card ${currentPrayer.status===s.v?'':'clickable'}" 
+           onclick="applyQuickStatus('${s.v}')"
+           style="margin-bottom:8px;${currentPrayer.status===s.v?'border-color:var(--gold-dim);background:var(--gold-faint);':''}">
+        <div class="flex-between">
+          <div>
+            <span class="badge badge-${s.v}">${s.v}</span>
+            <div style="font-size:14px;color:var(--muted);margin-top:4px;">${s.desc}</div>
+          </div>
+          ${currentPrayer.status===s.v?'<span style="color:var(--gold);">✓</span>':''}
+        </div>
+      </div>`).join('')}
+  `);
+}
+function applyQuickStatus(status) {
+  if (!currentPrayer) return;
+  currentPrayer.status = status;
+  if (status==='answered' && !currentPrayer.answeredAt) currentPrayer.answeredAt = Date.now();
+  persist(); closeModal(); renderPrayerDetail();
+}
+
+// ─── ENTRY FILTER ─────────────────────────────────────────────
+let _activeEntryFilters = [];
+function toggleEntryFilter() {
+  const bar = document.getElementById('entry-filter-bar');
+  const btn = document.getElementById('filter-btn');
+  if (bar.style.display === 'none' || !bar.style.display) {
+    bar.style.display = 'flex';
+    bar.innerHTML = renderFilterBar();
+    btn.style.color = 'var(--gold)';
+  } else {
+    bar.style.display = 'none';
+    btn.style.color = '';
+  }
+}
+function renderFilterBar() {
+  const types = [
+    {v:'request',     label:'Request',     icon:'🙏'},
+    {v:'update',      label:'Update',      icon:'📝'},
+    {v:'observation', label:'Observation', icon:'👁'},
+    {v:'gratitude',   label:'Gratitude',   icon:'💛'},
+    {v:'answer',      label:'Answer',      icon:'✨'},
+    {v:'principle',   label:'Principle',   icon:'📖'},
+  ];
+  return `<div class="entry-filter-bar">
+    <span style="font-family:'Lato',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-right:2px;">Show:</span>
+    ${types.map(t=>`
+      <button class="filter-pill ${_activeEntryFilters.includes(t.v)?'active':''}" 
+              id="fpill-${t.v}"
+              onclick="toggleFilterType('${t.v}')">
+        <span class="pill-icon">${t.icon}</span>${t.label}
+      </button>`).join('')}
+    ${_activeEntryFilters.length?`<button class="filter-pill" onclick="clearEntryFilter()" style="border-color:var(--gold-dim);color:var(--gold-dim);">✕ Clear</button>`:''}
+  </div>`;
+}
+function toggleFilterType(type) {
+  if (_activeEntryFilters.includes(type)) {
+    _activeEntryFilters = _activeEntryFilters.filter(t=>t!==type);
+  } else {
+    _activeEntryFilters.push(type);
+  }
+  document.getElementById('entry-filter-bar').innerHTML = renderFilterBar();
+  renderThread(currentPrayer);
+}
+function clearEntryFilter() {
+  _activeEntryFilters = [];
+  document.getElementById('entry-filter-bar').innerHTML = renderFilterBar();
+  renderThread(currentPrayer);
+}
+function updateFilterPills() {
+  // Called after re-render
+}
+
 const ENTRY_ICONS = {request:'🙏',update:'📝',observation:'👁',answer:'✨',principle:'📖',gratitude:'💛'};
 
 function renderThread(p) {
   const td = document.getElementById('pd-thread');
-  if (!p.entries.length) {
-    td.innerHTML = `<div class="empty-state">Begin with your first entry above.</div>`;
+  const filtered = _activeEntryFilters.length
+    ? p.entries.filter(e => _activeEntryFilters.includes(e.type))
+    : p.entries;
+  if (!filtered.length) {
+    td.innerHTML = _activeEntryFilters.length
+      ? `<div class="empty-state">No entries match this filter. <button class="btn btn-dim btn-sm mt8" onclick="clearEntryFilter()">Clear Filter</button></div>`
+      : `<div class="empty-state">Begin with your first entry above.</div>`;
     return;
   }
-  td.innerHTML = `<div class="thread">`+p.entries.map((e,i)=>{
-    const isLast = i===p.entries.length-1;
+  td.innerHTML = `<div class="thread">`+filtered.map((e,i)=>{
+    const isLast = i===filtered.length-1;
     const timeStr = new Date(e.createdAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
     return `
       <div class="entry">
@@ -1737,6 +2015,7 @@ function openEntryDetail(prayerId, entryId) {
   const dt = new Date(e.createdAt);
   const dateStr = dt.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const timeStr = dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  const scripId = 'scrip-expand-'+e.id;
   showModal('Entry', `
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
       <span style="font-size:24px;">${ENTRY_ICONS[e.type]||'·'}</span>
@@ -1748,13 +2027,41 @@ function openEntryDetail(prayerId, entryId) {
     <div style="color:var(--cream);line-height:1.7;font-size:17px;margin-bottom:${e.scripture?'0':'8px'};">${esc(e.content)}</div>
     ${e.scripture ? `
       <div style="margin-top:16px;padding:14px 16px;background:rgba(200,164,74,0.06);border-left:3px solid var(--gold-dim);border-radius:0 8px 8px 0;">
-        <div style="font-family:'Lato',sans-serif;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:6px;">Scripture</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <div style="font-family:'Lato',sans-serif;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dim);">Scripture</div>
+          <button class="btn btn-dim btn-sm" style="font-size:10px;padding:3px 9px;" onclick="expandScripture('${esc(e.scripture)}','${scripId}')">📖 Load passage</button>
+        </div>
         <div style="font-style:italic;color:var(--cream-dim);font-size:16px;line-height:1.65;">${esc(e.scripture)}</div>
+        <div id="${scripId}" style="margin-top:10px;"></div>
       </div>` : ''}
     <div style="margin-top:18px;">
       <button class="btn btn-dim btn-sm" onclick="closeModal();deleteEntry('${e.id}')">Delete this entry</button>
     </div>
   `);
+}
+
+async function expandScripture(ref, containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = `<div style="color:var(--muted);font-size:13px;font-family:'Lato',sans-serif;">Loading passage...</div>`;
+  try {
+    // Extract just the reference part (before any dash/em-dash)
+    const refPart = ref.split(/[–—]/)[0].trim();
+    const encoded = encodeURIComponent(refPart);
+    const res = await fetch(`https://bible-api.com/${encoded}`);
+    const data = await res.json();
+    if (data && data.text) {
+      el.innerHTML = `
+        <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px;">
+          <div style="font-family:'Lato',sans-serif;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:8px;">${esc(data.reference)} · WEB Translation</div>
+          <div style="font-style:italic;color:var(--cream);line-height:1.75;font-size:15px;">${esc(data.text.trim())}</div>
+        </div>`;
+    } else {
+      el.innerHTML = `<div style="color:var(--muted);font-size:13px;">Could not find this passage. Check the reference format.</div>`;
+    }
+  } catch(err) {
+    el.innerHTML = `<div style="color:var(--muted);font-size:13px;">Could not load passage — check your connection.</div>`;
+  }
 }
 
 async function refreshSummary() {
@@ -1803,6 +2110,7 @@ function showAddEntryModal() {
 
 // ─── EDIT PRAYER TAGS & TITLE ────────────────────────────────
 let _editTags = [];
+let _activeEntryFilters = []; // empty = show all
 function editPrayerTags() {
   if (!currentPrayer) return;
   _editTags = [...(currentPrayer.themeIds||[])];
