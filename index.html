@@ -1798,11 +1798,11 @@ function renderPrayerDetail() {
   const p = currentPrayer;
   document.getElementById('pd-title').textContent = p.title;
   // Reset filter bar on detail re-render (not on filter toggle)
-  const filterBar = document.getElementById('pd-filter-bar');
+  const filterBar = document.getElementById('entry-filter-bar');
   if (filterBar && !_activeEntryFilters.length) {
     filterBar.style.display = 'none';
     const fb = document.getElementById('filter-btn');
-    if (fb) fb.classList.remove('active');
+    if (fb) fb.style.color = '';
   }
 
   // Badges
@@ -2110,7 +2110,6 @@ function showAddEntryModal() {
 
 // ─── EDIT PRAYER TAGS & TITLE ────────────────────────────────
 let _editTags = [];
-let _activeEntryFilters = []; // empty = show all
 function editPrayerTags() {
   if (!currentPrayer) return;
   _editTags = [...(currentPrayer.themeIds||[])];
