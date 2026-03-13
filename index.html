@@ -1299,7 +1299,6 @@ function showFocusChangePicker() {
       ${prayers.map(p=>`
         <div class="focus-pick-card ${p.id===db.settings.tomorrowFocusPrayerId?'chosen':''}" onclick="setHomeFocus('${p.id}')" style="margin-bottom:6px;">
           <div style="font-family:'Playfair Display',serif;font-size:16px;">${esc(p.title)}</div>
-          ${p.description?`<div style="font-size:13px;color:var(--muted);margin-top:2px;">${esc(p.description)}</div>`:''}
         </div>`).join('')}
     </div>`;
   });
@@ -2486,14 +2485,12 @@ function openRoutine() {
         <p class="text-muted text-small" style="margin-bottom:10px;">Tomorrow's focus prayer:</p>
         <div class="living-summary" style="margin-bottom:12px;">
           <div class="ls-label" id="focus-pick-label">🙏 ${esc(focus?focus.title:'None selected')}</div>
-          <div class="ls-text" id="focus-pick-summary">${focus?(focus.livingSummary||'Bring this before God tomorrow.'):''}
-          </div>
+          <div class="ls-text" id="focus-pick-summary" style="font-size:14px;">${focus ? (focus.entries.length ? 'Last update ' + fmtRel(focus.entries[focus.entries.length-1].createdAt) : 'No entries yet') : ''}</div>
         </div>
         <button class="btn btn-dim btn-sm btn-full mb16" onclick="toggleFocusPicker()">⇄ Choose different prayer</button>
         <div id="focus-picker" style="display:none;" class="focus-prayer-pick">
           ${active.map(p=>`<div class="focus-pick-card ${p.id===_routineChosenFocusId?'chosen':''}" id="fpc-${p.id}" onclick="pickFocusPrayer('${p.id}')">
             <div style="font-family:'Playfair Display',serif;font-size:16px;">${esc(p.title)}</div>
-            ${p.description?`<div style="font-size:13px;color:var(--muted);margin-top:3px;">${esc(p.description)}</div>`:''}
           </div>`).join('')}
         </div>`:
         `<p class="text-muted" style="margin-bottom:14px;">Add your first prayer to activate a daily focus.</p>`}
@@ -2521,7 +2518,8 @@ function pickFocusPrayer(id) {
   if (card) card.classList.add('chosen');
   if (prayer) {
     document.getElementById('focus-pick-label').textContent='🙏 '+prayer.title;
-    document.getElementById('focus-pick-summary').textContent=prayer.livingSummary||'Bring this before God tomorrow.';
+    const last = prayer.entries[prayer.entries.length-1];
+    document.getElementById('focus-pick-summary').textContent = last ? 'Last update ' + fmtRel(last.createdAt) : 'No entries yet';
   }
   toggleFocusPicker();
 }
