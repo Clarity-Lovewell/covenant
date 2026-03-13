@@ -1033,7 +1033,8 @@ function renderCustomThemeEditor() {
     el.innerHTML = '';
     return;
   }
-  const ct = db.settings[slot] || defaultCustomTheme(slot);
+  const settingsKey = slot === 'custom1' ? 'customTheme1' : 'customTheme2';
+  const ct = db.settings[settingsKey] || defaultCustomTheme(slot);
   const name = slot === 'custom1' ? 'Horizon' : 'Dawn';
   el.innerHTML = `
     <div class="custom-theme-editor-panel">
