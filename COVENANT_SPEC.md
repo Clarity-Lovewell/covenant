@@ -1,4 +1,4 @@
-# Covenant — Prayer Journal · SPEC v1.4
+# Covenant — Prayer Journal · SPEC v1.5
 
 > **This document is the single source of truth for the Covenant app.**
 > Upload this file alongside index.html (and optionally a JSON backup) at the start of every Claude session.
@@ -25,7 +25,9 @@ The core difference from existing apps: prayers are *living threads* that evolve
   - **Cocoa**: chocolate brown bg #1a0e08, warm tan accents #d4a060, ivory text
   - **Horizon** (custom dark): user-defined bg + accent — defaults to dark navy + sky blue
   - **Dawn** (custom light): user-defined bg + accent — defaults to warm white + violet
-- Horizon and Dawn are fully user-customisable: background colour + accent colour via colour pickers in Settings → Appearance
+- Horizon and Dawn are fully user-customisable: background colour + accent colour
+- **Custom theme editor is only shown in Settings when Horizon or Dawn is the active theme** — no clutter for preset theme users
+- Custom theme editor uses native `<input type="color">` swatches (directly clickable, render as coloured squares) alongside editable hex text fields — changes apply live with no "Save" button needed
 - Custom theme colour math: surfaces derived by stepping bg brightness ±14 per level; cream/muted toggled by luminance threshold (< 0.5 = dark mode behaviour)
 - Preset themes use `[data-theme="..."]` CSS selectors; custom themes inject inline CSS vars on the html element
 - Theme persists in `settings.theme`; custom colours in `settings.customTheme1` / `settings.customTheme2`
@@ -48,41 +50,63 @@ The core difference from existing apps: prayers are *living threads* that evolve
 - Each entry is tappable to open a full detail modal (date, time, scripture beautifully rendered)
 
 ### Prayer Detail Header (redesigned)
-- Stacked column layout to avoid wrapping issues with long titles and many tags:
+- Stacked column layout:
   - Row 1: Back button + Prayer title (wraps naturally, full width)
   - Row 2: Status badge (with emoji) + Theme tags (wrapping flex row)
   - Row 3: ✎ Edit · ⊟ Filter · + Entry action buttons
-- This replaces the old single-row header that caused layout messiness on mobile
 
 ### Prayer Tags / Edit
-- "✎ Edit" button (gold ghost style — clearly interactive) in prayer detail header opens modal for: title, theme tags (multi-select), and status
-- Status badge in prayer detail is also directly tappable (shows ✎ icon) → opens quick status picker
+- "✎ Edit" button (gold ghost style) in prayer detail header opens modal for: title, theme tags (multi-select), and status
+- Status badge in prayer detail is also directly tappable → opens quick status picker
 
 ### Entry Filtering
-- "⊟ Filter" button (gold ghost style, same visual weight as Edit — clearly interactive) in prayer detail header
-- When active: button gains gold background tint (`.filter-btn-active` class) to indicate on/off state
-- Opens an inline filter bar with pill buttons for each entry type (with icons)
+- "⊟ Filter" button (gold ghost style) in prayer detail header
+- When active: button gains gold background tint (`.filter-btn-active`) to show state
+- Opens inline filter bar with pill buttons for each entry type
 - Active filters highlighted in gold; "✕ Clear" button to reset
-- Thread updates live as types are toggled
 
 ### Add Entry — Bottom CTA
-- A dashed "+ Add Entry" pill button appears at the bottom of the entry thread as an additional tap target, in addition to the "+ Entry" button in the header
+- A dashed "+ Add Entry" pill button at the bottom of the entry thread, in addition to the "+ Entry" button in the header
+
+### Entry Editing
+- Every entry shows an **Edit** link in the thread (alongside Delete)
+- **✎ Edit Entry** button also in the entry detail modal
+- Edit modal allows changing: type, content, scripture
+- On save: `editedAt` timestamp recorded on the entry
+- Thread shows "· edited [relative date]" label in the entry meta row
+- Entry detail modal shows edited date in the timestamp line
+- No full edit history — simple overwrite with timestamp. `originalRaw` (inbox capture) still preserved where applicable.
 
 ### Prayer Status Emojis
 - Status displayed with emoji throughout the app: 🟢 Active · 👁️ Watching · 💤 Dormant · ✅ Answered
-- Used in: prayer list cards (theme modal), status badge on detail screen, quick status picker, and filing dropdowns
+
+### Dismiss Inbox Items — Confirmation
+- "Dismiss" button on inbox items now shows a confirmation dialog before marking as processed
+- Prevents accidental loss of captures
 
 ### AI Layer
 - Requires Anthropic API key (stored in localStorage)
 - AI features:
   - **Inbox processing**: processes raw capture → shows before/after comparison with editable draft textarea
   - **Living summary**: summarises prayer thread in second person ("You began this prayer…")
-  - **Scripture suggestion**: included in inbox processing and entry assist
+  - **Scripture suggestion** (available in four places):
+    - Inbox "File Manually" modal — "✦ Suggest Scripture" button below scripture field
+    - Add Entry modal — "✦ Suggest Scripture" button below scripture field
+    - Edit Entry modal — "✦ Suggest Scripture" button below scripture field
+    - Entry Detail modal — "✦ Suggest Scripture" button shown when no scripture exists; result can be added directly to the saved entry via "Add to Entry" button (persists immediately)
   - **Principle extraction**: detected during inbox AI processing
-  - **Prayer description generation**: "✦ AI Generate" button in description area, Edit Description modal, and New Prayer modal — uses prayer title + recent entries as context
-  - **Entry assist**: "✦ AI Assist" button in Add Entry modal — polishes raw note, can suggest spinning off a new prayer if content is clearly off-topic
+  - **Prayer description generation**: "✦ AI Generate" in description area, Edit Description modal, and New Prayer modal
+  - **Entry assist**: "✦ AI Assist" in Add Entry modal — polishes raw note, can suggest spinning off a new prayer
 - All AI is assistive — user reviews/edits before anything is filed
 - Manual mode available for all features without API key
+
+### File Manually — Retains AI Context
+- When "File Manually" is triggered after AI has processed an item, the modal pre-fills:
+  - Entry text from the edited AI draft (or raw text if AI wasn't run)
+  - Entry type from AI suggestion
+  - Prayer selection pre-set to the AI-suggested prayer (if it matches an existing one)
+  - Scripture from AI suggestion
+- User can adjust all fields before filing
 
 ### Inbox — Before/After + Editable Draft
 - When AI processes an inbox item, the suggestion panel shows:
@@ -124,6 +148,7 @@ prayers: [{
 
 entries: [{
   id, type, content, scripture, createdAt,
+  editedAt (optional — timestamp of last edit),
   originalRaw (optional — stores pre-AI raw capture for before/after view)
 }]
 
@@ -171,7 +196,8 @@ devNotes: [{
 - Tappable to open full detail modal (type icon, date, time, scripture)
 - Scripture reference shows "📖 Load passage" → fetches full passage from bible-api.com
 - If entry has `originalRaw`: "📎 View original capture" toggle shown in detail modal
-- Delete available from thread view and detail modal
+- Edit and Delete available from both thread view and detail modal
+- Edited entries show "· edited [date]" label in thread and detail modal
 - "+ Add Entry" button at both top (header) and bottom of thread
 
 ### Dev Notes (Settings)
@@ -220,6 +246,8 @@ Workflow: Edit → commit via GitHub Desktop or GitHub Mobile → push to main �
 ## Session Workflow
 
 - Chris provides: `index.html` + `COVENANT_SPEC.md` + optional JSON backup at the start of each session
+- **For small changes (1–2 features):** single prompt is fine
+- **For larger batches (3+ dev notes):** split into two prompts — first handles code-heavy changes (theming, new modals, data structure), second handles lighter changes (copy tweaks, confirmation dialogs, UI polish). This avoids hitting output length limits mid-spec.
 - Changes requested in plain language; Claude handles the code
 - Claude delivers: updated `index.html` + updated `COVENANT_SPEC.md`
 - Chris commits both files to GitHub
@@ -235,7 +263,8 @@ Workflow: Edit → commit via GitHub Desktop or GitHub Mobile → push to main �
 | v1.1 | 2026-03-12 | Quick capture top; routine tracking; multiple notes; focus picker; prayer descriptions; theme descriptions; testimony milestones; 16 verses; PWA meta tags |
 | v1.2 | 2026-03-12 | 10 prayer themes; 4 visual themes (Candlelight, Parchment, Midnight, Ember); canvas app icon; Settings screen; Today's Focus + change picker; prayer edit modal; gratitude entry type; grouped prayer picker; entry expansion modal with scripture; ENTRY_ICONS fix; Firefox nav fix |
 | v1.3 | 2026-03-12 | PWA: dynamic manifest + service worker; Cocoa theme; Focus picker grouped by theme; Entry filter bar; Scripture passage expansion (bible-api.com); Dev note editing inline; Status badge clickable; Edit button gold ghost style |
-| v1.4 | 2026-03-13 | Custom themes Horizon + Dawn with live colour pickers; Prayer detail header redesign (stacked layout, no wrapping); Filter button now gold ghost style with active highlight state; Add Entry button at bottom of thread; Status emojis throughout (🟢👁️💤✅); Prayer list cards with emoji status in theme modal; AI description generation for prayers; AI entry assist with new-prayer suggestion; Inbox before/after comparison with editable draft; Original capture stored on entry with toggle in detail modal; Dev notes checkbox — tick to archive, collapsible archived section, checked date recorded |
+| v1.4 | 2026-03-13 | Custom themes Horizon + Dawn with live colour pickers; Prayer detail header redesign (stacked layout); Filter button gold ghost style with active highlight; Add Entry button at bottom of thread; Status emojis throughout; Prayer list cards with emoji status; AI description generation; AI entry assist with new-prayer suggestion; Inbox before/after comparison with editable draft; Original capture stored on entry with toggle; Dev notes checkbox — tick to archive, collapsible archived section |
+| v1.5 | 2026-03-13 | Dismiss inbox confirmation dialog; Custom theme editor rebuilt — native colour inputs + hex text fields, live apply, only shown when Horizon/Dawn active; File Manually retains AI-suggested prayer/type/scripture; AI scripture suggestion in Add Entry, Edit Entry, Entry Detail (posted entries), and File Manually modals; Entry editing (type + content + scripture) with editedAt timestamp shown in thread and detail modal |
 
 ---
 
@@ -263,4 +292,4 @@ Workflow: Edit → commit via GitHub Desktop or GitHub Mobile → push to main �
 
 ---
 
-*Covenant SPEC v1.4 — Built with Claude Sonnet, March 2026*
+*Covenant SPEC v1.5 — Built with Claude Sonnet, March 2026*
