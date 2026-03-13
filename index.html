@@ -1072,8 +1072,9 @@ function renderCustomThemeEditor() {
 function liveUpdateCustom(prop, value) {
   const slot = db.settings.theme;
   if (slot !== 'custom1' && slot !== 'custom2') return;
-  const ct = { ...(db.settings[slot] || defaultCustomTheme(slot)), [prop]: value };
-  db.settings[slot] = ct;
+  const settingsKey = slot === 'custom1' ? 'customTheme1' : 'customTheme2';
+  const ct = { ...(db.settings[settingsKey] || defaultCustomTheme(slot)), [prop]: value };
+  db.settings[settingsKey] = ct;
   persist();
   applyCustomThemeVars(slot);
   updateCustomSwatchPreviews();
@@ -1522,7 +1523,6 @@ function fileManually(id) {
   _mThemes = [];
   const item = db.inbox.find(i=>i.id===id); if (!item) return;
   const aiData = _pendingAI[id] || null;
-
   // Pull pre-fills from AI result if available
   let preSelectedPrayerId = '';
   if (aiData?.suggestedPrayer) {
@@ -1531,6 +1531,11 @@ function fileManually(id) {
   }
   const prefillType = aiData?.entryType || 'observation';
   const prefillScripture = aiData?.scripture || '';
+  const prefillNewTitle = (!preSelectedPrayerId && aiData?.newPrayerTitle) ? aiData.newPrayerTitle : '';
+  const prefillThemeId = (!preSelectedPrayerId && aiData?.suggestedTheme)
+    ? (db.themes.find(t=>t.name===aiData.suggestedTheme)?.id || '')
+    : '';
+  if (prefillThemeId) _mThemes = [prefillThemeId];
 
   // Content: use the edited AI draft if present, else raw text
   const draftEl = document.getElementById('ai-draft-'+id);
@@ -1575,9 +1580,9 @@ function fileManually(id) {
       <select id="m-prayer" onchange="toggleNewPrayer(this.value)">${prayerOptions}</select>
     </div>
     <div id="m-new-fields" style="${preSelectedPrayerId?'display:none;':''}">
-      <div class="field"><label>New Prayer Title</label><input type="text" id="m-title" placeholder="Name this prayer..."/></div>
+      <div class="field"><label>New Prayer Title</label><input type="text" id="m-title" placeholder="Name this prayer..." value="${esc(prefillNewTitle)}"/></div>
       <div class="field"><label>Themes</label>
-        <div class="tags">${db.themes.map(t=>`<span class="tag" onclick="toggleMTheme('${t.id}',this)">${t.icon} ${t.name}</span>`).join('')}</div>
+        <div class="tags">${db.themes.map(t=>`<span class="tag ${t.id===prefillThemeId?'selected':''}" onclick="toggleMTheme('${t.id}',this)">${t.icon} ${t.name}</span>`).join('')}</div>
       </div>
     </div>
     <div class="field">
