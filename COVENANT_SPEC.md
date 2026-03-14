@@ -1,4 +1,4 @@
-# Covenant — Prayer Journal · SPEC v1.6
+# Covenant — Prayer Journal · SPEC v1.7
 
 > **This document is the single source of truth for the Covenant app.**
 > Upload this file alongside index.html (and optionally a JSON backup) at the start of every Claude session.
@@ -54,6 +54,18 @@ The core difference from existing apps: prayers are *living threads* that evolve
   - Row 1: Back button + Prayer title (wraps naturally, full width)
   - Row 2: Status badge (with emoji) + Theme tags (wrapping flex row)
   - Row 3: ✎ Edit · ⊟ Filter · + Entry action buttons
+
+
+### All Prayers View
+- Accessible via "All Prayers" toggle on the Prayers screen (next to "By Theme")
+- Toggle persists within the session (`_prayerView` state)
+- **Filter strip**: All · 🟢 Active · 👁️ Watching · 💤 Dormant · ✅ Answered — with live counts
+- **Sort buttons**: Recent activity (default) · A → Z · Oldest first
+- Within each sort, primary grouping is always by status (active → watching → dormant → answered)
+- Each row shows: status emoji, prayer title, theme tags (up to 2), time since last entry, last entry snippet (2 lines), entry count
+- Answered prayers visually dimmed and title in green
+- Tapping any row navigates directly to prayer detail
+- Status groups shown as labelled headers with counts when "All" filter is active
 
 ### Prayer Tags / Edit
 - "✎ Edit" button (gold ghost style) in prayer detail header opens modal for: title, theme tags (multi-select), and status
@@ -187,7 +199,7 @@ devNotes: [{
 |---|---|---|
 | Home | Nav: Home | Greeting, quick capture (with voice button), routine card, focus card, testimony card |
 | Inbox | Nav: Inbox | Unprocessed captures — file manually or with AI |
-| Themes | Nav: Prayers | 10 themes with descriptions, tap to see prayers within |
+| Prayers | Nav: Prayers | Toggle between "By Theme" (grid of 10 themes) and "All Prayers" (flat sorted list) |
 | Prayer Detail | Tap any prayer | Description + threaded entries + living summary |
 | Testimony | Nav: Testimony | Fully answered prayers + Along the Way milestones |
 | Principles | Nav: Wisdom | Personal wisdom library |
@@ -284,6 +296,7 @@ Workflow: Edit → commit via GitHub Desktop or GitHub Mobile → push to main �
 | v1.3 | 2026-03-12 | PWA: dynamic manifest + service worker; Cocoa theme; Focus picker grouped by theme; Entry filter bar; Scripture passage expansion (bible-api.com); Dev note editing inline; Status badge clickable; Edit button gold ghost style |
 | v1.4 | 2026-03-13 | Custom themes Horizon + Dawn with live colour pickers; Prayer detail header redesign (stacked layout); Filter button gold ghost style with active highlight; Add Entry button at bottom of thread; Status emojis throughout; Prayer list cards with emoji status; AI description generation; AI entry assist with new-prayer suggestion; Inbox before/after comparison with editable draft; Original capture stored on entry with toggle; Dev notes checkbox — tick to archive, collapsible archived section |
 | v1.5 | 2026-03-13 | Dismiss inbox confirmation dialog; Custom theme editor rebuilt — native colour inputs + hex text fields, live apply, only shown when Horizon/Dawn active; File Manually retains AI-suggested prayer/type/scripture; AI scripture suggestion in Add Entry, Edit Entry, Entry Detail (posted entries), and File Manually modals; Entry editing (type + content + scripture) with editedAt timestamp shown in thread and detail modal |
+| v1.7 | 2026-03-14 | All Prayers view — flat sorted list with filter strip and sort toggles, accessible via toggle on Prayers screen |
 | v1.6 | 2026-03-14 | AI prompts tightened — concise, natural, no filler; "Mark as Answered?" prompt when filing answer-type entries (submitEntry + submitEditEntry); AI-detected principles no longer auto-saved — shown with unchecked checkbox for user to opt in; Voice capture button (🎤) on home quick-capture using Web Speech API; "File Manually" from original inbox item uses raw capture text (ignores AI data); Evening routine state preserved when navigating to inbox mid-routine via `_routineRendered` flag |
 
 ---
@@ -313,4 +326,4 @@ Workflow: Edit → commit via GitHub Desktop or GitHub Mobile → push to main �
 
 ---
 
-*Covenant SPEC v1.6 — Built with Claude Sonnet, March 2026*
+*Covenant SPEC v1.7 — Built with Claude Sonnet, March 2026*

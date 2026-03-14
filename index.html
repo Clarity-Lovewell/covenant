@@ -585,6 +585,113 @@ input[type="color"].theme-color-pick::-webkit-color-swatch{border:none;border-ra
 ::-webkit-scrollbar{width:3px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:2px;}
+
+/* ══════════════════════════════════
+   ALL PRAYERS VIEW
+══════════════════════════════════ */
+.view-toggle{
+  display:flex;gap:0;margin-bottom:18px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;
+}
+.view-toggle-btn{
+  flex:1;padding:8px 0;background:none;border:none;
+  font-family:'Lato',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:0.09em;text-transform:uppercase;
+  color:var(--muted);cursor:pointer;transition:all 0.2s;
+}
+.view-toggle-btn.active{
+  background:var(--gold-faint);color:var(--gold);
+  border-bottom:2px solid var(--gold-dim);
+}
+.ap-filter-strip{
+  display:flex;gap:6px;flex-wrap:wrap;
+  margin-bottom:14px;align-items:center;
+}
+.ap-filter-label{
+  font-family:'Lato',sans-serif;font-size:10px;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--muted);flex-shrink:0;
+}
+.ap-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 11px;border-radius:20px;
+  border:1px solid var(--border);background:var(--surface);
+  font-family:'Lato',sans-serif;font-size:11px;
+  color:var(--cream-dim);cursor:pointer;transition:all 0.2s;user-select:none;
+}
+.ap-chip:hover{border-color:var(--border-strong);}
+.ap-chip.active{border-color:var(--gold-dim);background:var(--gold-faint);color:var(--gold);}
+.ap-chip-count{
+  background:var(--surface-3);border-radius:10px;
+  padding:0 5px;font-size:10px;color:var(--muted);
+}
+.ap-chip.active .ap-chip-count{background:rgba(200,164,74,0.18);color:var(--gold-dim);}
+.ap-sort-row{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;
+}
+.ap-sort-label{font-family:'Lato',sans-serif;font-size:11px;color:var(--muted);}
+.ap-sort-btns{display:flex;gap:5px;}
+.ap-sort-btn{
+  background:none;border:1px solid var(--border);
+  color:var(--muted);font-family:'Lato',sans-serif;
+  font-size:10px;letter-spacing:0.07em;text-transform:uppercase;
+  padding:3px 9px;border-radius:6px;cursor:pointer;transition:all 0.2s;
+}
+.ap-sort-btn.active{border-color:var(--gold-dim);color:var(--gold);background:var(--gold-faint);}
+.ap-group-header{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 0 6px;margin-bottom:5px;
+  border-bottom:1px solid var(--border);
+}
+.ap-group-label{
+  font-family:'Lato',sans-serif;font-size:10px;
+  letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);
+}
+.ap-group-count{
+  font-family:'Lato',sans-serif;font-size:10px;color:var(--muted);
+  background:var(--surface-2);border-radius:10px;padding:1px 7px;
+}
+.ap-row{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:12px 14px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;margin-bottom:6px;
+  cursor:pointer;transition:all 0.18s;
+}
+.ap-row:hover{
+  border-color:var(--border-strong);
+  background:var(--surface-2);
+  transform:translateX(2px);
+}
+.ap-row.ap-answered{opacity:0.72;}
+.ap-row.ap-answered .ap-row-title{color:var(--green-text);}
+.ap-row-status{font-size:17px;flex-shrink:0;margin-top:2px;line-height:1;}
+.ap-row-body{flex:1;min-width:0;}
+.ap-row-title{
+  font-family:'Playfair Display',serif;font-size:17px;
+  color:var(--cream);line-height:1.25;margin-bottom:4px;
+}
+.ap-row-meta{
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;
+}
+.ap-theme-tag{
+  display:inline-flex;align-items:center;gap:3px;
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:10px;padding:2px 7px;
+  font-family:'Lato',sans-serif;font-size:10px;color:var(--cream-dim);
+}
+.ap-date{font-family:'Lato',sans-serif;font-size:11px;color:var(--muted);}
+.ap-sep{color:var(--muted);font-size:10px;}
+.ap-snippet{
+  color:var(--cream-dim);font-size:14px;font-style:italic;
+  line-height:1.5;overflow:hidden;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+}
+.ap-row-count{
+  flex-shrink:0;font-family:'Lato',sans-serif;
+  font-size:10px;color:var(--muted);white-space:nowrap;padding-top:3px;
+}
 </style>
 </head>
 <body>
@@ -673,7 +780,30 @@ input[type="color"].theme-color-pick::-webkit-color-swatch{border:none;border-ra
       <h2 style="font-size:28px;font-family:'Playfair Display',serif;">Prayers</h2>
       <button class="btn btn-ghost btn-sm" onclick="showNewPrayerModal()">+ New Prayer</button>
     </div>
+    <div class="view-toggle">
+      <button class="view-toggle-btn active" id="vt-themes" onclick="setPrayerView('themes')">By Theme</button>
+      <button class="view-toggle-btn" id="vt-all" onclick="setPrayerView('all')">All Prayers</button>
+    </div>
     <div id="themes-list"></div>
+    <div id="all-prayers-view" style="display:none;">
+      <div class="ap-filter-strip">
+        <span class="ap-filter-label">Show:</span>
+        <button class="ap-chip active" data-apf="all" onclick="setAPFilter('all',this)">All <span class="ap-chip-count" id="apc-all"></span></button>
+        <button class="ap-chip" data-apf="active" onclick="setAPFilter('active',this)">🟢 Active <span class="ap-chip-count" id="apc-active"></span></button>
+        <button class="ap-chip" data-apf="watching" onclick="setAPFilter('watching',this)">👁️ Watching <span class="ap-chip-count" id="apc-watching"></span></button>
+        <button class="ap-chip" data-apf="dormant" onclick="setAPFilter('dormant',this)">💤 Dormant <span class="ap-chip-count" id="apc-dormant"></span></button>
+        <button class="ap-chip" data-apf="answered" onclick="setAPFilter('answered',this)">✅ Answered <span class="ap-chip-count" id="apc-answered"></span></button>
+      </div>
+      <div class="ap-sort-row">
+        <span class="ap-sort-label" id="ap-sort-label"></span>
+        <div class="ap-sort-btns">
+          <button class="ap-sort-btn active" id="aps-recency" onclick="setAPSort('recency')">Recent</button>
+          <button class="ap-sort-btn" id="aps-alpha" onclick="setAPSort('alpha')">A → Z</button>
+          <button class="ap-sort-btn" id="aps-oldest" onclick="setAPSort('oldest')">Oldest</button>
+        </div>
+      </div>
+      <div id="ap-list"></div>
+    </div>
   </div>
 
   <!-- PRAYER DETAIL -->
@@ -1410,7 +1540,10 @@ function navigate(screen) {
   window.scrollTo(0,0);
   if (screen==='home')       renderHome();
   if (screen==='inbox')      renderInbox();
-  if (screen==='themes')     renderThemes();
+  if (screen==='themes') {
+    if (_prayerView === 'all') renderAllPrayers();
+    else renderThemes();
+  }
   if (screen==='testimony')  renderTestimony();
   if (screen==='principles') renderPrinciples();
   updateInboxBadge();
@@ -1742,6 +1875,128 @@ function applyScriptureSuggestion(inputId, resultId) {
 // ═══════════════════════════════════════════════════════════
 // THEMES SCREEN
 // ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// ALL PRAYERS VIEW
+// ═══════════════════════════════════════════════════════════
+let _prayerView  = 'themes';  // 'themes' | 'all'
+let _apFilter    = 'all';
+let _apSort      = 'recency';
+
+const AP_STATUS_ORDER = {active:0,watching:1,dormant:2,answered:3};
+
+function apLastEntry(p) {
+  return p.entries.length ? p.entries[p.entries.length-1].createdAt : p.createdAt;
+}
+
+function setPrayerView(v) {
+  _prayerView = v;
+  document.getElementById('vt-themes').classList.toggle('active', v==='themes');
+  document.getElementById('vt-all').classList.toggle('active', v==='all');
+  document.getElementById('themes-list').style.display = v==='themes' ? '' : 'none';
+  document.getElementById('all-prayers-view').style.display = v==='all' ? '' : 'none';
+  if (v==='all') renderAllPrayers();
+  else renderThemes();
+}
+
+function setAPFilter(f, el) {
+  _apFilter = f;
+  document.querySelectorAll('.ap-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderAllPrayers();
+}
+
+function setAPSort(s) {
+  _apSort = s;
+  document.querySelectorAll('.ap-sort-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('aps-'+s).classList.add('active');
+  renderAllPrayers();
+}
+
+function renderAllPrayers() {
+  const container = document.getElementById('ap-list'); if (!container) return;
+
+  // Update counts
+  ['all','active','watching','dormant','answered'].forEach(f => {
+    const el = document.getElementById('apc-'+f);
+    if (el) el.textContent = f==='all'
+      ? db.prayers.length
+      : db.prayers.filter(p=>p.status===f).length;
+  });
+
+  // Sort label
+  const sortLabels = {
+    recency:'Most recent activity first',
+    alpha:'A → Z within each group',
+    oldest:'Least recent activity first',
+  };
+  const sl = document.getElementById('ap-sort-label');
+  if (sl) sl.textContent = sortLabels[_apSort];
+
+  let list = _apFilter==='all' ? [...db.prayers] : db.prayers.filter(p=>p.status===_apFilter);
+
+  if (!list.length) {
+    container.innerHTML = `<div class="empty-state">No prayers here yet. ✦</div>`;
+    return;
+  }
+
+  // Sort
+  list.sort((a,b) => {
+    const sd = AP_STATUS_ORDER[a.status] - AP_STATUS_ORDER[b.status];
+    if (sd !== 0) return sd;
+    if (_apSort==='alpha')   return a.title.localeCompare(b.title);
+    if (_apSort==='oldest')  return apLastEntry(a) - apLastEntry(b);
+    return apLastEntry(b) - apLastEntry(a); // recency default
+  });
+
+  let html = '';
+  if (_apFilter === 'all') {
+    const statusLabels = {active:'Active',watching:'Watching',dormant:'Dormant',answered:'Answered'};
+    ['active','watching','dormant','answered'].forEach(status => {
+      const group = list.filter(p=>p.status===status);
+      if (!group.length) return;
+      html += `
+        <div style="margin-bottom:8px;">
+          <div class="ap-group-header">
+            <span style="font-size:14px;">${STATUS_EMOJI[status]}</span>
+            <span class="ap-group-label">${statusLabels[status]}</span>
+            <span class="ap-group-count">${group.length}</span>
+          </div>
+          ${group.map(apRow).join('')}
+        </div>`;
+    });
+  } else {
+    html = list.map(apRow).join('');
+  }
+
+  container.innerHTML = html;
+}
+
+function apRow(p) {
+  const last = p.entries.length ? p.entries[p.entries.length-1] : null;
+  const snippet = last ? last.content : '';
+  const trimmed = snippet.length > 100 ? snippet.slice(0,100)+'…' : snippet;
+  const themeTags = (p.themeIds||[]).slice(0,2).map(tid => {
+    const t = db.themes.find(th=>th.id===tid);
+    return t ? `<span class="ap-theme-tag">${t.icon} ${t.name}</span>` : '';
+  }).join('');
+  const entryCount = p.entries.length;
+  const dateStr = last ? fmtRel(last.createdAt) : 'no entries';
+  return `
+    <div class="ap-row ap-${p.status}" onclick="openPrayer('${p.id}')">
+      <div class="ap-row-status">${STATUS_EMOJI[p.status]||'📿'}</div>
+      <div class="ap-row-body">
+        <div class="ap-row-title">${esc(p.title)}</div>
+        <div class="ap-row-meta">
+          ${themeTags}
+          ${themeTags ? '<span class="ap-sep">·</span>' : ''}
+          <span class="ap-date">${dateStr}</span>
+        </div>
+        ${trimmed ? `<div class="ap-snippet">${esc(trimmed)}</div>` : ''}
+      </div>
+      <div class="ap-row-count">${entryCount} entr${entryCount===1?'y':'ies'}</div>
+    </div>`;
+}
+
 function renderThemes() {
   const list = document.getElementById('themes-list');
   list.innerHTML = db.themes.map(theme => {
