@@ -1304,21 +1304,35 @@ function startVoiceCapture() {
   recognition.lang = 'en-AU';
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
+
+  let captured = '';
+
   btn.textContent = '🔴';
   btn.classList.add('recording');
   recognition.start();
+
   recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript;
-    const input = document.getElementById('qc-input');
-    input.value = (input.value ? input.value + ' ' : '') + transcript;
-    btn.textContent = '🎤';
-    btn.classList.remove('recording');
+    // Collect all result segments in case there are multiple
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      if (event.results[i].isFinal) {
+        captured += (captured ? ' ' : '') + event.results[i][0].transcript;
+      }
+    }
   };
-  recognition.onerror = () => {
-    btn.textContent = '🎤';
-    btn.classList.remove('recording');
-  };
+
   recognition.onend = () => {
+    btn.textContent = '🎤';
+    btn.classList.remove('recording');
+    if (captured) {
+      const input = document.getElementById('qc-input');
+      input.value = (input.value ? input.value.trimEnd() + ' ' : '') + captured;
+      // Dispatch native input event so the browser registers the change
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.focus();
+    }
+  };
+
+  recognition.onerror = () => {
     btn.textContent = '🎤';
     btn.classList.remove('recording');
   };
