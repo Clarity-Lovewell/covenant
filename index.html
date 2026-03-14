@@ -1291,28 +1291,42 @@ function renderFutureImprovements() {
 // ═══════════════════════════════════════════════════════════
 // VOICE CAPTURE
 // ═══════════════════════════════════════════════════════════
+let _voiceRecognition = null;
+let _voiceCapturing = false;
+
 function startVoiceCapture() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   const btn = document.getElementById('voice-btn');
+
+  // Second tap — stop recording
+  if (_voiceCapturing && _voiceRecognition) {
+    _voiceRecognition.stop();
+    return;
+  }
+
   if (!SR) {
     btn.textContent = '✗';
     setTimeout(() => { btn.textContent = '🎤'; }, 2000);
     alert('Voice input isn\'t supported in this browser. Try Chrome.');
     return;
   }
+
   const recognition = new SR();
   recognition.lang = 'en-AU';
+  recognition.continuous = true;      // don't auto-stop on pause
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
 
   let captured = '';
+  _voiceRecognition = recognition;
+  _voiceCapturing = true;
 
   btn.textContent = '🔴';
+  btn.title = 'Tap to stop recording';
   btn.classList.add('recording');
   recognition.start();
 
   recognition.onresult = (event) => {
-    // Collect all result segments in case there are multiple
     for (let i = event.resultIndex; i < event.results.length; i++) {
       if (event.results[i].isFinal) {
         captured += (captured ? ' ' : '') + event.results[i][0].transcript;
@@ -1321,19 +1335,25 @@ function startVoiceCapture() {
   };
 
   recognition.onend = () => {
+    _voiceCapturing = false;
+    _voiceRecognition = null;
     btn.textContent = '🎤';
+    btn.title = 'Voice capture';
     btn.classList.remove('recording');
     if (captured) {
       const input = document.getElementById('qc-input');
       input.value = (input.value ? input.value.trimEnd() + ' ' : '') + captured;
-      // Dispatch native input event so the browser registers the change
       input.dispatchEvent(new Event('input', { bubbles: true }));
       input.focus();
     }
   };
 
-  recognition.onerror = () => {
+  recognition.onerror = (e) => {
+    if (e.error === 'no-speech') return; // ignore — user just hasn't spoken yet
+    _voiceCapturing = false;
+    _voiceRecognition = null;
     btn.textContent = '🎤';
+    btn.title = 'Voice capture';
     btn.classList.remove('recording');
   };
 }
@@ -2541,15 +2561,29 @@ function deletePrinciple(id) {
 // EVENING ROUTINE
 // ═══════════════════════════════════════════════════════════
 let _routineChosenFocusId = '';
-let _routineRendered = false; // preserves routine DOM when navigating to inbox mid-routine
 
-function openRoutine() {
-  const overlay = document.getElementById('routine-overlay');
-  overlay.classList.add('open');
-  // If already rendered (e.g. user went to inbox and came back), just show — don't re-render
-  if (_routineRendered) return;
-  _routineRendered = true;
+// ── Routine draft helpers ────────────────────────────────────
+function saveRoutineDraft() {
+  const thanks = [...document.querySelectorAll('.r-thanks')].map(t=>t.value.trim()).filter(Boolean);
+  const surrender = [...document.querySelectorAll('.r-surrender')].map(t=>t.value.trim()).filter(Boolean);
+  if (thanks.length || surrender.length) {
+    db.settings.routineDraft = {
+      date: new Date().toISOString().split('T')[0],
+      thanks,
+      surrender,
+    };
+  } else {
+    db.settings.routineDraft = null;
+  }
+  persist();
+}
 
+function clearRoutineDraft() {
+  db.settings.routineDraft = null;
+  persist();
+}
+
+function buildRoutineBody(restoredThanks, restoredSurrender) {
   _routineChosenFocusId = db.settings.tomorrowFocusPrayerId||'';
   const unread = db.inbox.filter(i=>!i.processed).length;
   const active = db.prayers.filter(p=>p.status==='active');
@@ -2559,13 +2593,22 @@ function openRoutine() {
   const todayStr = new Date().toISOString().split('T')[0];
   const doneToday = db.settings.routineCompletedDate === todayStr;
 
+  // Build restored gratitude rows
+  const thanksRows = restoredThanks && restoredThanks.length
+    ? restoredThanks.map((t,i) => `<div class="note-row"><textarea class="r-thanks" rows="2"${i>0?' placeholder="Another note..."':''}>${esc(t)}</textarea>${i>0?'<button class="note-remove" onclick="this.parentElement.remove()">×</button>':''}</div>`).join('')
+    : `<div class="note-row"><textarea class="r-thanks" rows="2" placeholder="One thing, however small..."></textarea></div>`;
+
+  const surrenderRows = restoredSurrender && restoredSurrender.length
+    ? restoredSurrender.map((s,i) => `<div class="note-row"><textarea class="r-surrender" rows="2"${i>0?' placeholder="Another note..."':''}>${esc(s)}</textarea>${i>0?'<button class="note-remove" onclick="this.parentElement.remove()">×</button>':''}</div>`).join('')
+    : `<div class="note-row"><textarea class="r-surrender" rows="2" placeholder="Whatever is on your heart..."></textarea></div>`;
+
   document.getElementById('routine-body').innerHTML=`
     ${doneToday?`<div style="text-align:center;margin-bottom:16px;font-family:'Lato',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-text);">✓ Already completed today — going again is fine</div>`:''}
     <div class="routine-step">
       <div class="step-num">Step 1 of 3</div><div class="step-title">Give Thanks</div>
       <div class="step-verse">"In everything give thanks; for this is the will of God." — 1 Thess 5:18</div>
       <label>What did you see God do today?</label>
-      <div id="thanks-rows"><div class="note-row"><textarea class="r-thanks" rows="2" placeholder="One thing, however small..."></textarea></div></div>
+      <div id="thanks-rows">${thanksRows}</div>
       <button class="btn btn-dim btn-sm mt8" onclick="addNoteRow('thanks-rows','r-thanks')">＋ Add another gratitude</button>
     </div>
     <div class="routine-step">
@@ -2591,16 +2634,55 @@ function openRoutine() {
         </div>`:
         `<p class="text-muted" style="margin-bottom:14px;">Add your first prayer to activate a daily focus.</p>`}
       <label style="margin-top:8px;">Anything to surrender tonight?</label>
-      <div id="surrender-rows"><div class="note-row"><textarea class="r-surrender" rows="2" placeholder="Whatever is on your heart..."></textarea></div></div>
+      <div id="surrender-rows">${surrenderRows}</div>
       <button class="btn btn-dim btn-sm mt8" onclick="addNoteRow('surrender-rows','r-surrender')">＋ Add another note</button>
     </div>
     <button class="btn btn-primary btn-full" onclick="completeRoutine()">Complete Evening ✦</button>
   `;
 }
 
-// Navigate to inbox from within routine without losing routine state
+function openRoutine() {
+  const overlay = document.getElementById('routine-overlay');
+  overlay.classList.add('open');
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const draft = db.settings.routineDraft;
+
+  // Same-day draft: restore silently without re-rendering the overlay
+  if (draft && draft.date === todayStr) {
+    // Only rebuild if DOM is gone (first open after page load with saved draft)
+    if (document.getElementById('thanks-rows')) return;
+    buildRoutineBody(draft.thanks, draft.surrender);
+    return;
+  }
+
+  // Previous-day draft: show a banner asking keep or clear
+  if (draft && draft.date !== todayStr) {
+    const draftDate = new Date(draft.date).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+    const hasThanks = draft.thanks && draft.thanks.length;
+    const hasSurrender = draft.surrender && draft.surrender.length;
+    const whatLeft = [hasThanks ? `${draft.thanks.length} gratitude note${draft.thanks.length>1?'s':''}` : '', hasSurrender ? `${draft.surrender.length} surrender note${draft.surrender.length>1?'s':''}` : ''].filter(Boolean).join(' and ');
+    showModal('Unfinished Routine', `
+      <div style="text-align:center;padding:4px 0 8px;">
+        <div style="font-size:36px;margin-bottom:12px;">🌙</div>
+        <p style="font-family:'Playfair Display',serif;font-size:18px;color:var(--cream);margin-bottom:8px;">You left ${whatLeft} unfinished from ${draftDate}.</p>
+        <p style="color:var(--muted);font-size:15px;line-height:1.6;margin-bottom:22px;">Would you like to carry them into tonight's routine, or start fresh?</p>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-dim btn-full" onclick="closeModal();clearRoutineDraft();buildRoutineBody(null,null);">Start fresh</button>
+          <button class="btn btn-primary btn-full" onclick="closeModal();buildRoutineBody(db.settings.routineDraft?.thanks,db.settings.routineDraft?.surrender);">Keep them</button>
+        </div>
+      </div>
+    `);
+    return;
+  }
+
+  // No draft — fresh start
+  buildRoutineBody(null, null);
+}
+
+// Navigate to inbox from within routine — save draft first
 function routineGoToInbox() {
-  // Hide overlay but keep _routineRendered = true so inputs are preserved
+  saveRoutineDraft();
   document.getElementById('routine-overlay').classList.remove('open');
   navigate('inbox');
 }
@@ -2634,11 +2716,11 @@ function completeRoutine() {
   surrender.forEach(s=>db.inbox.push({id:uid(),rawText:'[Surrender] '+s,createdAt:Date.now(),processed:false}));
   db.settings.tomorrowFocusPrayerId=_routineChosenFocusId||'';
   db.settings.routineCompletedDate=new Date().toISOString().split('T')[0];
-  _routineRendered = false; // reset so next open starts fresh
+  clearRoutineDraft(); // filed — no need to keep draft
   persist(); closeRoutine(); renderHome(); updateInboxBadge();
 }
 function closeRoutine() {
-  _routineRendered = false; // closing via ✕ always resets
+  saveRoutineDraft(); // save whatever is in the fields
   document.getElementById('routine-overlay').classList.remove('open');
 }
 
