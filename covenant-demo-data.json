@@ -1,0 +1,764 @@
+{
+  "settings": {
+    "name": "Chris",
+    "apiKey": "",
+    "routineCompletedDate": "",
+    "tomorrowFocusPrayerId": "0c9bbce6538515",
+    "theme": "candlelight",
+    "customTheme1": {
+      "bg": "#0f1a2e",
+      "accent": "#64b5f6"
+    },
+    "customTheme2": {
+      "bg": "#f8f4ee",
+      "accent": "#9b4dca"
+    },
+    "routineDraft": null
+  },
+  "themes": [
+    {
+      "id": "work",
+      "name": "Work & Calling",
+      "icon": "💼",
+      "description": "Prayers about vocation, purpose, and daily work."
+    },
+    {
+      "id": "home",
+      "name": "Home & Living",
+      "icon": "🏡",
+      "description": "Prayers about your home, environment, and practical provision."
+    },
+    {
+      "id": "marriage",
+      "name": "Marriage",
+      "icon": "💑",
+      "description": "Prayers for your relationship, unity, and growth together."
+    },
+    {
+      "id": "family",
+      "name": "Family",
+      "icon": "👨‍👩‍👧‍👦",
+      "description": "Prayers for family members, relationships, and household."
+    },
+    {
+      "id": "relationships",
+      "name": "Relationships",
+      "icon": "🤝",
+      "description": "Prayers for friendships, colleagues, and community connections."
+    },
+    {
+      "id": "church",
+      "name": "Church & Community",
+      "icon": "⛪",
+      "description": "Prayers for your church, its leaders, and wider community."
+    },
+    {
+      "id": "health",
+      "name": "Health",
+      "icon": "🌿",
+      "description": "Prayers for physical, mental, and emotional wellbeing."
+    },
+    {
+      "id": "faith",
+      "name": "Faith & Growth",
+      "icon": "✨",
+      "description": "Prayers for spiritual depth, character, and closeness with God."
+    },
+    {
+      "id": "finances",
+      "name": "Finances",
+      "icon": "🌱",
+      "description": "Prayers about provision, stewardship, and financial wisdom."
+    },
+    {
+      "id": "theology",
+      "name": "Theology",
+      "icon": "📚",
+      "description": "Questions, study notes, and prayers about doctrine and belief."
+    }
+  ],
+  "prayers": [
+    {
+      "id": "a8dd28c5fc95d0",
+      "title": "Direction for the next role",
+      "description": "Praying for clarity about what comes after this season of work, and the courage to step toward it.",
+      "themeIds": [
+        "work"
+      ],
+      "status": "active",
+      "createdAt": 1763118653006,
+      "entries": [
+        {
+          "id": "56aca6819696f5",
+          "type": "request",
+          "content": "Lord, I feel restless in my current work. I'm asking for clarity about what's next and the courage to step toward it when it comes.",
+          "scripture": "Jer 29:11 — For I know the plans I have for you",
+          "createdAt": 1763118653006
+        },
+        {
+          "id": "7353f59d46d357",
+          "type": "update",
+          "content": "Had coffee with James today — he mentioned a product lead role opening at his company. Not sure if it's the direction yet, but worth exploring.",
+          "scripture": "",
+          "createdAt": 1769598653006
+        },
+        {
+          "id": "db537bbefb44e4",
+          "type": "observation",
+          "content": "I've noticed I come alive when building something from scratch rather than maintaining what others made. That feels like useful information.",
+          "scripture": "",
+          "createdAt": 1772449853006
+        },
+        {
+          "id": "9304ce9b3cb84d",
+          "type": "update",
+          "content": "Interview went well. Waiting on their decision and trying not to grip this too tightly.",
+          "scripture": "",
+          "createdAt": 1773313853006
+        }
+      ],
+      "livingSummary": "",
+      "linkedPrayerIds": []
+    },
+    {
+      "id": "f805ddac396a64",
+      "title": "Our marriage — staying present and close",
+      "description": "Praying that I'd be genuinely present with Elise, not just physically in the room but truly attentive.",
+      "themeIds": [
+        "marriage"
+      ],
+      "status": "active",
+      "createdAt": 1756206653006,
+      "entries": [
+        {
+          "id": "a0ae4950498995",
+          "type": "request",
+          "content": "Praying that God would help me be genuinely present with Elise — not just in the house but truly attentive to her.",
+          "scripture": "Eph 5:25 — Love your wives as Christ loved the church",
+          "createdAt": 1756206653006
+        },
+        {
+          "id": "1d063eda340393",
+          "type": "observation",
+          "content": "I've been short-tempered twice this week and both times I'd been prayerless for a few days before. The pattern is clear.",
+          "scripture": "",
+          "createdAt": 1765710653006
+        },
+        {
+          "id": "2f46a7bbeb264a",
+          "type": "principle",
+          "content": "When I'm reactive with Elise it usually means I've left God's rhythm. The irritability is a symptom, not the problem.",
+          "scripture": "",
+          "createdAt": 1765883453006
+        },
+        {
+          "id": "994036de490bb4",
+          "type": "update",
+          "content": "Good weekend — went for a long walk and actually talked. Not about logistics, about real things. These moments matter.",
+          "scripture": "",
+          "createdAt": 1772968253006
+        }
+      ],
+      "livingSummary": "",
+      "linkedPrayerIds": []
+    },
+    {
+      "id": "4db1a8fa4c5820",
+      "title": "Sarah's anxiety and finding the right support",
+      "description": "Praying for Sarah as she navigates anxiety — for the right medical care and for her to feel held.",
+      "themeIds": [
+        "family",
+        "health"
+      ],
+      "status": "active",
+      "createdAt": 1768302653006,
+      "entries": [
+        {
+          "id": "039ec46ca1e9e9",
+          "type": "request",
+          "content": "Sarah is really struggling. I'm asking God for wisdom as her dad and for the right medical support to show up.",
+          "scripture": "",
+          "createdAt": 1768302653006
+        },
+        {
+          "id": "c5eab185156882",
+          "type": "update",
+          "content": "First GP appointment done. Doctor took it seriously and referred her to a psychologist. Genuinely grateful.",
+          "scripture": "",
+          "createdAt": 1770894653006
+        },
+        {
+          "id": "5205a95963d13c",
+          "type": "gratitude",
+          "content": "She had a good week. Lighter somehow. Small but real and I don't want to miss it.",
+          "scripture": "",
+          "createdAt": 1773141053006
+        }
+      ],
+      "livingSummary": "",
+      "linkedPrayerIds": []
+    },
+    {
+      "id": "0c9bbce6538515",
+      "title": "Daily rhythm of prayer",
+      "description": "Wanting prayer to be the first thing I reach for, not the last resort after everything else has failed.",
+      "themeIds": [
+        "faith"
+      ],
+      "status": "active",
+      "createdAt": 1747566653006,
+      "entries": [
+        {
+          "id": "c3a39bf1361323",
+          "type": "request",
+          "content": "I want prayer to be the first thing I reach for, not the last. Asking God to rewire my instincts.",
+          "scripture": "Phil 4:6 — In everything, by prayer and supplication",
+          "createdAt": 1747566653006
+        },
+        {
+          "id": "798ae008a047cd",
+          "type": "observation",
+          "content": "Evenings work better than mornings for me. I kept fighting that. Stopped fighting it and started using it.",
+          "scripture": "",
+          "createdAt": 1768302653006
+        },
+        {
+          "id": "f00d64f0d90de1",
+          "type": "update",
+          "content": "Three weeks of consistent evening routine. There's a quiet accumulation happening that's hard to name but is definitely real.",
+          "scripture": "",
+          "createdAt": 1772795453006
+        },
+        {
+          "id": "ac7ad3d2d4995e",
+          "type": "principle",
+          "content": "Consistency matters more than intensity. Ten minutes every evening beats an hour once a week.",
+          "scripture": "",
+          "createdAt": 1773054653006
+        }
+      ],
+      "livingSummary": "",
+      "linkedPrayerIds": []
+    },
+    {
+      "id": "c16cd6057a4f8f",
+      "title": "Finding genuine community at Cornerstone",
+      "description": "We've been attending for four months and still feel on the edges. Praying for real connection to form.",
+      "themeIds": [
+        "church"
+      ],
+      "status": "active",
+      "createdAt": 1766574653006,
+      "entries": [
+        {
+          "id": "7cfbe1e34d848d",
+          "type": "request",
+          "content": "We've been attending for four months and still feel peripheral. Asking God to open up a real connection.",
+          "scripture": "",
+          "createdAt": 1766574653006
+        },
+        {
+          "id": "91edc50e151fd3",
+          "type": "update",
+          "content": "Matt invited us to the small group starting next month. Going to say yes even though it feels awkward.",
+          "scripture": "",
+          "createdAt": 1772277053006
+        },
+        {
+          "id": "b4da89e551d3c9",
+          "type": "observation",
+          "content": "I think I've been holding back waiting to feel comfortable first. That's backwards.",
+          "scripture": "",
+          "createdAt": 1772881853006
+        }
+      ],
+      "livingSummary": "",
+      "linkedPrayerIds": []
+    },
+    {
+      "id": "8cfeccb29b3ea4",
+      "title": "Provision for the renovation",
+      "description": "Quotes came in higher than expected. Praying for wisdom about whether to proceed and where the money comes from.",
+      "themeIds": [
+        "finances",
+        "home"
+      ],
+      "status": "active",
+      "createdAt": 1769598653006,
+      "entries": [
+        {
+          "id": "9dcea7a7294e5d",
+          "type": "request",
+          "content": "The renovation quotes came in significantly higher than budgeted. Asking for wisdom — proceed, wait, or find another way.",
+          "scripture": "",
+          "createdAt": 1769598653006
+        },
+        {
+          "id": "a9c058bcee3504",
+          "type": "update",
+          "content": "Third quote came in much lower and the builder has excellent references. Taking this as a door opening.",
+          "scripture": "",
+          "createdAt": 1771931453006
+        },
+        {
+          "id": "7ce7abb3f711e1",
+          "type": "observation",
+          "content": "I notice I move faster when I'm anxious. Trying to slow down and let this settle before we sign anything.",
+          "scripture": "",
+          "createdAt": 1773054653006
+        }
+      ],
+      "livingSummary": "",
+      "linkedPrayerIds": []
+    },
+    {
+      "id": "0fa26a75fd3a8f",
+      "title": "Theology of suffering — working through it honestly",
+      "description": "Wrestling with how a good God allows the suffering I've seen up close. Not a crisis of faith but a real question.",
+      "themeIds": [
+        "theology",
+        "faith"
+      ],
+      "status": "active",
+      "createdAt": 1760526653006,
+      "entries": [
+        {
+          "id": "2c4c960772e9fa",
+          "type": "request",
+          "content": "I'm not in crisis but I am genuinely unsettled by the suffering I've watched people I love go through. Asking God to meet me in the question.",
+          "scripture": "",
+          "createdAt": 1760526653006
+        },
+        {
+          "id": "18af4bef7d052d",
+          "type": "observation",
+          "content": "Reading Job. The thing that strikes me is that God doesn't answer Job's questions — he shows up. That's a different kind of answer.",
+          "scripture": "",
+          "createdAt": 1767438653006
+        },
+        {
+          "id": "b7d4894b7a100e",
+          "type": "update",
+          "content": "Long conversation with Pastor David. He didn't resolve it but he sat with it well. That helped.",
+          "scripture": "",
+          "createdAt": 1770894653006
+        },
+        {
+          "id": "320cc161ab2ac9",
+          "type": "principle",
+          "content": "Honest doubt offered to God is closer to faith than tidy answers that don't cost anything.",
+          "scripture": "Job 38:4 — Where were you when I laid the earth's foundation?",
+          "createdAt": 1771067453006
+        }
+      ],
+      "livingSummary": "",
+      "linkedPrayerIds": []
+    },
+    {
+      "id": "5cfeac7d0bc3e4",
+      "title": "Dad's health — waiting on scan results",
+      "description": "Dad's scan is done. Two weeks until results. Holding this with open hands.",
+      "themeIds": [
+        "family",
+        "health"
+      ],
+      "status": "watching",
+      "createdAt": 1770894653006,
+      "entries": [
+        {
+          "id": "651f5b812c126b",
+          "type": "request",
+          "content": "Dad's scan is done. Two weeks until results. Holding this with open hands and asking God for good news.",
+          "scripture": "Ps 46:1 — God is our refuge and strength",
+          "createdAt": 1770894653006
+        },
+        {
+          "id": "f8eb0159ee614d",
+          "type": "observation",
+          "content": "He seems calm about it, which is itself a kind of grace I didn't expect.",
+          "scripture": "",
+          "createdAt": 1772622653006
+        }
+      ],
+      "livingSummary": "",
+      "linkedPrayerIds": []
+    },
+    {
+      "id": "80a8457c83bce8",
+      "title": "Ben — a friendship that's gone quiet",
+      "description": "Ben and I have drifted and I don't fully understand why. Asking God to show me if there's something I need to own.",
+      "themeIds": [
+        "relationships"
+      ],
+      "status": "watching",
+      "createdAt": 1760526653006,
+      "entries": [
+        {
+          "id": "4ac4b507bfd620",
+          "type": "request",
+          "content": "Ben and I have drifted and I don't fully understand it. Asking God to show me if there's something I need to own here.",
+          "scripture": "",
+          "createdAt": 1760526653006
+        },
+        {
+          "id": "7274dceb59bedc",
+          "type": "update",
+          "content": "Sent him a message. He replied warmly but briefly. Hard to read.",
+          "scripture": "",
+          "createdAt": 1770462653006
+        },
+        {
+          "id": "28476ac1c40b70",
+          "type": "observation",
+          "content": "I think I've been waiting for him to reach out. That might be the problem right there.",
+          "scripture": "",
+          "createdAt": 1771758653006
+        }
+      ],
+      "livingSummary": "",
+      "linkedPrayerIds": []
+    },
+    {
+      "id": "d5af01b1dc1a4b",
+      "title": "Whether to pursue theological study",
+      "description": "The idea keeps returning. Not sure if it's calling or escapism from the ordinary.",
+      "themeIds": [
+        "work",
+        "faith"
+      ],
+      "status": "watching",
+      "createdAt": 1757070653006,
+      "entries": [
+        {
+          "id": "27c1ae7eba1d9b",
+          "type": "request",
+          "content": "The idea of further theological study keeps coming back. I can't tell if it's calling or just the appeal of a clean break.",
+          "scripture": "",
+          "createdAt": 1757070653006
+        },
+        {
+          "id": "946018d040a0ad",
+          "type": "observation",
+          "content": "Every time I sit with scripture for an extended period I feel more alive than in most of my work. That's data worth taking seriously.",
+          "scripture": "",
+          "createdAt": 1767438653006
+        },
+        {
+          "id": "97c5f23b92dab6",
+          "type": "update",
+          "content": "Looked at three courses. One part-time option through the college could work without requiring us to uproot.",
+          "scripture": "",
+          "createdAt": 1771326653006
+        }
+      ],
+      "livingSummary": "",
+      "linkedPrayerIds": []
+    },
+    {
+      "id": "96ee19d93aec27",
+      "title": "The marketplace app idea",
+      "description": "An idea I've had for two years. Prayed about, explored, and set down for now.",
+      "themeIds": [
+        "work",
+        "finances"
+      ],
+      "status": "dormant",
+      "createdAt": 1738926653006,
+      "entries": [
+        {
+          "id": "6dbc2b878295a1",
+          "type": "request",
+          "content": "This idea has been with me for two years. Asking God for clarity about whether to pursue it or let it go.",
+          "scripture": "",
+          "createdAt": 1738926653006
+        },
+        {
+          "id": "9224ed84689051",
+          "type": "update",
+          "content": "Talked to three potential customers. The problem is real. My timing and capacity are wrong. Setting it down.",
+          "scripture": "",
+          "createdAt": 1756206653006
+        },
+        {
+          "id": "71f6d5b15ad974",
+          "type": "observation",
+          "content": "The fact that I can set it down without grief probably tells me something about whether it was really calling.",
+          "scripture": "",
+          "createdAt": 1756638653006
+        }
+      ],
+      "livingSummary": "",
+      "linkedPrayerIds": []
+    },
+    {
+      "id": "e8a5526c317a27",
+      "title": "Mum's loneliness after moving interstate",
+      "description": "She moved to be closer but I think she's more isolated now. Holding this more lightly since she found a book club.",
+      "themeIds": [
+        "family"
+      ],
+      "status": "dormant",
+      "createdAt": 1730286653006,
+      "entries": [
+        {
+          "id": "37e7e85eaa6052",
+          "type": "request",
+          "content": "Mum moved to be closer to us but I worry the transition has made her more isolated than before.",
+          "scripture": "",
+          "createdAt": 1730286653006
+        },
+        {
+          "id": "0ab23b279405cd",
+          "type": "update",
+          "content": "She's joined a book club and mentions it often. The energy in her voice when she talks about it is different.",
+          "scripture": "",
+          "createdAt": 1757934653006
+        },
+        {
+          "id": "31278d4dd28307",
+          "type": "gratitude",
+          "content": "Visited last week. She showed me the book they're reading and talked for an hour. This is real.",
+          "scripture": "",
+          "createdAt": 1770030653006
+        }
+      ],
+      "livingSummary": "",
+      "linkedPrayerIds": []
+    },
+    {
+      "id": "12b3e591d3a777",
+      "title": "Buying our first home",
+      "description": "Three years of praying, saving, and seven offers before the right one.",
+      "themeIds": [
+        "home",
+        "finances"
+      ],
+      "status": "answered",
+      "createdAt": 1710414653006,
+      "entries": [
+        {
+          "id": "b12269160f97ab",
+          "type": "request",
+          "content": "Lord, we want to put down roots. We're asking for the right house at the right time — not our timeline, yours.",
+          "scripture": "Ps 127:1 — Unless the Lord builds the house",
+          "createdAt": 1710414653006
+        },
+        {
+          "id": "ee3fe684aaa8af",
+          "type": "update",
+          "content": "Seven offers. Four rejections. Still trusting, though it's harder than I expected.",
+          "scripture": "",
+          "createdAt": 1738926653006
+        },
+        {
+          "id": "4c3aa6e8663fde",
+          "type": "update",
+          "content": "Walked through a house on a whim on the way to another viewing. Elise went quiet and then said it felt like home.",
+          "scripture": "",
+          "createdAt": 1757502653006
+        },
+        {
+          "id": "9b6701241c99ef",
+          "type": "answer",
+          "content": "We got it. The house we stumbled onto, the one Elise knew immediately. God's timing was not ours but it was better. Standing in the kitchen the first morning I was undone.",
+          "scripture": "Ps 84:11 — No good thing does he withhold from those who walk uprightly",
+          "createdAt": 1757934653006
+        }
+      ],
+      "livingSummary": "",
+      "linkedPrayerIds": []
+    },
+    {
+      "id": "000520c65ff2c8",
+      "title": "Finding our church after the move",
+      "description": "Visited five churches over three months. Cornerstone was the third Sunday.",
+      "themeIds": [
+        "church"
+      ],
+      "status": "answered",
+      "createdAt": 1721646653006,
+      "entries": [
+        {
+          "id": "40733f00db6d90",
+          "type": "request",
+          "content": "We've visited five churches. Asking God for a community that will stretch us, hold us, and let us contribute.",
+          "scripture": "",
+          "createdAt": 1721646653006
+        },
+        {
+          "id": "bc28a1c1bde188",
+          "type": "update",
+          "content": "Cornerstone has something different about it. Hard to name. Going back next week.",
+          "scripture": "",
+          "createdAt": 1744974653006
+        },
+        {
+          "id": "65e22bddcb1713",
+          "type": "answer",
+          "content": "Third Sunday at Cornerstone — I looked across at Elise during the sermon and she was in tears. We both knew. Didn't say it out loud until we were in the car.",
+          "scripture": "",
+          "createdAt": 1745838653006
+        }
+      ],
+      "livingSummary": "",
+      "linkedPrayerIds": []
+    },
+    {
+      "id": "69b39e924b2883",
+      "title": "God's hand through the redundancy",
+      "description": "Didn't see it coming. Eighteen months later it was clearly the best thing that happened to my career.",
+      "themeIds": [
+        "work"
+      ],
+      "status": "answered",
+      "createdAt": 1695726653006,
+      "entries": [
+        {
+          "id": "763519ece37306",
+          "type": "request",
+          "content": "I didn't see the redundancy coming and I'm scared. I need God to be present in this and I need to not spiral.",
+          "scripture": "",
+          "createdAt": 1695726653006
+        },
+        {
+          "id": "1ec9a579becdd6",
+          "type": "observation",
+          "content": "A door closing is still a door. I keep having to remind myself of that.",
+          "scripture": "",
+          "createdAt": 1704366653006
+        },
+        {
+          "id": "d58f480c64f382",
+          "type": "principle",
+          "content": "Disruption and direction often arrive together. The thing that ends something is sometimes the same thing that starts something.",
+          "scripture": "Rom 8:28 — In all things God works for the good of those who love him",
+          "createdAt": 1708686653006
+        },
+        {
+          "id": "dced4b22fbee98",
+          "type": "answer",
+          "content": "Eighteen months later I'm in a role that actually uses me. I would never have left on my own. The redundancy was an answer I wouldn't have had the courage to pray for.",
+          "scripture": "",
+          "createdAt": 1717326653006
+        }
+      ],
+      "livingSummary": "",
+      "linkedPrayerIds": []
+    },
+    {
+      "id": "f9c966d87c9b17",
+      "title": "Elise's miscarriage — grieving well",
+      "description": "We lost the pregnancy at nine weeks. Prayed that we could grieve honestly and stay close through it.",
+      "themeIds": [
+        "marriage",
+        "family",
+        "health"
+      ],
+      "status": "answered",
+      "createdAt": 1678446653006,
+      "entries": [
+        {
+          "id": "fd999f82cd6f0a",
+          "type": "request",
+          "content": "We lost the pregnancy. I don't have the right words. I'm asking God to hold us through this and not let it drive us apart.",
+          "scripture": "Ps 34:18 — The Lord is close to the brokenhearted",
+          "createdAt": 1678446653006
+        },
+        {
+          "id": "37c58114f553eb",
+          "type": "update",
+          "content": "We cried together for a long time last night. I think that was the right thing to do. No fixing, just being there.",
+          "scripture": "",
+          "createdAt": 1680174653006
+        },
+        {
+          "id": "eea8e00ba4a400",
+          "type": "observation",
+          "content": "Grief shared is different from grief alone. We've been closer this week than we've been in months.",
+          "scripture": "",
+          "createdAt": 1683630653006
+        },
+        {
+          "id": "1416f6ace1557b",
+          "type": "answer",
+          "content": "Six months on, the grief is still real but it didn't break us. If anything it made something between us that wasn't there before. We talk about the baby by name now.",
+          "scripture": "",
+          "createdAt": 1693998653006
+        }
+      ],
+      "livingSummary": "",
+      "linkedPrayerIds": []
+    }
+  ],
+  "inbox": [
+    {
+      "id": "e3a1ef426ab4ac",
+      "rawText": "Feeling unsettled about the conversation with my manager today — not sure if I handled it well or if something needs to be addressed",
+      "createdAt": 1773400253006,
+      "processed": false
+    },
+    {
+      "id": "569266f06efd76",
+      "rawText": "[Gratitude] Had a really good morning with the kids, completely unplanned, just present",
+      "createdAt": 1773400253006,
+      "processed": false
+    },
+    {
+      "id": "23fec32636e208",
+      "rawText": "Something is shifting in how I read scripture — it feels less like duty and more like conversation. Want to track this.",
+      "createdAt": 1773227453006,
+      "processed": false
+    }
+  ],
+  "principles": [
+    {
+      "id": "8de0cbdd60da8b",
+      "text": "When I'm reactive with Elise it usually means I've been prayerless for a few days. The irritability is a symptom, not the problem.",
+      "prayerIds": [
+        "f805ddac396a64"
+      ],
+      "createdAt": 1765883453006
+    },
+    {
+      "id": "6ab9206f476aac",
+      "text": "Consistency matters more than intensity in prayer. Ten minutes every evening beats an hour once a week.",
+      "prayerIds": [
+        "0c9bbce6538515"
+      ],
+      "createdAt": 1773054653006
+    },
+    {
+      "id": "8b20b922393f82",
+      "text": "Disruption and direction often arrive together. The thing that ends something is sometimes the same thing that starts something new.",
+      "prayerIds": [
+        "69b39e924b2883"
+      ],
+      "createdAt": 1708686653006
+    },
+    {
+      "id": "97fa8197285e19",
+      "text": "Honest doubt offered to God is closer to faith than tidy answers that don't cost anything.",
+      "prayerIds": [
+        "0fa26a75fd3a8f"
+      ],
+      "createdAt": 1771067453006
+    },
+    {
+      "id": "94181a8363e1f2",
+      "text": "Grief shared is different from grief alone. Don't shortcut the being-present part to get to the fixing part.",
+      "prayerIds": [
+        "f9c966d87c9b17"
+      ],
+      "createdAt": 1683630653006
+    }
+  ],
+  "devNotes": [
+    {
+      "id": "1610ee5702483c",
+      "text": "Test the All Prayers view with this data — check filter counts, sort order, snippet rendering",
+      "createdAt": 1773486653006,
+      "checked": false,
+      "checkedAt": null
+    }
+  ]
+}

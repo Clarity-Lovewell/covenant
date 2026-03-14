@@ -692,6 +692,81 @@ input[type="color"].theme-color-pick::-webkit-color-swatch{border:none;border-ra
   flex-shrink:0;font-family:'Lato',sans-serif;
   font-size:10px;color:var(--muted);white-space:nowrap;padding-top:3px;
 }
+
+/* ══════════════════════════════════
+   THEME MODAL — RICH DESIGN
+══════════════════════════════════ */
+.tm-hero{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;}
+.tm-hero-icon{
+  font-size:40px;line-height:1;flex-shrink:0;
+  filter:drop-shadow(0 0 10px rgba(200,164,74,0.2));
+}
+.tm-hero-name{
+  font-family:'Playfair Display',serif;font-size:22px;
+  color:var(--cream);line-height:1.2;margin-bottom:5px;
+}
+.tm-hero-desc{color:var(--muted);font-style:italic;font-size:15px;line-height:1.5;}
+.tm-stat-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px;}
+.tm-stat-pill{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 10px;border-radius:20px;
+  font-family:'Lato',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:0.07em;text-transform:uppercase;
+}
+.tm-sp-total  {background:var(--surface-2);border:1px solid var(--border);color:var(--cream-dim);}
+.tm-sp-active {background:rgba(200,164,74,0.1);border:1px solid var(--gold-dim);color:var(--gold);}
+.tm-sp-watching{background:rgba(122,170,206,0.1);border:1px solid rgba(122,170,206,0.3);color:var(--blue-text);}
+.tm-sp-answered{background:rgba(74,138,80,0.1);border:1px solid rgba(74,138,80,0.3);color:var(--green-text);}
+.tm-section-header{
+  display:flex;align-items:center;gap:7px;
+  padding:12px 0 7px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:8px;
+}
+.tm-section-label{
+  font-family:'Lato',sans-serif;font-size:10px;
+  letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);
+}
+.tm-section-count{
+  font-family:'Lato',sans-serif;font-size:10px;
+  background:var(--surface-2);border-radius:10px;
+  padding:1px 7px;color:var(--muted);
+}
+.tm-card{
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:11px;padding:13px 15px;
+  margin-bottom:8px;cursor:pointer;transition:all 0.18s;
+}
+.tm-card:hover{border-color:var(--border-strong);background:var(--surface-3);transform:translateX(2px);}
+.tm-card.tm-answered{opacity:0.72;border-color:rgba(74,138,80,0.18);}
+.tm-card.tm-answered:hover{border-color:rgba(74,138,80,0.4);}
+.tm-card-top{display:flex;align-items:flex-start;gap:9px;margin-bottom:5px;}
+.tm-card-emoji{font-size:15px;flex-shrink:0;margin-top:1px;line-height:1;}
+.tm-card-title{
+  font-family:'Playfair Display',serif;font-size:16px;
+  color:var(--cream);line-height:1.25;flex:1;
+}
+.tm-card.tm-answered .tm-card-title{color:var(--green-text);}
+.tm-card-count{
+  font-family:'Lato',sans-serif;font-size:10px;
+  color:var(--muted);white-space:nowrap;flex-shrink:0;padding-top:2px;
+}
+.tm-snippet{
+  color:var(--cream-dim);font-size:14px;font-style:italic;
+  line-height:1.5;margin-bottom:5px;padding-left:24px;
+  overflow:hidden;display:-webkit-box;
+  -webkit-line-clamp:2;-webkit-box-orient:vertical;
+}
+.tm-card.tm-answered .tm-snippet{color:var(--green-text);opacity:0.65;font-style:normal;}
+.tm-card-footer{
+  display:flex;align-items:center;gap:7px;padding-left:24px;flex-wrap:wrap;
+}
+.tm-card-date{font-family:'Lato',sans-serif;font-size:11px;color:var(--muted);}
+.tm-card-type{
+  font-family:'Lato',sans-serif;font-size:10px;letter-spacing:0.06em;
+  text-transform:uppercase;color:var(--muted);
+  background:var(--surface-3);border-radius:4px;padding:1px 6px;
+}
 </style>
 </head>
 <body>
@@ -873,7 +948,7 @@ input[type="color"].theme-color-pick::-webkit-color-swatch{border:none;border-ra
     <div class="flex-between mb16">
       <div>
         <h2 style="font-size:24px;font-family:'Playfair Display',serif;">⚙️ Settings</h2>
-        <div style="font-family:'Lato',sans-serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-top:3px;">Covenant v1.6</div>
+        <div style="font-family:'Lato',sans-serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-top:3px;">Covenant v1.7</div>
       </div>
       <button class="routine-close" onclick="closeSettings()">✕</button>
     </div>
@@ -1423,14 +1498,16 @@ function renderFutureImprovements() {
 // ═══════════════════════════════════════════════════════════
 let _voiceRecognition = null;
 let _voiceCapturing = false;
+let _voiceCaptured = '';  // persists across auto-restarts
 
 function startVoiceCapture() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   const btn = document.getElementById('voice-btn');
 
-  // Second tap — stop recording
-  if (_voiceCapturing && _voiceRecognition) {
-    _voiceRecognition.stop();
+  // Second tap — user wants to stop
+  if (_voiceCapturing) {
+    _voiceCapturing = false;
+    if (_voiceRecognition) { try { _voiceRecognition.stop(); } catch(e){} }
     return;
   }
 
@@ -1441,51 +1518,65 @@ function startVoiceCapture() {
     return;
   }
 
-  const recognition = new SR();
-  recognition.lang = 'en-AU';
-  recognition.continuous = true;      // don't auto-stop on pause
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-
-  let captured = '';
-  _voiceRecognition = recognition;
   _voiceCapturing = true;
-
+  _voiceCaptured = '';
   btn.textContent = '🔴';
   btn.title = 'Tap to stop recording';
   btn.classList.add('recording');
-  recognition.start();
 
-  recognition.onresult = (event) => {
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      if (event.results[i].isFinal) {
-        captured += (captured ? ' ' : '') + event.results[i][0].transcript;
+  function startSession() {
+    const recognition = new SR();
+    recognition.lang = 'en-AU';
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    _voiceRecognition = recognition;
+
+    recognition.onresult = (event) => {
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          _voiceCaptured += (_voiceCaptured ? ' ' : '') + event.results[i][0].transcript;
+        }
       }
-    }
-  };
+    };
 
-  recognition.onend = () => {
-    _voiceCapturing = false;
-    _voiceRecognition = null;
-    btn.textContent = '🎤';
-    btn.title = 'Voice capture';
-    btn.classList.remove('recording');
-    if (captured) {
-      const input = document.getElementById('qc-input');
-      input.value = (input.value ? input.value.trimEnd() + ' ' : '') + captured;
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-      input.focus();
-    }
-  };
+    recognition.onend = () => {
+      // If user hasn't tapped stop, Chrome killed it due to silence — restart
+      if (_voiceCapturing) {
+        try { recognition.start(); } catch(e) {
+          // start() failed (e.g. already started) — create a fresh instance
+          setTimeout(startSession, 100);
+        }
+        return;
+      }
+      // User tapped stop — commit text
+      _voiceRecognition = null;
+      btn.textContent = '🎤';
+      btn.title = 'Voice capture';
+      btn.classList.remove('recording');
+      if (_voiceCaptured) {
+        const input = document.getElementById('qc-input');
+        input.value = (input.value ? input.value.trimEnd() + ' ' : '') + _voiceCaptured;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.focus();
+        _voiceCaptured = '';
+      }
+    };
 
-  recognition.onerror = (e) => {
-    if (e.error === 'no-speech') return; // ignore — user just hasn't spoken yet
-    _voiceCapturing = false;
-    _voiceRecognition = null;
-    btn.textContent = '🎤';
-    btn.title = 'Voice capture';
-    btn.classList.remove('recording');
-  };
+    recognition.onerror = (e) => {
+      if (e.error === 'no-speech' || e.error === 'aborted') return;
+      // Real error — stop gracefully
+      _voiceCapturing = false;
+      _voiceRecognition = null;
+      btn.textContent = '🎤';
+      btn.title = 'Voice capture';
+      btn.classList.remove('recording');
+    };
+
+    recognition.start();
+  }
+
+  startSession();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2031,33 +2122,96 @@ function renderThemes() {
 }
 
 function openThemeModal(themeId) {
-  let prayers, name;
+  let prayers, themeObj;
   if (themeId==='__none__') {
-    prayers=db.prayers.filter(p=>!p.themeIds||!p.themeIds.length);
-    name='📋 Other Prayers';
+    prayers = db.prayers.filter(p=>!p.themeIds||!p.themeIds.length);
+    themeObj = {icon:'📋', name:'Other Prayers', description:'Prayers not yet assigned to a theme.'};
   } else {
-    prayers=db.prayers.filter(p=>p.themeIds&&p.themeIds.includes(themeId));
-    const t=db.themes.find(t=>t.id===themeId);
-    name=t?t.icon+' '+t.name:themeId;
+    prayers = db.prayers.filter(p=>p.themeIds&&p.themeIds.includes(themeId));
+    themeObj = db.themes.find(t=>t.id===themeId) || {icon:'📿', name:themeId, description:''};
   }
-  const order={active:0,watching:1,dormant:2,answered:3};
-  prayers.sort((a,b)=>(order[a.status]||0)-(order[b.status]||0));
-  showModal(name, `
-    <button class="btn btn-ghost btn-full mb16" onclick="closeModal();showNewPrayerModal('${themeId}')">+ New Prayer in this Theme</button>
-    ${!prayers.length ? '<div class="empty-state">No prayers in this theme yet.</div>' : ''}
-    ${prayers.map(p=>`
-      <div class="prayer-list-card" onclick="closeModal();openPrayer('${p.id}')">
-        <span class="prayer-list-icon">${STATUS_EMOJI[p.status]||'📿'}</span>
-        <div class="prayer-list-body">
-          <div class="prayer-list-title">${esc(p.title)}</div>
-          <div class="prayer-list-meta">
-            ${p.entries.length} entr${p.entries.length===1?'y':'ies'}
-            ${p.entries.length?' · last '+fmtRel(p.entries[p.entries.length-1].createdAt):''}
-            <span class="badge badge-${p.status}" style="margin-left:6px;">${p.status}</span>
-          </div>
+
+  // Group by status
+  const groups = {active:[], watching:[], dormant:[], answered:[]};
+  prayers.forEach(p => { if (groups[p.status]) groups[p.status].push(p); });
+
+  // Sort each group by most recent entry
+  Object.values(groups).forEach(g =>
+    g.sort((a,b) => {
+      const la = a.entries.length ? a.entries[a.entries.length-1].createdAt : a.createdAt;
+      const lb = b.entries.length ? b.entries[b.entries.length-1].createdAt : b.createdAt;
+      return lb - la;
+    })
+  );
+
+  const ENTRY_TYPE_LABEL = {request:'Request',update:'Update',observation:'Observation',answer:'Answer',principle:'Principle',gratitude:'Gratitude'};
+
+  function tmCard(p) {
+    const last = p.entries.length ? p.entries[p.entries.length-1] : null;
+    const snippet = last ? last.content : '';
+    const trimmed = snippet.length > 110 ? snippet.slice(0,110)+'…' : snippet;
+    const typeLabel = last ? (ENTRY_TYPE_LABEL[last.type]||'') : '';
+    const dateStr = last ? fmtRel(last.createdAt) : 'no entries';
+    const count = p.entries.length;
+    return `
+      <div class="tm-card tm-${p.status}" onclick="closeModal();openPrayer('${p.id}')">
+        <div class="tm-card-top">
+          <span class="tm-card-emoji">${STATUS_EMOJI[p.status]||'📿'}</span>
+          <span class="tm-card-title">${esc(p.title)}</span>
+          <span class="tm-card-count">${count} entr${count===1?'y':'ies'}</span>
         </div>
-      </div>`).join('')}
-  `);
+        ${trimmed ? `<div class="tm-snippet">${esc(trimmed)}</div>` : ''}
+        <div class="tm-card-footer">
+          <span class="tm-card-date">${dateStr}</span>
+          ${typeLabel ? `<span class="tm-card-type">${typeLabel}</span>` : ''}
+        </div>
+      </div>`;
+  }
+
+  function tmSection(status, label) {
+    const group = groups[status];
+    if (!group.length) return '';
+    return `
+      <div class="tm-section-header">
+        <span style="font-size:13px;">${STATUS_EMOJI[status]}</span>
+        <span class="tm-section-label">${label}</span>
+        <span class="tm-section-count">${group.length}</span>
+      </div>
+      ${group.map(tmCard).join('')}`;
+  }
+
+  // Stat pills — only show non-zero
+  const nTotal    = prayers.length;
+  const nActive   = groups.active.length;
+  const nWatching = groups.watching.length;
+  const nAnswered = groups.answered.length;
+  const statPills = [
+    `<span class="tm-stat-pill tm-sp-total">${nTotal} prayer${nTotal!==1?'s':''}</span>`,
+    nActive   ? `<span class="tm-stat-pill tm-sp-active">🟢 ${nActive} active</span>` : '',
+    nWatching ? `<span class="tm-stat-pill tm-sp-watching">👁️ ${nWatching} watching</span>` : '',
+    nAnswered ? `<span class="tm-stat-pill tm-sp-answered">✅ ${nAnswered} answered</span>` : '',
+  ].filter(Boolean).join('');
+
+  const heroHtml = `
+    <div class="tm-hero">
+      <div class="tm-hero-icon">${themeObj.icon}</div>
+      <div>
+        <div class="tm-hero-name">${esc(themeObj.name)}</div>
+        ${themeObj.description ? `<div class="tm-hero-desc">${esc(themeObj.description)}</div>` : ''}
+      </div>
+    </div>
+    <div class="tm-stat-row">${statPills}</div>
+    <button class="btn btn-ghost btn-full mb16" style="border-style:dashed;" onclick="closeModal();showNewPrayerModal('${themeId}')">＋ New Prayer in ${esc(themeObj.name)}</button>`;
+
+  const bodyHtml = !prayers.length
+    ? `<div class="empty-state" style="padding:32px 0;">No prayers here yet. Start one above.</div>`
+    : tmSection('active','Active') + tmSection('watching','Watching') + tmSection('dormant','Dormant') + tmSection('answered','Answered');
+
+  showModal('', heroHtml + bodyHtml);
+
+  // Hide the default modal title bar title (we render our own header)
+  const titleEl = document.getElementById('modal-title-text');
+  if (titleEl) titleEl.textContent = '';
 }
 
 // ═══════════════════════════════════════════════════════════
