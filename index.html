@@ -60,7 +60,6 @@
   --red-faint:rgba(140,60,40,0.3);--routine-grad-1:#3a2010;--routine-grad-2:#4a2c18;
   --glow-1:rgba(212,160,96,0.06);--glow-2:rgba(212,160,96,0.03);
 }
-/* custom1/custom2 vars are injected inline by JS */
 [data-theme="custom1"],[data-theme="custom2"]{}
 
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -136,7 +135,6 @@ h1,h2,h3,h4{font-family:'Playfair Display',Georgia,serif;font-weight:600;}
 .pd-action-row{
   display:flex;gap:6px;flex-wrap:wrap;
 }
-/* Filter button active state */
 .filter-btn-active{
   background:var(--gold-faint)!important;
   border-color:var(--gold-dim)!important;
@@ -203,7 +201,7 @@ label{
 .badge-dormant{background:rgba(100,90,70,0.2);color:var(--muted);}
 .badge-watching{background:rgba(58,90,130,0.2);color:var(--blue-text);}
 
-/* ── STATUS EMOJI PILLS (prayer list) ── */
+/* ── STATUS EMOJI PILLS ── */
 .status-icon{font-size:16px;flex-shrink:0;}
 
 /* ── TAGS ── */
@@ -268,6 +266,16 @@ label{
 .qc-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;}
 .qc-label{font-family:'Lato',sans-serif;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:10px;}
 
+/* ── Voice button ── */
+.voice-btn{
+  background:var(--surface-3);border:1px solid var(--border);
+  color:var(--muted);border-radius:8px;padding:9px 12px;
+  cursor:pointer;font-size:16px;line-height:1;transition:all 0.2s;flex-shrink:0;
+}
+.voice-btn:hover{border-color:var(--border-strong);color:var(--cream-dim);}
+.voice-btn.recording{border-color:rgba(200,80,80,0.6);color:#e08080;background:rgba(200,80,80,0.1);animation:pulse-rec 1s ease-in-out infinite;}
+@keyframes pulse-rec{0%,100%{opacity:1;}50%{opacity:0.6;}}
+
 /* ══════════════════════════════════
    INBOX
 ══════════════════════════════════ */
@@ -301,6 +309,18 @@ label{
 }
 .ai-draft-edit:focus{border-color:var(--gold);}
 
+/* Principle checkbox row */
+.principle-confirm-row{
+  display:flex;align-items:flex-start;gap:8px;margin-top:8px;
+  padding:8px 10px;background:rgba(180,130,240,0.08);
+  border:1px solid rgba(180,130,240,0.2);border-radius:7px;
+}
+.principle-confirm-row input[type="checkbox"]{
+  width:16px;height:16px;margin-top:3px;flex-shrink:0;
+  cursor:pointer;accent-color:var(--purple-text);
+}
+.principle-confirm-label{font-size:14px;color:var(--purple-text);line-height:1.5;}
+
 /* Original capture toggle on filed entry */
 .entry-original-capture{
   margin-top:10px;padding:8px 12px;
@@ -331,7 +351,7 @@ label{
 .theme-stats{font-family:'Lato',sans-serif;font-size:11px;color:var(--muted);}
 .theme-arrow{font-size:18px;color:var(--muted);}
 
-/* Prayer list card in theme modal */
+/* Prayer list card */
 .prayer-list-card{
   display:flex;align-items:center;gap:12px;
   background:var(--surface);border:1px solid var(--border);
@@ -445,7 +465,7 @@ label{
 .theme-swatch.active{border-color:var(--gold);color:var(--gold);}
 .theme-swatch-preview{width:52px;height:52px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:22px;}
 
-/* ── CUSTOM THEME EDITOR (new simplified) ── */
+/* ── CUSTOM THEME EDITOR ── */
 .custom-theme-editor-panel{
   margin-top:16px;background:var(--surface-2);
   border:1px solid var(--border);border-radius:12px;overflow:hidden;
@@ -459,7 +479,6 @@ label{
 .color-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;}
 .color-row-label{font-family:'Lato',sans-serif;font-size:12px;color:var(--cream-dim);}
 .color-inputs{display:flex;align-items:center;gap:8px;}
-/* Native colour input — visible as a small swatch */
 input[type="color"].theme-color-pick{
   width:34px;height:34px;border-radius:8px;cursor:pointer;
   border:2px solid var(--border-strong);padding:2px;
@@ -603,7 +622,8 @@ input[type="color"].theme-color-pick::-webkit-color-swatch{border:none;border-ra
     <div class="qc-box" style="margin-bottom:12px;">
       <div class="qc-label">⚡ Quick Capture</div>
       <textarea id="qc-input" rows="3" placeholder="A thought, prayer, observation — anything. Don't think, just capture it."></textarea>
-      <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;">
+        <button class="voice-btn" id="voice-btn" onclick="startVoiceCapture()" title="Voice capture">🎤</button>
         <button id="qc-btn" class="btn btn-primary" onclick="quickCapture()">Capture →</button>
       </div>
     </div>
@@ -656,7 +676,7 @@ input[type="color"].theme-color-pick::-webkit-color-swatch{border:none;border-ra
     <div id="themes-list"></div>
   </div>
 
-  <!-- PRAYER DETAIL — redesigned header -->
+  <!-- PRAYER DETAIL -->
   <div id="screen-prayer" class="screen">
     <div class="pd-header">
       <div class="pd-header-top">
@@ -723,7 +743,7 @@ input[type="color"].theme-color-pick::-webkit-color-swatch{border:none;border-ra
     <div class="flex-between mb16">
       <div>
         <h2 style="font-size:24px;font-family:'Playfair Display',serif;">⚙️ Settings</h2>
-        <div style="font-family:'Lato',sans-serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-top:3px;">Covenant v1.5</div>
+        <div style="font-family:'Lato',sans-serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-top:3px;">Covenant v1.6</div>
       </div>
       <button class="routine-close" onclick="closeSettings()">✕</button>
     </div>
@@ -763,7 +783,6 @@ input[type="color"].theme-color-pick::-webkit-color-swatch{border:none;border-ra
           <div class="theme-swatch-preview" id="ct2-swatch" style="background:#f8f4ee;">🎨</div>Dawn
         </div>
       </div>
-      <!-- Custom theme colour editor — only shown when Horizon or Dawn is active -->
       <div id="custom-theme-editor"></div>
     </div>
 
@@ -820,8 +839,8 @@ const STORE = 'covenant_v1';
 
 function defaultCustomTheme(slot) {
   return slot === 'custom1'
-    ? { bg: '#0f1a2e', accent: '#64b5f6' }   // Horizon: dark navy + sky blue
-    : { bg: '#f8f4ee', accent: '#9b4dca' };   // Dawn: warm white + violet
+    ? { bg: '#0f1a2e', accent: '#64b5f6' }
+    : { bg: '#f8f4ee', accent: '#9b4dca' };
 }
 
 function load() {
@@ -1022,17 +1041,11 @@ function setTheme(t) {
   renderCustomThemeEditor();
 }
 
-// ══════════════════════════════════
-// CUSTOM THEME EDITOR (new — only shown when Horizon/Dawn active)
-// ══════════════════════════════════
 function renderCustomThemeEditor() {
   const el = document.getElementById('custom-theme-editor');
   if (!el) return;
   const slot = db.settings.theme;
-  if (slot !== 'custom1' && slot !== 'custom2') {
-    el.innerHTML = '';
-    return;
-  }
+  if (slot !== 'custom1' && slot !== 'custom2') { el.innerHTML = ''; return; }
   const settingsKey = slot === 'custom1' ? 'customTheme1' : 'customTheme2';
   const ct = db.settings[settingsKey] || defaultCustomTheme(slot);
   const name = slot === 'custom1' ? 'Horizon' : 'Dawn';
@@ -1079,10 +1092,8 @@ function liveUpdateCustom(prop, value) {
   persist();
   applyCustomThemeVars(slot);
   updateCustomSwatchPreviews();
-  // Sync sibling hex text input
   const hexEl = document.getElementById(`ct-${prop}-hex`);
   if (hexEl && hexEl !== document.activeElement) hexEl.value = value;
-  // Update preview bar
   const bar = document.getElementById('ct-preview-bar');
   if (bar) { bar.style.background = ct.bg; bar.style.color = ct.accent; }
 }
@@ -1278,6 +1289,42 @@ function renderFutureImprovements() {
 }
 
 // ═══════════════════════════════════════════════════════════
+// VOICE CAPTURE
+// ═══════════════════════════════════════════════════════════
+function startVoiceCapture() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const btn = document.getElementById('voice-btn');
+  if (!SR) {
+    btn.textContent = '✗';
+    setTimeout(() => { btn.textContent = '🎤'; }, 2000);
+    alert('Voice input isn\'t supported in this browser. Try Chrome.');
+    return;
+  }
+  const recognition = new SR();
+  recognition.lang = 'en-AU';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  btn.textContent = '🔴';
+  btn.classList.add('recording');
+  recognition.start();
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    const input = document.getElementById('qc-input');
+    input.value = (input.value ? input.value + ' ' : '') + transcript;
+    btn.textContent = '🎤';
+    btn.classList.remove('recording');
+  };
+  recognition.onerror = () => {
+    btn.textContent = '🎤';
+    btn.classList.remove('recording');
+  };
+  recognition.onend = () => {
+    btn.textContent = '🎤';
+    btn.classList.remove('recording');
+  };
+}
+
+// ═══════════════════════════════════════════════════════════
 // FOCUS PICKER
 // ═══════════════════════════════════════════════════════════
 function showFocusChangePicker() {
@@ -1424,7 +1471,7 @@ function renderInbox() {
       <div id="ir-${item.id}"></div>
       <div class="flex wrap gap8 mt8">
         ${db.settings.apiKey ? `<button class="btn btn-primary btn-sm" onclick="processInbox('${item.id}')">✦ Process with AI</button>` : ''}
-        <button class="btn btn-ghost btn-sm" onclick="fileManually('${item.id}')">File Manually</button>
+        <button class="btn btn-ghost btn-sm" onclick="fileManually('${item.id}', true)">File Manually</button>
         <button class="btn btn-dim btn-sm" onclick="dismissItem('${item.id}')">Dismiss</button>
       </div>
     </div>`).join('');
@@ -1436,22 +1483,13 @@ async function processInbox(id) {
   r.innerHTML = `<div class="ai-thinking">✦ Processing <div class="dots"><span></span><span></span><span></span></div></div>`;
   const pTitles = db.prayers.map(p=>p.title).join(', ') || 'none yet';
   const tNames  = db.themes.map(t=>t.name).join(', ');
-  const prompt = `You are a spiritual journal assistant. Process this raw capture and return ONLY a valid JSON object with no markdown or preamble.
+  const prompt = `Process this raw prayer journal capture. Return ONLY valid JSON, no markdown or explanation.
 
 Raw capture: "${item.rawText}"
 Existing prayers: ${pTitles}
-Themes available: ${tNames}
+Themes: ${tNames}
 
-Return JSON:
-{
-  "entryDraft": "A thoughtful journal entry (2-4 sentences) in first person expanding the raw thought meaningfully",
-  "suggestedPrayer": "exact title of most relevant existing prayer, or null",
-  "newPrayerTitle": "suggested title if creating new prayer, or null",
-  "suggestedTheme": "most relevant theme name",
-  "entryType": "request or update or observation or principle or answer",
-  "scripture": "one relevant verse reference and brief quote e.g. Phil 4:6 — Be anxious for nothing",
-  "principle": "if this contains a life lesson state it as one clear sentence, else null"
-}`;
+{"entryDraft":"1-3 sentences, first person, natural and direct — no clichés or religious filler","suggestedPrayer":"exact title of best matching existing prayer, or null","newPrayerTitle":"short title if new prayer needed, or null","suggestedTheme":"most relevant theme name","entryType":"request or update or observation or principle or answer","scripture":"one verse e.g. Phil 4:6 — Be anxious for nothing, or null","principle":"one plain sentence if a clear life lesson is present, else null"}`;
   try {
     const raw = await callAI(prompt);
     let data;
@@ -1471,7 +1509,13 @@ Return JSON:
           <textarea class="ai-draft-edit" id="ai-draft-${id}" rows="4">${esc(data.entryDraft)}</textarea>
         </div>
         ${data.scripture ? `<div class="entry-scripture mt8">${esc(data.scripture)}</div>` : ''}
-        ${data.principle ? `<div style="margin-top:10px;padding:9px 12px;background:rgba(180,130,240,0.08);border-radius:7px;font-size:14px;color:var(--purple-text);"><strong>Principle detected:</strong> ${esc(data.principle)}</div>` : ''}
+        ${data.principle ? `
+          <div class="principle-confirm-row">
+            <input type="checkbox" id="include-principle-${id}">
+            <label class="principle-confirm-label" for="include-principle-${id}" style="font-family:'Crimson Text',serif;font-size:14px;text-transform:none;letter-spacing:0;color:var(--purple-text);">
+              <strong>Principle detected</strong> — save to Wisdom? <em>"${esc(data.principle)}"</em>
+            </label>
+          </div>` : ''}
         <div style="margin-top:8px;font-family:'Lato',sans-serif;font-size:11px;color:var(--muted);">
           Filing to: <strong style="color:var(--cream-dim);">${esc(pTitle)}</strong> · Type: ${esc(data.entryType||'observation')}
         </div>
@@ -1505,25 +1549,31 @@ function acceptAI(id) {
     createdAt:Date.now(),
     originalRaw:item.rawText
   });
-  if (data.principle) db.principles.push({id:uid(),text:data.principle,prayerIds:[prayer.id],createdAt:Date.now()});
+  // Only save principle if user checked the checkbox
+  const principleCheckbox = document.getElementById('include-principle-'+id);
+  if (data.principle && principleCheckbox && principleCheckbox.checked) {
+    db.principles.push({id:uid(),text:data.principle,prayerIds:[prayer.id],createdAt:Date.now()});
+  }
   if (data.entryType==='answer') { prayer.status='answered'; prayer.answeredAt=Date.now(); }
   item.processed=true;
   delete _pendingAI[id];
   persist(); renderInbox(); updateInboxBadge();
 }
 
-// ── Manual filing — retains AI suggestion data ────────────────
+// ── Manual filing ─────────────────────────────────────────────
+// useOriginal=true: ignore any pending AI data (treat as fresh manual filing)
 let _mThemes = [];
 function toggleMTheme(id, el) {
   if (_mThemes.includes(id)) { _mThemes=_mThemes.filter(t=>t!==id); el.classList.remove('selected'); }
   else { _mThemes.push(id); el.classList.add('selected'); }
 }
 
-function fileManually(id) {
+function fileManually(id, useOriginal) {
   _mThemes = [];
   const item = db.inbox.find(i=>i.id===id); if (!item) return;
-  const aiData = _pendingAI[id] || null;
-  // Pull pre-fills from AI result if available
+  // If useOriginal is true, skip AI data entirely (user wants to work from raw capture)
+  const aiData = (!useOriginal && _pendingAI[id]) ? _pendingAI[id] : null;
+
   let preSelectedPrayerId = '';
   if (aiData?.suggestedPrayer) {
     const match = db.prayers.find(p=>p.title===aiData.suggestedPrayer);
@@ -1537,11 +1587,15 @@ function fileManually(id) {
     : '';
   if (prefillThemeId) _mThemes = [prefillThemeId];
 
-  // Content: use the edited AI draft if present, else raw text
-  const draftEl = document.getElementById('ai-draft-'+id);
-  const prefillContent = draftEl ? draftEl.value.trim() : item.rawText;
+  // Content: use raw text when filing from original capture; AI draft when filing from AI panel
+  let prefillContent;
+  if (useOriginal) {
+    prefillContent = item.rawText;
+  } else {
+    const draftEl = document.getElementById('ai-draft-'+id);
+    prefillContent = draftEl ? draftEl.value.trim() : item.rawText;
+  }
 
-  // Build prayer options with pre-selection
   let prayerOptions = `<option value="" ${!preSelectedPrayerId?'selected':''}>— Create New Prayer —</option>`;
   db.themes.forEach(theme => {
     const themed = db.prayers.filter(p=>p.themeIds&&p.themeIds.includes(theme.id));
@@ -1630,7 +1684,7 @@ async function aiSuggestScriptureManual() {
   if (!content) { alert('Add some entry text first.'); return; }
   const el = document.getElementById('m-scripture-ai'); if (!el) return;
   el.innerHTML = `<div class="ai-thinking" style="margin-top:8px;">✦ Finding scripture <div class="dots"><span></span><span></span><span></span></div></div>`;
-  const prompt = `Suggest ONE relevant Bible verse for this prayer journal entry. Return ONLY the reference and a brief quote in this exact format: "Phil 4:6 — Be anxious for nothing". Nothing else.\nEntry: "${content}"`;
+  const prompt = `Suggest ONE Bible verse for this prayer journal entry. Format: "Phil 4:6 — Be anxious for nothing". Return only that, nothing else.\nEntry: "${content}"`;
   try {
     const result = await callAI(prompt);
     window._lastScriptureSuggestion = result.trim();
@@ -1798,11 +1852,8 @@ async function aiGenerateDescriptionFill() {
   const p = currentPrayer;
   const statusEl = document.getElementById('desc-ai-status');
   if (statusEl) statusEl.innerHTML = `<div class="ai-thinking">✦ Generating <div class="dots"><span></span><span></span><span></span></div></div>`;
-  const entries = p.entries.slice(-5).map(e=>`[${e.type}]: ${e.content}`).join('\n');
-  const prompt = `Write a 1-2 sentence description for a prayer journal entry titled "${p.title}".
-${entries ? `Recent context:\n${entries}` : 'No entries yet.'}
-Write in first person, present tense. Honest, grounded, personal. No fluff.
-Return ONLY the description text, nothing else.`;
+  const entries = p.entries.slice(-3).map(e=>`[${e.type}]: ${e.content}`).join('\n');
+  const prompt = `Write one sentence describing this prayer, titled "${p.title}". First person, plain and honest — no religious filler.${entries?'\nContext:\n'+entries:''}\nReturn only the sentence.`;
   try {
     const desc = await callAI(prompt);
     const el = document.getElementById('desc-text');
@@ -2001,14 +2052,14 @@ function toggleOriginalCapture(id) {
   el.style.display = el.style.display==='none' ? 'block' : 'none';
 }
 
-// ── AI Scripture Suggestion — Entry Detail Modal ──────────────
+// ── AI Scripture Suggestion — Entry Detail ────────────────────
 async function aiSuggestScriptureDetail(prayerId, entryId) {
   const prayer = db.prayers.find(p=>p.id===prayerId);
   const e = prayer?.entries.find(e=>e.id===entryId);
   if (!e || !db.settings.apiKey) return;
   const el = document.getElementById(`detail-scripture-ai-${entryId}`); if (!el) return;
   el.innerHTML = `<div class="ai-thinking" style="margin-top:8px;">✦ Finding scripture <div class="dots"><span></span><span></span><span></span></div></div>`;
-  const prompt = `Suggest ONE relevant Bible verse for this prayer journal entry. Return ONLY the reference and a brief quote in this format: "Phil 4:6 — Be anxious for nothing". Nothing else.\nEntry: "${e.content}"`;
+  const prompt = `Suggest ONE Bible verse for this prayer journal entry. Format: "Phil 4:6 — Be anxious for nothing". Return only that.\nEntry: "${e.content}"`;
   try {
     const result = await callAI(prompt);
     const scripture = result.trim();
@@ -2029,7 +2080,6 @@ function applyScriptureToEntry(prayerId, entryId, encodedScripture) {
   e.scripture = decodeURIComponent(encodedScripture);
   persist();
   renderThread(currentPrayer);
-  // Reopen the detail modal to show the scripture
   openEntryDetail(prayerId, entryId);
 }
 
@@ -2073,8 +2123,12 @@ function submitEditEntry(prayerId, entryId) {
   e.content = content;
   e.scripture = scripture;
   e.editedAt = Date.now();
-  if (type==='answer' && !prayer.answeredAt) { prayer.status='answered'; prayer.answeredAt=Date.now(); }
-  persist(); closeModal(); renderPrayerDetail();
+  persist(); closeModal();
+  if (type === 'answer' && prayer.status !== 'answered') {
+    askMarkAnswered(prayer);
+  } else {
+    renderPrayerDetail();
+  }
 }
 
 // ── AI Scripture Suggestion — Edit Entry Modal ────────────────
@@ -2083,7 +2137,7 @@ async function aiSuggestScriptureEdit() {
   if (!content) { alert('Add some entry text first.'); return; }
   const el = document.getElementById('ee-scripture-ai'); if (!el) return;
   el.innerHTML = `<div class="ai-thinking" style="margin-top:8px;">✦ Finding scripture <div class="dots"><span></span><span></span><span></span></div></div>`;
-  const prompt = `Suggest ONE relevant Bible verse for this prayer journal entry. Return ONLY the reference and a brief quote in this format: "Phil 4:6 — Be anxious for nothing". Nothing else.\nEntry: "${content}"`;
+  const prompt = `Suggest ONE Bible verse for this prayer journal entry. Format: "Phil 4:6 — Be anxious for nothing". Return only that.\nEntry: "${content}"`;
   try {
     const result = await callAI(prompt);
     window._lastScriptureSuggestion = result.trim();
@@ -2119,13 +2173,12 @@ async function refreshSummary() {
   const p=currentPrayer; if (!p||!db.settings.apiKey) return;
   document.getElementById('pd-summary').innerHTML=`<div class="living-summary"><div class="ai-thinking">✦ Generating <div class="dots"><span></span><span></span><span></span></div></div></div>`;
   const entries=p.entries.map(e=>`[${e.type} · ${fmtDate(e.createdAt)}]: ${e.content}`).join('\n');
-  const prompt=`You are a spiritual journal assistant. Write a warm, concise living summary (3-5 sentences) for this prayer. Write in second person ("You began this prayer..."). Capture the arc, current status, and any key insights. End with where things stand now.
+  const prompt=`Write a brief living summary (2-3 sentences) for this prayer. Second person ("You began..."). Honest and direct — capture the arc and where things stand now. No filler.
 
-Prayer: "${p.title}"
-Status: ${p.status}
-Entries:\n${entries}
+Prayer: "${p.title}" (${p.status})
+${entries}
 
-Return ONLY the summary text, nothing else.`;
+Return only the summary.`;
   try {
     p.livingSummary=await callAI(prompt); persist(); renderPrayerDetail();
   } catch(e) {
@@ -2133,7 +2186,7 @@ Return ONLY the summary text, nothing else.`;
   }
 }
 
-// ── ADD ENTRY MODAL (with AI assist) ─────────────────────────
+// ── ADD ENTRY MODAL ──────────────────────────────────────────
 function showAddEntryModal() {
   showModal('Add Entry', `
     <div class="field"><label>Entry Type</label>
@@ -2166,7 +2219,7 @@ async function aiSuggestScriptureAdd() {
   if (!content) { alert('Add some entry text first.'); return; }
   const el = document.getElementById('add-scripture-ai'); if (!el) return;
   el.innerHTML = `<div class="ai-thinking" style="margin-top:8px;">✦ Finding scripture <div class="dots"><span></span><span></span><span></span></div></div>`;
-  const prompt = `Suggest ONE relevant Bible verse for this prayer journal entry. Return ONLY the reference and a brief quote in this format: "Phil 4:6 — Be anxious for nothing". Nothing else.\nEntry: "${content}"`;
+  const prompt = `Suggest ONE Bible verse for this prayer journal entry. Format: "Phil 4:6 — Be anxious for nothing". Return only that.\nEntry: "${content}"`;
   try {
     const result = await callAI(prompt);
     window._lastScriptureSuggestion = result.trim();
@@ -2188,22 +2241,15 @@ async function aiAssistEntry() {
   resultEl.style.display='block';
   resultEl.innerHTML=`<div class="ai-thinking">✦ Thinking <div class="dots"><span></span><span></span><span></span></div></div>`;
   const recentEntries=p.entries.slice(-3).map(e=>`[${e.type}]: ${e.content}`).join('\n');
-  const prompt=`You are a spiritual journal assistant. The user is adding an entry to their prayer "${p.title}".
+  const prompt=`Refine this rough prayer journal entry for the prayer "${p.title}". Keep it natural, personal, 1-2 sentences. No preachiness.
 
-Their raw note: "${content}"
-Recent prayer context:
-${recentEntries||'This is a new prayer.'}
+Raw note: "${content}"
+Recent context: ${recentEntries||'First entry.'}
 
 Return ONLY valid JSON:
-{
-  "polishedEntry": "1-3 sentence refined journal entry in first person, thoughtful and genuine",
-  "suggestsNewPrayer": false,
-  "newPrayerTitle": null,
-  "newPrayerReason": null,
-  "scripture": null
-}
+{"polishedEntry":"refined entry in first person","suggestsNewPrayer":false,"newPrayerTitle":null,"newPrayerReason":null,"scripture":null}
 
-Set suggestsNewPrayer to true only if the content is clearly about something distinct from "${p.title}" and would work better as its own prayer.`;
+Set suggestsNewPrayer true only if the content is clearly about a different topic than "${p.title}".`;
   try {
     const raw=await callAI(prompt);
     let data;
@@ -2213,7 +2259,7 @@ Set suggestsNewPrayer to true only if the content is clearly about something dis
     document.getElementById('e-content').value=data.polishedEntry;
     if (data.scripture) document.getElementById('e-scripture').value=data.scripture;
     let html=`<div style="background:var(--gold-faint);border:1px solid var(--border-strong);border-radius:8px;padding:10px 12px;margin-bottom:12px;">
-      <div style="font-family:'Lato',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:4px;">✦ Entry refined above — edit further if needed</div>`;
+      <div style="font-family:'Lato',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:4px;">✦ Refined above — edit further if needed</div>`;
     if (data.suggestsNewPrayer && data.newPrayerTitle) {
       html+=`<div style="margin-top:8px;padding:8px 10px;background:var(--surface-3);border-radius:6px;">
         <div style="font-size:14px;color:var(--cream-dim);margin-bottom:6px;">💡 This might work better as its own prayer: <strong style="color:var(--cream);">"${esc(data.newPrayerTitle)}"</strong></div>
@@ -2237,6 +2283,33 @@ function createFromAISuggestion(title, content) {
       if (c) c.value=content;
     },80);
   },80);
+}
+
+// ── MARK ANSWERED — ask when type=answer ────────────────────
+// Called after filing an answer-type entry from add or edit
+function askMarkAnswered(prayer) {
+  const p = prayer || currentPrayer;
+  if (!p || p.status === 'answered') { renderPrayerDetail(); return; }
+  showModal('Prayer Answered?', `
+    <div style="text-align:center;padding:8px 0;">
+      <div style="font-size:36px;margin-bottom:12px;">✨</div>
+      <p style="font-family:'Playfair Display',serif;font-size:19px;color:var(--cream);margin-bottom:8px;">Mark "${esc(p.title)}" as answered?</p>
+      <p style="color:var(--muted);font-size:15px;line-height:1.6;margin-bottom:22px;">You've recorded an answered prayer entry. Would you like to mark this prayer as fully answered and move it to Testimonies?</p>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-dim btn-full" onclick="closeModal();renderPrayerDetail()">Not yet</button>
+        <button class="btn btn-primary btn-full" onclick="confirmMarkPrayerAnswered()">Yes, it's answered ✅</button>
+      </div>
+    </div>
+  `);
+}
+
+function confirmMarkPrayerAnswered() {
+  if (currentPrayer && currentPrayer.status !== 'answered') {
+    currentPrayer.status = 'answered';
+    currentPrayer.answeredAt = Date.now();
+    persist();
+  }
+  closeModal(); renderPrayerDetail();
 }
 
 // ── EDIT PRAYER TAGS ──────────────────────────────────────────
@@ -2281,8 +2354,12 @@ function submitEntry() {
   const scripture=document.getElementById('e-scripture').value.trim();
   if (!content) return;
   currentPrayer.entries.push({id:uid(),type,content,scripture,createdAt:Date.now()});
-  if (type==='answer') { currentPrayer.status='answered'; currentPrayer.answeredAt=Date.now(); }
-  persist(); closeModal(); renderPrayerDetail();
+  persist(); closeModal();
+  if (type === 'answer' && currentPrayer.status !== 'answered') {
+    askMarkAnswered();
+  } else {
+    renderPrayerDetail();
+  }
 }
 function deleteEntry(entryId) {
   if (!confirm('Delete this entry?')) return;
@@ -2354,9 +2431,7 @@ async function aiGenerateNewPrayerDesc() {
   const statusEl = document.getElementById('np-desc-ai');
   if (!title && !content) { if(statusEl) statusEl.innerHTML=`<div class="text-muted text-small mt4">Add a title or initial request first.</div>`; return; }
   if (statusEl) statusEl.innerHTML=`<div class="ai-thinking">✦ Generating <div class="dots"><span></span><span></span><span></span></div></div>`;
-  const prompt=`Write a 1-2 sentence description for a new prayer journal entry titled "${title||'New Prayer'}".
-${content?`Initial prayer: "${content}"`:''}
-First person, present tense. Concise and personal. Return ONLY the description text.`;
+  const prompt=`Write one sentence describing a prayer titled "${title||'New Prayer'}". First person, plain and direct. Return only the sentence.${content?'\nContext: "'+content+'"':''}`;
   try {
     const desc=await callAI(prompt);
     const el=document.getElementById('np-desc');
@@ -2452,17 +2527,24 @@ function deletePrinciple(id) {
 // EVENING ROUTINE
 // ═══════════════════════════════════════════════════════════
 let _routineChosenFocusId = '';
+let _routineRendered = false; // preserves routine DOM when navigating to inbox mid-routine
+
 function openRoutine() {
-  const overlay=document.getElementById('routine-overlay');
+  const overlay = document.getElementById('routine-overlay');
   overlay.classList.add('open');
-  _routineChosenFocusId=db.settings.tomorrowFocusPrayerId||'';
-  const unread=db.inbox.filter(i=>!i.processed).length;
-  const active=db.prayers.filter(p=>p.status==='active');
-  const doy=Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/86400000);
-  let focus=_routineChosenFocusId?db.prayers.find(p=>p.id===_routineChosenFocusId&&p.status==='active'):null;
-  if (!focus) focus=active.length?active[doy%active.length]:null;
-  const todayStr=new Date().toISOString().split('T')[0];
-  const doneToday=db.settings.routineCompletedDate===todayStr;
+  // If already rendered (e.g. user went to inbox and came back), just show — don't re-render
+  if (_routineRendered) return;
+  _routineRendered = true;
+
+  _routineChosenFocusId = db.settings.tomorrowFocusPrayerId||'';
+  const unread = db.inbox.filter(i=>!i.processed).length;
+  const active = db.prayers.filter(p=>p.status==='active');
+  const doy = Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/86400000);
+  let focus = _routineChosenFocusId ? db.prayers.find(p=>p.id===_routineChosenFocusId&&p.status==='active') : null;
+  if (!focus) focus = active.length ? active[doy%active.length] : null;
+  const todayStr = new Date().toISOString().split('T')[0];
+  const doneToday = db.settings.routineCompletedDate === todayStr;
+
   document.getElementById('routine-body').innerHTML=`
     ${doneToday?`<div style="text-align:center;margin-bottom:16px;font-family:'Lato',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-text);">✓ Already completed today — going again is fine</div>`:''}
     <div class="routine-step">
@@ -2476,7 +2558,7 @@ function openRoutine() {
       <div class="step-num">Step 2 of 3</div>
       <div class="step-title">Inbox ${unread>0?`<span style="color:var(--gold);font-size:20px;">(${unread})</span>`:'✓'}</div>
       ${unread>0
-        ?`<p style="color:var(--muted);margin-bottom:14px;">You have <strong style="color:var(--gold);">${unread}</strong> unprocessed capture${unread>1?'s':''} waiting.</p><button class="btn btn-ghost btn-full" onclick="closeRoutine();navigate('inbox')">Review Inbox →</button>`
+        ?`<p style="color:var(--muted);margin-bottom:14px;">You have <strong style="color:var(--gold);">${unread}</strong> unprocessed capture${unread>1?'s':''} waiting.</p><button class="btn btn-ghost btn-full" onclick="routineGoToInbox()">Review Inbox →</button>`
         :`<p style="color:var(--green-text);">✓ Your inbox is clear.</p>`}
     </div>
     <div class="routine-step">
@@ -2501,6 +2583,14 @@ function openRoutine() {
     <button class="btn btn-primary btn-full" onclick="completeRoutine()">Complete Evening ✦</button>
   `;
 }
+
+// Navigate to inbox from within routine without losing routine state
+function routineGoToInbox() {
+  // Hide overlay but keep _routineRendered = true so inputs are preserved
+  document.getElementById('routine-overlay').classList.remove('open');
+  navigate('inbox');
+}
+
 function addNoteRow(containerId, cls) {
   const row=document.createElement('div'); row.className='note-row';
   row.innerHTML=`<textarea class="${cls}" rows="2" placeholder="Another note..."></textarea><button class="note-remove" onclick="this.parentElement.remove()">×</button>`;
@@ -2530,9 +2620,13 @@ function completeRoutine() {
   surrender.forEach(s=>db.inbox.push({id:uid(),rawText:'[Surrender] '+s,createdAt:Date.now(),processed:false}));
   db.settings.tomorrowFocusPrayerId=_routineChosenFocusId||'';
   db.settings.routineCompletedDate=new Date().toISOString().split('T')[0];
+  _routineRendered = false; // reset so next open starts fresh
   persist(); closeRoutine(); renderHome(); updateInboxBadge();
 }
-function closeRoutine() { document.getElementById('routine-overlay').classList.remove('open'); }
+function closeRoutine() {
+  _routineRendered = false; // closing via ✕ always resets
+  document.getElementById('routine-overlay').classList.remove('open');
+}
 
 // ═══════════════════════════════════════════════════════════
 // MODAL
