@@ -805,7 +805,7 @@ input[type="color"].theme-color-pick::-webkit-color-swatch{border:none;border-ra
       <div class="qc-label">⚡ Quick Capture</div>
       <textarea id="qc-input" rows="3" placeholder="A thought, prayer, observation — anything. Don't think, just capture it."></textarea>
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;">
-        <button class="voice-btn" id="voice-btn" onclick="startVoiceCapture()" title="Voice capture">🎤</button>
+        <button class="voice-btn" id="voice-btn" onclick="toggleVoiceCapture()" title="Voice capture">🎤</button>
         <button id="qc-btn" class="btn btn-primary" onclick="quickCapture()">Capture →</button>
       </div>
     </div>
@@ -1494,22 +1494,23 @@ function renderFutureImprovements() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// VOICE CAPTURE
+// VOICE CAPTURE — mirrors Clarity's continuous:false + auto-restart pattern
 // ═══════════════════════════════════════════════════════════
 let _voiceRecognition = null;
 let _voiceCapturing = false;
-let _voiceCaptured = '';  // persists across auto-restarts
+let _voiceFinal = '';  // accumulated text across auto-restarts
 
-function startVoiceCapture() {
+function toggleVoiceCapture() {
+  if (_voiceCapturing) {
+    _stopVoiceCapture();
+  } else {
+    _startVoiceCapture();
+  }
+}
+
+async function _startVoiceCapture() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   const btn = document.getElementById('voice-btn');
-
-  // Second tap — user wants to stop
-  if (_voiceCapturing) {
-    _voiceCapturing = false;
-    if (_voiceRecognition) { try { _voiceRecognition.stop(); } catch(e){} }
-    return;
-  }
 
   if (!SR) {
     btn.textContent = '✗';
@@ -1518,65 +1519,96 @@ function startVoiceCapture() {
     return;
   }
 
+  // Request mic permission explicitly — required on Android Chrome
+  try {
+    await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch(err) {
+    alert('Microphone access was denied. Please allow microphone access and try again.');
+    return;
+  }
+
   _voiceCapturing = true;
-  _voiceCaptured = '';
+  _voiceFinal = document.getElementById('qc-input').value; // preserve existing text
   btn.textContent = '🔴';
   btn.title = 'Tap to stop recording';
   btn.classList.add('recording');
 
-  function startSession() {
-    const recognition = new SR();
-    recognition.lang = 'en-AU';
-    recognition.continuous = true;
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-    _voiceRecognition = recognition;
+  _startVoiceSession(SR);
+}
 
-    recognition.onresult = (event) => {
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        if (event.results[i].isFinal) {
-          _voiceCaptured += (_voiceCaptured ? ' ' : '') + event.results[i][0].transcript;
-        }
+function _startVoiceSession(SR) {
+  if (!_voiceCapturing) return;
+
+  const recognition = new SR();
+  recognition.lang = 'en-AU';
+  recognition.continuous = false;       // false = works on Android; we restart manually
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
+  _voiceRecognition = recognition;
+
+  recognition.onresult = (event) => {
+    let interim = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      if (event.results[i].isFinal) {
+        _voiceFinal += (_voiceFinal ? ' ' : '') + event.results[i][0].transcript.trim();
+      } else {
+        interim += event.results[i][0].transcript;
       }
-    };
+    }
+    // Show final + live interim in the textarea
+    const input = document.getElementById('qc-input');
+    input.value = (_voiceFinal + (interim ? ' ' + interim : '')).trim();
+  };
 
-    recognition.onend = () => {
-      // If user hasn't tapped stop, Chrome killed it due to silence — restart
-      if (_voiceCapturing) {
-        try { recognition.start(); } catch(e) {
-          // start() failed (e.g. already started) — create a fresh instance
-          setTimeout(startSession, 100);
-        }
-        return;
-      }
-      // User tapped stop — commit text
-      _voiceRecognition = null;
-      btn.textContent = '🎤';
-      btn.title = 'Voice capture';
-      btn.classList.remove('recording');
-      if (_voiceCaptured) {
-        const input = document.getElementById('qc-input');
-        input.value = (input.value ? input.value.trimEnd() + ' ' : '') + _voiceCaptured;
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        input.focus();
-        _voiceCaptured = '';
-      }
-    };
+  recognition.onend = () => {
+    // If user hasn't tapped stop, auto-restart to simulate continuous mode
+    if (_voiceCapturing) {
+      setTimeout(() => _startVoiceSession(SR), 100);
+      return;
+    }
+    // User stopped — clean up
+    _voiceRecognition = null;
+    const btn = document.getElementById('voice-btn');
+    btn.textContent = '🎤';
+    btn.title = 'Voice capture';
+    btn.classList.remove('recording');
+    // Focus textarea for immediate typing
+    document.getElementById('qc-input').focus();
+  };
 
-    recognition.onerror = (e) => {
-      if (e.error === 'no-speech' || e.error === 'aborted') return;
-      // Real error — stop gracefully
-      _voiceCapturing = false;
-      _voiceRecognition = null;
-      btn.textContent = '🎤';
-      btn.title = 'Voice capture';
-      btn.classList.remove('recording');
-    };
+  recognition.onerror = (e) => {
+    // no-speech and aborted are normal pauses — restart silently
+    if (e.error === 'no-speech' || e.error === 'aborted') {
+      if (_voiceCapturing) setTimeout(() => _startVoiceSession(SR), 100);
+      return;
+    }
+    // Permission denied or other hard error — stop
+    _voiceCapturing = false;
+    _voiceRecognition = null;
+    const btn = document.getElementById('voice-btn');
+    btn.textContent = '🎤';
+    btn.title = 'Voice capture';
+    btn.classList.remove('recording');
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+      alert('Microphone access was denied.');
+    }
+  };
 
+  try {
     recognition.start();
+  } catch(e) {
+    // start() threw (race condition) — retry shortly
+    if (_voiceCapturing) setTimeout(() => _startVoiceSession(SR), 200);
   }
+}
 
-  startSession();
+function _stopVoiceCapture() {
+  _voiceCapturing = false;
+  if (_voiceRecognition) {
+    try { _voiceRecognition.abort(); } catch(e) {}
+    _voiceRecognition = null;
+  }
+  // onend will handle resetting the button UI
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1706,6 +1738,8 @@ function quickCapture() {
   const t = document.getElementById('qc-input').value.trim(); if (!t) return;
   db.inbox.push({id:uid(),rawText:t,createdAt:Date.now(),processed:false});
   persist(); document.getElementById('qc-input').value='';
+  // Stop voice if running
+  if (_voiceCapturing) _stopVoiceCapture();
   const btn=document.getElementById('qc-btn'); btn.textContent='✓ Saved';
   setTimeout(()=>{btn.textContent='Capture →';},1400);
   updateInboxBadge(); renderHome();
@@ -1807,7 +1841,6 @@ function acceptAI(id) {
     createdAt:Date.now(),
     originalRaw:item.rawText
   });
-  // Only save principle if user checked the checkbox
   const principleCheckbox = document.getElementById('include-principle-'+id);
   if (data.principle && principleCheckbox && principleCheckbox.checked) {
     db.principles.push({id:uid(),text:data.principle,prayerIds:[prayer.id],createdAt:Date.now()});
@@ -1819,7 +1852,6 @@ function acceptAI(id) {
 }
 
 // ── Manual filing ─────────────────────────────────────────────
-// useOriginal=true: ignore any pending AI data (treat as fresh manual filing)
 let _mThemes = [];
 function toggleMTheme(id, el) {
   if (_mThemes.includes(id)) { _mThemes=_mThemes.filter(t=>t!==id); el.classList.remove('selected'); }
@@ -1829,7 +1861,6 @@ function toggleMTheme(id, el) {
 function fileManually(id, useOriginal) {
   _mThemes = [];
   const item = db.inbox.find(i=>i.id===id); if (!item) return;
-  // If useOriginal is true, skip AI data entirely (user wants to work from raw capture)
   const aiData = (!useOriginal && _pendingAI[id]) ? _pendingAI[id] : null;
 
   let preSelectedPrayerId = '';
@@ -1845,7 +1876,6 @@ function fileManually(id, useOriginal) {
     : '';
   if (prefillThemeId) _mThemes = [prefillThemeId];
 
-  // Content: use raw text when filing from original capture; AI draft when filing from AI panel
   let prefillContent;
   if (useOriginal) {
     prefillContent = item.rawText;
@@ -1964,12 +1994,9 @@ function applyScriptureSuggestion(inputId, resultId) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// THEMES SCREEN
+// THEMES SCREEN / ALL PRAYERS VIEW
 // ═══════════════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════
-// ALL PRAYERS VIEW
-// ═══════════════════════════════════════════════════════════
-let _prayerView  = 'themes';  // 'themes' | 'all'
+let _prayerView  = 'themes';
 let _apFilter    = 'all';
 let _apSort      = 'recency';
 
@@ -2005,16 +2032,12 @@ function setAPSort(s) {
 
 function renderAllPrayers() {
   const container = document.getElementById('ap-list'); if (!container) return;
-
-  // Update counts
   ['all','active','watching','dormant','answered'].forEach(f => {
     const el = document.getElementById('apc-'+f);
     if (el) el.textContent = f==='all'
       ? db.prayers.length
       : db.prayers.filter(p=>p.status===f).length;
   });
-
-  // Sort label
   const sortLabels = {
     recency:'Most recent activity first',
     alpha:'A → Z within each group',
@@ -2022,23 +2045,18 @@ function renderAllPrayers() {
   };
   const sl = document.getElementById('ap-sort-label');
   if (sl) sl.textContent = sortLabels[_apSort];
-
   let list = _apFilter==='all' ? [...db.prayers] : db.prayers.filter(p=>p.status===_apFilter);
-
   if (!list.length) {
     container.innerHTML = `<div class="empty-state">No prayers here yet. ✦</div>`;
     return;
   }
-
-  // Sort
   list.sort((a,b) => {
     const sd = AP_STATUS_ORDER[a.status] - AP_STATUS_ORDER[b.status];
     if (sd !== 0) return sd;
     if (_apSort==='alpha')   return a.title.localeCompare(b.title);
     if (_apSort==='oldest')  return apLastEntry(a) - apLastEntry(b);
-    return apLastEntry(b) - apLastEntry(a); // recency default
+    return apLastEntry(b) - apLastEntry(a);
   });
-
   let html = '';
   if (_apFilter === 'all') {
     const statusLabels = {active:'Active',watching:'Watching',dormant:'Dormant',answered:'Answered'};
@@ -2058,7 +2076,6 @@ function renderAllPrayers() {
   } else {
     html = list.map(apRow).join('');
   }
-
   container.innerHTML = html;
 }
 
@@ -2130,12 +2147,8 @@ function openThemeModal(themeId) {
     prayers = db.prayers.filter(p=>p.themeIds&&p.themeIds.includes(themeId));
     themeObj = db.themes.find(t=>t.id===themeId) || {icon:'📿', name:themeId, description:''};
   }
-
-  // Group by status
   const groups = {active:[], watching:[], dormant:[], answered:[]};
   prayers.forEach(p => { if (groups[p.status]) groups[p.status].push(p); });
-
-  // Sort each group by most recent entry
   Object.values(groups).forEach(g =>
     g.sort((a,b) => {
       const la = a.entries.length ? a.entries[a.entries.length-1].createdAt : a.createdAt;
@@ -2143,9 +2156,7 @@ function openThemeModal(themeId) {
       return lb - la;
     })
   );
-
   const ENTRY_TYPE_LABEL = {request:'Request',update:'Update',observation:'Observation',answer:'Answer',principle:'Principle',gratitude:'Gratitude'};
-
   function tmCard(p) {
     const last = p.entries.length ? p.entries[p.entries.length-1] : null;
     const snippet = last ? last.content : '';
@@ -2167,7 +2178,6 @@ function openThemeModal(themeId) {
         </div>
       </div>`;
   }
-
   function tmSection(status, label) {
     const group = groups[status];
     if (!group.length) return '';
@@ -2179,8 +2189,6 @@ function openThemeModal(themeId) {
       </div>
       ${group.map(tmCard).join('')}`;
   }
-
-  // Stat pills — only show non-zero
   const nTotal    = prayers.length;
   const nActive   = groups.active.length;
   const nWatching = groups.watching.length;
@@ -2191,7 +2199,6 @@ function openThemeModal(themeId) {
     nWatching ? `<span class="tm-stat-pill tm-sp-watching">👁️ ${nWatching} watching</span>` : '',
     nAnswered ? `<span class="tm-stat-pill tm-sp-answered">✅ ${nAnswered} answered</span>` : '',
   ].filter(Boolean).join('');
-
   const heroHtml = `
     <div class="tm-hero">
       <div class="tm-hero-icon">${themeObj.icon}</div>
@@ -2202,14 +2209,10 @@ function openThemeModal(themeId) {
     </div>
     <div class="tm-stat-row">${statPills}</div>
     <button class="btn btn-ghost btn-full mb16" style="border-style:dashed;" onclick="closeModal();showNewPrayerModal('${themeId}')">＋ New Prayer in ${esc(themeObj.name)}</button>`;
-
   const bodyHtml = !prayers.length
     ? `<div class="empty-state" style="padding:32px 0;">No prayers here yet. Start one above.</div>`
     : tmSection('active','Active') + tmSection('watching','Watching') + tmSection('dormant','Dormant') + tmSection('answered','Answered');
-
   showModal('', heroHtml + bodyHtml);
-
-  // Hide the default modal title bar title (we render our own header)
   const titleEl = document.getElementById('modal-title-text');
   if (titleEl) titleEl.textContent = '';
 }
@@ -2228,21 +2231,18 @@ function openPrayer(id) {
 function renderPrayerDetail() {
   const p = currentPrayer;
   document.getElementById('pd-title').textContent = p.title;
-
   const filterBar = document.getElementById('entry-filter-bar');
   if (filterBar && !_activeEntryFilters.length) {
     filterBar.style.display='none';
     const fb=document.getElementById('filter-btn');
     if (fb) fb.classList.remove('filter-btn-active');
   }
-
   const themeBadges = (p.themeIds||[]).map(tid=>{
     const t=db.themes.find(th=>th.id===tid);
     return t?`<span class="tag selected" style="cursor:default;">${t.icon} ${t.name}</span>`:'';
   }).join('');
   document.getElementById('pd-badges').innerHTML =
     `<span class="badge badge-${p.status} badge-clickable" onclick="quickChangeStatus()" title="Tap to change status">${STATUS_EMOJI[p.status]||''} ${p.status}</span>${themeBadges}`;
-
   const sd = document.getElementById('pd-summary');
   const descHtml = `
     <div class="prayer-description">
@@ -2254,7 +2254,6 @@ function renderPrayerDetail() {
         <button class="btn btn-dim btn-sm" onclick="editPrayerDescription()">Edit Description</button>
       </div>
     </div>`;
-
   let summaryHtml = '';
   if (p.livingSummary) {
     summaryHtml = `<div class="living-summary"><div class="ls-label">Living Summary</div><div class="ls-text">${esc(p.livingSummary)}</div>${db.settings.apiKey?`<button class="btn btn-ghost btn-sm mt8" onclick="refreshSummary()">↻ Refresh</button>`:''}</div>`;
@@ -2262,9 +2261,7 @@ function renderPrayerDetail() {
     summaryHtml = `<div class="living-summary" style="text-align:center;"><button class="btn btn-ghost" onclick="refreshSummary()">✦ Generate Living Summary</button></div>`;
   }
   sd.innerHTML = descHtml + summaryHtml;
-
   renderThread(p);
-
   const ad = document.getElementById('pd-actions');
   const btns = [];
   if (p.status!=='answered') btns.push(`<button class="btn btn-ghost btn-sm" onclick="markAnswered()">✨ Mark Answered</button>`);
@@ -2275,7 +2272,6 @@ function renderPrayerDetail() {
   ad.innerHTML = btns.join('');
 }
 
-// ── AI: Generate Prayer Description ──────────────────────────
 async function aiGenerateDescription() {
   if (!currentPrayer || !db.settings.apiKey) return;
   const p = currentPrayer;
@@ -2328,7 +2324,6 @@ function submitPrayerDescription() {
   persist(); closeModal(); renderPrayerDetail();
 }
 
-// ── QUICK STATUS ──────────────────────────────────────────────
 function quickChangeStatus() {
   if (!currentPrayer) return;
   const statuses = [
@@ -2359,7 +2354,6 @@ function applyQuickStatus(status) {
   persist(); closeModal(); renderPrayerDetail();
 }
 
-// ── ENTRY FILTER ──────────────────────────────────────────────
 let _activeEntryFilters = [];
 function toggleEntryFilter() {
   const bar = document.getElementById('entry-filter-bar');
@@ -2448,7 +2442,6 @@ function renderThread(p) {
   td.innerHTML = html;
 }
 
-// ── ENTRY DETAIL MODAL ────────────────────────────────────────
 function openEntryDetail(prayerId, entryId) {
   const prayer=db.prayers.find(p=>p.id===prayerId); if (!prayer) return;
   const e=prayer.entries.find(e=>e.id===entryId); if (!e) return;
@@ -2495,7 +2488,6 @@ function toggleOriginalCapture(id) {
   el.style.display = el.style.display==='none' ? 'block' : 'none';
 }
 
-// ── AI Scripture Suggestion — Entry Detail ────────────────────
 async function aiSuggestScriptureDetail(prayerId, entryId) {
   const prayer = db.prayers.find(p=>p.id===prayerId);
   const e = prayer?.entries.find(e=>e.id===entryId);
@@ -2526,17 +2518,14 @@ function applyScriptureToEntry(prayerId, entryId, encodedScripture) {
   openEntryDetail(prayerId, entryId);
 }
 
-// ── ENTRY EDITING ─────────────────────────────────────────────
 function editEntry(prayerId, entryId) {
   const prayer = db.prayers.find(p=>p.id===prayerId); if (!prayer) return;
   const e = prayer.entries.find(e=>e.id===entryId); if (!e) return;
-
   const typeOptions = [
     {v:'update',l:'Update'},{v:'observation',l:'Observation'},
     {v:'request',l:'Prayer Request'},{v:'gratitude',l:'Gratitude'},
     {v:'answer',l:'Answered Prayer'},{v:'principle',l:'Principle Learned'}
   ].map(t=>`<option value="${t.v}" ${e.type===t.v?'selected':''}>${t.l}</option>`).join('');
-
   showModal('Edit Entry', `
     <div class="field"><label>Entry Type</label>
       <select id="ee-type">${typeOptions}</select>
@@ -2574,7 +2563,6 @@ function submitEditEntry(prayerId, entryId) {
   }
 }
 
-// ── AI Scripture Suggestion — Edit Entry Modal ────────────────
 async function aiSuggestScriptureEdit() {
   const content = document.getElementById('ee-content')?.value.trim();
   if (!content) { alert('Add some entry text first.'); return; }
@@ -2629,7 +2617,6 @@ Return only the summary.`;
   }
 }
 
-// ── ADD ENTRY MODAL ──────────────────────────────────────────
 function showAddEntryModal() {
   showModal('Add Entry', `
     <div class="field"><label>Entry Type</label>
@@ -2728,8 +2715,6 @@ function createFromAISuggestion(title, content) {
   },80);
 }
 
-// ── MARK ANSWERED — ask when type=answer ────────────────────
-// Called after filing an answer-type entry from add or edit
 function askMarkAnswered(prayer) {
   const p = prayer || currentPrayer;
   if (!p || p.status === 'answered') { renderPrayerDetail(); return; }
@@ -2755,7 +2740,6 @@ function confirmMarkPrayerAnswered() {
   closeModal(); renderPrayerDetail();
 }
 
-// ── EDIT PRAYER TAGS ──────────────────────────────────────────
 let _editTags = [];
 function editPrayerTags() {
   if (!currentPrayer) return;
@@ -2971,7 +2955,6 @@ function deletePrinciple(id) {
 // ═══════════════════════════════════════════════════════════
 let _routineChosenFocusId = '';
 
-// ── Routine draft helpers ────────────────────────────────────
 function saveRoutineDraft() {
   const thanks = [...document.querySelectorAll('.r-thanks')].map(t=>t.value.trim()).filter(Boolean);
   const surrender = [...document.querySelectorAll('.r-surrender')].map(t=>t.value.trim()).filter(Boolean);
@@ -3002,7 +2985,6 @@ function buildRoutineBody(restoredThanks, restoredSurrender) {
   const todayStr = new Date().toISOString().split('T')[0];
   const doneToday = db.settings.routineCompletedDate === todayStr;
 
-  // Build restored gratitude rows
   const thanksRows = restoredThanks && restoredThanks.length
     ? restoredThanks.map((t,i) => `<div class="note-row"><textarea class="r-thanks" rows="2"${i>0?' placeholder="Another note..."':''}>${esc(t)}</textarea>${i>0?'<button class="note-remove" onclick="this.parentElement.remove()">×</button>':''}</div>`).join('')
     : `<div class="note-row"><textarea class="r-thanks" rows="2" placeholder="One thing, however small..."></textarea></div>`;
@@ -3053,19 +3035,13 @@ function buildRoutineBody(restoredThanks, restoredSurrender) {
 function openRoutine() {
   const overlay = document.getElementById('routine-overlay');
   overlay.classList.add('open');
-
   const todayStr = new Date().toISOString().split('T')[0];
   const draft = db.settings.routineDraft;
-
-  // Same-day draft: restore silently without re-rendering the overlay
   if (draft && draft.date === todayStr) {
-    // Only rebuild if DOM is gone (first open after page load with saved draft)
     if (document.getElementById('thanks-rows')) return;
     buildRoutineBody(draft.thanks, draft.surrender);
     return;
   }
-
-  // Previous-day draft: show a banner asking keep or clear
   if (draft && draft.date !== todayStr) {
     const draftDate = new Date(draft.date).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
     const hasThanks = draft.thanks && draft.thanks.length;
@@ -3084,12 +3060,9 @@ function openRoutine() {
     `);
     return;
   }
-
-  // No draft — fresh start
   buildRoutineBody(null, null);
 }
 
-// Navigate to inbox from within routine — save draft first
 function routineGoToInbox() {
   saveRoutineDraft();
   document.getElementById('routine-overlay').classList.remove('open');
@@ -3125,11 +3098,11 @@ function completeRoutine() {
   surrender.forEach(s=>db.inbox.push({id:uid(),rawText:'[Surrender] '+s,createdAt:Date.now(),processed:false}));
   db.settings.tomorrowFocusPrayerId=_routineChosenFocusId||'';
   db.settings.routineCompletedDate=new Date().toISOString().split('T')[0];
-  clearRoutineDraft(); // filed — no need to keep draft
+  clearRoutineDraft();
   persist(); closeRoutine(); renderHome(); updateInboxBadge();
 }
 function closeRoutine() {
-  saveRoutineDraft(); // save whatever is in the fields
+  saveRoutineDraft();
   document.getElementById('routine-overlay').classList.remove('open');
 }
 
