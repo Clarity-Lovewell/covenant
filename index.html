@@ -118,30 +118,26 @@ label{display:block;font-family:'Lato',sans-serif;font-size:11px;font-weight:700
 .living-summary::before{content:'✦';position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--bg);padding:0 8px;color:var(--gold);font-size:13px;}
 .ls-label{font-family:'Lato',sans-serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:8px;}
 .ls-text{color:var(--cream-dim);font-style:italic;line-height:1.7;font-size:16px;}
-.thread{margin-top:8px;}
-.entry{display:flex;gap:14px;margin-bottom:0;position:relative;}.entry+.entry{margin-top:0;}
-.thread-line-wrap{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
-.entry-dot{width:30px;height:30px;border-radius:50%;background:var(--surface-2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
-.entry-dot.t-request{border-color:var(--gold-dim);background:rgba(200,164,74,0.1);}
-.entry-dot.t-update{border-color:var(--blue-text);background:rgba(58,90,130,0.1);}
-.entry-dot.t-answer{border-color:var(--green-text);background:rgba(74,138,80,0.12);}
-.entry-dot.t-principle{border-color:var(--purple-text);background:rgba(180,130,240,0.1);}
-.entry-dot.t-observation{border-color:var(--muted);}
-.entry-dot.t-gratitude{border-color:#c880c0;background:rgba(200,128,192,0.1);}
-.entry-dot.t-question{border-color:var(--blue-text);background:rgba(122,170,206,0.1);}
-.entry-dot.t-todo{border-color:var(--muted);background:rgba(122,106,74,0.1);}
-.entry-line{flex:1;width:1px;background:var(--border);margin:4px 0;}
-.entry-body{flex:1;padding-bottom:22px;cursor:pointer;}.entry-body:hover .entry-content{color:var(--cream);}
-.entry-type-label{font-family:'Lato',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
-.entry-date{font-family:'Lato',sans-serif;font-size:11px;color:var(--muted);}
-.entry-meta{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;}
-.entry-content{color:var(--cream);line-height:1.65;}
-.entry-scripture{margin-top:9px;padding:9px 13px;background:rgba(200,164,74,0.06);border-left:2px solid var(--gold-dim);font-style:italic;color:var(--cream-dim);font-size:15px;border-radius:0 6px 6px 0;}
-.entry-actions{margin-top:6px;display:flex;gap:14px;align-items:center;}
-.entry-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;font-family:'Lato',sans-serif;letter-spacing:0.05em;padding:2px 0;transition:color 0.2s;}.entry-del:hover{color:var(--cream-dim);}
-.entry-edit{background:none;border:none;color:var(--gold-dim);cursor:pointer;font-size:12px;font-family:'Lato',sans-serif;letter-spacing:0.05em;padding:2px 0;transition:color 0.2s;}.entry-edit:hover{color:var(--gold);}
-.entry-edited-label{font-family:'Lato',sans-serif;font-size:10px;color:var(--muted);font-style:italic;}
-.entry-expand-hint{font-family:'Lato',sans-serif;font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:0.05em;}
+/* ── COMPACT ENTRY BUBBLES ── */
+.entry-bubble{border-radius:10px;padding:9px 12px 7px;margin-bottom:5px;cursor:pointer;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--border-strong);transition:background 0.15s,border-color 0.15s;}
+.entry-bubble:hover{background:var(--surface-2);}
+.entry-bubble.t-request{border-left-color:var(--gold-dim);}
+.entry-bubble.t-update{border-left-color:var(--blue-text);}
+.entry-bubble.t-answer{border-left-color:var(--green-text);}
+.entry-bubble.t-principle{border-left-color:var(--purple-text);}
+.entry-bubble.t-observation{border-left-color:var(--muted);}
+.entry-bubble.t-gratitude{border-left-color:#c880c0;}
+.entry-bubble.t-question{border-left-color:var(--blue-text);}
+.entry-bubble.t-todo{border-left-color:var(--cream-dim);}
+.eb-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;gap:6px;}
+.eb-type{font-family:'Lato',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+.eb-date{font-family:'Lato',sans-serif;font-size:10px;color:var(--muted);white-space:nowrap;flex-shrink:0;}
+.eb-content{color:var(--cream);line-height:1.5;font-size:15px;}
+.eb-scripture{margin-top:5px;padding:4px 9px;background:rgba(200,164,74,0.06);border-left:2px solid var(--gold-dim);font-style:italic;color:var(--cream-dim);font-size:13px;border-radius:0 5px 5px 0;line-height:1.4;}
+.eb-actions{display:flex;gap:12px;align-items:center;margin-top:4px;}
+.eb-edited{font-family:'Lato',sans-serif;font-size:10px;color:var(--muted);font-style:italic;}
+.entry-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;font-family:'Lato',sans-serif;padding:2px 0;transition:color 0.2s;}.entry-del:hover{color:var(--cream-dim);}
+.entry-edit{background:none;border:none;color:var(--gold-dim);cursor:pointer;font-size:11px;font-family:'Lato',sans-serif;padding:2px 0;transition:color 0.2s;}.entry-edit:hover{color:var(--gold);}
 .thread-add-entry{display:flex;justify-content:center;padding:16px 0 4px;}
 .thread-add-entry-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 20px;border-radius:20px;border:1px dashed var(--border-strong);background:transparent;color:var(--gold-dim);font-family:'Lato',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;}
 .thread-add-entry-btn:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-faint);}
@@ -279,6 +275,14 @@ input[type="color"].theme-color-pick::-webkit-color-swatch{border:none;border-ra
 .tm-card-footer{display:flex;align-items:center;gap:7px;padding-left:24px;flex-wrap:wrap;}
 .tm-card-date{font-family:'Lato',sans-serif;font-size:11px;color:var(--muted);}
 .tm-card-type{font-family:'Lato',sans-serif;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);background:var(--surface-3);border-radius:4px;padding:1px 6px;}
+.qc-cat{padding:4px 11px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-family:'Lato',sans-serif;font-size:11px;font-weight:500;transition:all 0.15s;user-select:none;}
+.qc-cat.on{border-color:var(--gold-dim);background:var(--gold-faint);color:var(--gold);}
+.ib-filter-strip{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+.ib-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-family:'Lato',sans-serif;font-size:11px;color:var(--cream-dim);cursor:pointer;transition:all 0.18s;user-select:none;}
+.ib-chip:hover{border-color:var(--border-strong);}
+.ib-chip.active{border-color:var(--gold-dim);background:var(--gold-faint);color:var(--gold);}
+.ib-chip-count{background:var(--surface-3);border-radius:10px;padding:0 5px;font-size:10px;color:var(--muted);}
+.ib-chip.active .ib-chip-count{background:rgba(200,164,74,0.18);color:var(--gold-dim);}
 .prayer-picker-item{padding:10px 12px;cursor:pointer;color:var(--cream);transition:background 0.15s;border-bottom:1px solid var(--border);font-family:'Crimson Text',serif;font-size:15px;line-height:1.3;}
 .prayer-picker-item:last-child{border-bottom:none;}.prayer-picker-item:hover{background:var(--surface-3);}
 .prayer-picker-item.selected{background:var(--gold-faint);color:var(--gold);}
@@ -319,6 +323,11 @@ input[type="color"].theme-color-pick::-webkit-color-swatch{border:none;border-ra
     <div class="qc-box" style="margin-bottom:12px;">
       <div class="qc-label">⚡ Quick Capture</div>
       <textarea id="qc-input" rows="3" placeholder="A thought, prayer, observation — anything. Don't think, just capture it."></textarea>
+      <div id="qc-cats" style="display:flex;gap:6px;margin-top:9px;flex-wrap:wrap;">
+        <span class="qc-cat on" data-cat="capture" onclick="setQCCat(this,'capture')">⚡ Capture</span>
+        <span class="qc-cat" data-cat="prayer" onclick="setQCCat(this,'prayer')">🙏 Prayer</span>
+        <span class="qc-cat" data-cat="todo" onclick="setQCCat(this,'todo')">☐ To-Do</span>
+      </div>
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;">
         <button class="voice-btn" id="voice-btn" onclick="startVoiceCapture()" title="Voice capture">🎤</button>
         <button id="qc-btn" class="btn btn-primary" onclick="quickCapture()">Capture →</button>
@@ -360,6 +369,7 @@ input[type="color"].theme-color-pick::-webkit-color-swatch{border:none;border-ra
       <button class="back-btn" onclick="navigate('home')">←</button>
       <h2 class="screen-title">Inbox</h2>
     </div>
+    <div id="ib-filter-strip" class="ib-filter-strip"></div>
     <div id="inbox-list"></div>
     <div id="inbox-empty" class="empty-state" style="display:none;">Your inbox is clear. 🕊️</div>
   </div>
@@ -789,10 +799,14 @@ function renderHome(){
   const tc=document.getElementById('h-testimony-card');
   if(answered.length>0){tc.style.display='block';document.getElementById('h-test-title').textContent=answered[0].title;document.getElementById('h-test-sub').textContent=fmtRel(answered[0].answeredAt||answered[0].createdAt);tc.onclick=()=>openPrayer(answered[0].id);}else tc.style.display='none';
 }
+let _qcCat='capture';
+function setQCCat(el,cat){_qcCat=cat;document.querySelectorAll('.qc-cat').forEach(c=>c.classList.toggle('on',c.dataset.cat===cat));}
 function quickCapture(){
   const t=document.getElementById('qc-input').value.trim();if(!t)return;
-  db.inbox.push({id:uid(),rawText:t,createdAt:Date.now(),processed:false});
+  db.inbox.push({id:uid(),rawText:t,createdAt:Date.now(),processed:false,category:_qcCat});
   persist();document.getElementById('qc-input').value='';
+  // reset category to capture
+  _qcCat='capture';document.querySelectorAll('.qc-cat').forEach(c=>c.classList.toggle('on',c.dataset.cat==='capture'));
   const btn=document.getElementById('qc-btn');btn.textContent='✓ Saved';setTimeout(()=>{btn.textContent='Capture →';},1400);
   updateInboxBadge();renderHome();
 }
@@ -809,14 +823,48 @@ function showFocusChangePicker(){
 function setHomeFocus(id){db.settings.tomorrowFocusPrayerId=id;persist();closeModal();renderHome();}
 
 // ── INBOX ──
-let _pendingAI={};
+let _ibFilter='all';
+function setIBFilter(f){
+  _ibFilter=f;
+  document.querySelectorAll('.ib-chip').forEach(c=>c.classList.toggle('active',c.dataset.f===f));
+  renderInboxList();
+}
 function renderInbox(){
+  const all=db.inbox.filter(i=>!i.processed);
+  const counts={all:all.length,capture:all.filter(i=>!i.category||i.category==='capture').length,prayer:all.filter(i=>i.category==='prayer').length,todo:all.filter(i=>i.category==='todo').length,gratitude:all.filter(i=>i.category==='gratitude').length};
+  const strip=document.getElementById('ib-filter-strip');
+  if(strip){
+    const cats=[{f:'all',label:'All'},{f:'capture',label:'⚡ Capture'},{f:'prayer',label:'🙏 Prayer'},{f:'todo',label:'☐ To-Do'},{f:'gratitude',label:'💛 Gratitude'}];
+    strip.innerHTML=cats.map(c=>`<button class="ib-chip ${_ibFilter===c.f?'active':''}" data-f="${c.f}" onclick="setIBFilter('${c.f}')">${c.label} <span class="ib-chip-count">${counts[c.f]||0}</span></button>`).join('');
+  }
+  renderInboxList();
+}
+function renderInboxList(){
   const list=document.getElementById('inbox-list');const empty=document.getElementById('inbox-empty');
-  const items=db.inbox.filter(i=>!i.processed).sort((a,b)=>b.createdAt-a.createdAt);
+  let items=db.inbox.filter(i=>!i.processed);
+  if(_ibFilter!=='all'){
+    if(_ibFilter==='capture')items=items.filter(i=>!i.category||i.category==='capture');
+    else items=items.filter(i=>i.category===_ibFilter);
+  }
+  items=items.sort((a,b)=>b.createdAt-a.createdAt);
   if(!items.length){list.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
-  list.innerHTML=items.map(item=>`<div class="inbox-item" id="ii-${item.id}"><div class="inbox-raw">"${esc(item.rawText)}"</div><div class="inbox-meta">${fmtDate(item.createdAt)}</div><div id="ir-${item.id}"></div><div class="flex wrap gap8 mt8">${db.settings.apiKey?`<button class="btn btn-primary btn-sm" onclick="processInbox('${item.id}')">✦ Process with AI</button>`:''}<button class="btn btn-ghost btn-sm" onclick="fileManually('${item.id}',true)">File Manually</button><button class="btn btn-dim btn-sm" onclick="dismissItem('${item.id}')">Dismiss</button></div></div>`).join('');
+  const CAT_STYLE={capture:{bg:'rgba(200,164,74,0.1)',color:'var(--gold-dim)'},prayer:{bg:'rgba(200,164,74,0.1)',color:'var(--gold)'},todo:{bg:'rgba(122,106,74,0.12)',color:'var(--cream-dim)'},gratitude:{bg:'rgba(200,128,192,0.1)',color:'#c880c0)'}};
+  list.innerHTML=items.map(item=>{
+    const cat=item.category||'capture';
+    const catLabels={capture:'⚡ Capture',prayer:'🙏 Prayer',todo:'☐ To-Do',gratitude:'💛 Gratitude'};
+    return`<div class="inbox-item" id="ii-${item.id}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span class="inbox-meta" style="margin-bottom:0;">${fmtDate(item.createdAt)}</span>
+        <span style="font-family:'Lato',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:1px 7px;">${catLabels[cat]||cat}</span>
+      </div>
+      <div class="inbox-raw">"${esc(item.rawText)}"</div>
+      <div id="ir-${item.id}"></div>
+      <div class="flex wrap gap8 mt8">${db.settings.apiKey?`<button class="btn btn-primary btn-sm" onclick="processInbox('${item.id}')">✦ Process with AI</button>`:''}<button class="btn btn-ghost btn-sm" onclick="fileManually('${item.id}',true)">File Manually</button><button class="btn btn-dim btn-sm" onclick="dismissItem('${item.id}')">Dismiss</button></div>
+    </div>`;
+  }).join('');
 }
+let _pendingAI={};
 async function processInbox(id){
   const item=db.inbox.find(i=>i.id===id);if(!item)return;
   const r=document.getElementById('ir-'+id);
@@ -1030,14 +1078,24 @@ const ENTRY_ICONS={request:'🙏',update:'📝',observation:'👁',answer:'✨',
 function renderThread(p){
   const td=document.getElementById('pd-thread');
   const filtered=_activeEntryFilters.length?p.entries.filter(e=>_activeEntryFilters.includes(e.type)):p.entries;
-  if(!filtered.length){td.innerHTML=_activeEntryFilters.length?`<div class="empty-state">No entries match this filter. <br><button class="btn btn-dim btn-sm mt8" onclick="clearEntryFilter()">Clear Filter</button></div>`:`<div class="empty-state">Begin with your first entry above.</div>`;return;}
-  let html=`<div class="thread">`;
-  filtered.forEach((e,i)=>{
-    const isLast=i===filtered.length-1;const timeStr=new Date(e.createdAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-    html+=`<div class="entry"><div class="thread-line-wrap"><div class="entry-dot t-${e.type}">${ENTRY_ICONS[e.type]||'·'}</div>${!isLast?'<div class="entry-line"></div>':''}</div><div class="entry-body" onclick="openEntryDetail('${p.id}','${e.id}')"><div class="entry-meta"><span class="entry-type-label">${e.type}</span><span class="entry-date">${fmtDate(e.createdAt)} · ${timeStr}</span>${e.editedAt?`<span class="entry-edited-label">· edited ${fmtRel(e.editedAt)}</span>`:''}</div><div class="entry-content">${esc(e.content)}</div>${e.scripture?`<div class="entry-scripture">${esc(e.scripture)}</div>`:''}<div class="entry-expand-hint">Tap to expand</div><div class="entry-actions"><button class="entry-edit" onclick="event.stopPropagation();editEntry('${p.id}','${e.id}')">Edit</button><button class="entry-del" onclick="event.stopPropagation();deleteEntry('${e.id}')">Delete</button></div></div></div>`;
-  });
-  html+=`</div><div class="thread-add-entry"><button class="thread-add-entry-btn" onclick="showAddEntryModal()">＋ Add Entry</button></div>`;
-  td.innerHTML=html;
+  if(!filtered.length){td.innerHTML=_activeEntryFilters.length?`<div class="empty-state">No entries match this filter.<br><button class="btn btn-dim btn-sm mt8" onclick="clearEntryFilter()">Clear Filter</button></div>`:`<div class="empty-state">Begin with your first entry above.</div>`;return;}
+  const html=filtered.map(e=>{
+    const timeStr=new Date(e.createdAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    return`<div class="entry-bubble t-${e.type}" onclick="openEntryDetail('${p.id}','${e.id}')">
+      <div class="eb-header">
+        <span class="eb-type">${ENTRY_ICONS[e.type]||'·'} ${e.type}</span>
+        <span class="eb-date">${fmtDate(e.createdAt)} · ${timeStr}</span>
+      </div>
+      <div class="eb-content">${esc(e.content)}</div>
+      ${e.scripture?`<div class="eb-scripture">${esc(e.scripture)}</div>`:''}
+      <div class="eb-actions" onclick="event.stopPropagation()">
+        ${e.editedAt?`<span class="eb-edited">edited ${fmtRel(e.editedAt)}</span>`:''}
+        <button class="entry-edit" onclick="editEntry('${p.id}','${e.id}')">Edit</button>
+        <button class="entry-del" onclick="deleteEntry('${e.id}')">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+  td.innerHTML=html+`<div class="thread-add-entry"><button class="thread-add-entry-btn" onclick="showAddEntryModal()">＋ Add Entry</button></div>`;
 }
 function openEntryDetail(prayerId,entryId){
   const prayer=db.prayers.find(p=>p.id===prayerId);if(!prayer)return;const e=prayer.entries.find(e=>e.id===entryId);if(!e)return;
@@ -1233,8 +1291,8 @@ function pickFocusPrayer(id){
 }
 function completeRoutine(){
   const thanks=[...document.querySelectorAll('.r-thanks')].map(t=>t.value.trim()).filter(Boolean);const surrender=[...document.querySelectorAll('.r-surrender')].map(t=>t.value.trim()).filter(Boolean);
-  thanks.forEach(t=>db.inbox.push({id:uid(),rawText:'[Gratitude] '+t,createdAt:Date.now(),processed:false}));
-  surrender.forEach(s=>db.inbox.push({id:uid(),rawText:'[Surrender] '+s,createdAt:Date.now(),processed:false}));
+  thanks.forEach(t=>db.inbox.push({id:uid(),rawText:'[Gratitude] '+t,createdAt:Date.now(),processed:false,category:'gratitude'}));
+  surrender.forEach(s=>db.inbox.push({id:uid(),rawText:'[Surrender] '+s,createdAt:Date.now(),processed:false,category:'prayer'}));
   db.settings.tomorrowFocusPrayerId=_routineChosenFocusId||'';db.settings.routineCompletedDate=new Date().toISOString().split('T')[0];
   clearRoutineDraft();persist();closeRoutine();renderHome();updateInboxBadge();
 }

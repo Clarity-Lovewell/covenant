@@ -1,4 +1,4 @@
-# Covenant — Prayer Journal · SPEC v1.8
+# Covenant — Prayer Journal · SPEC v1.9
 
 > **This document is the single source of truth for the Covenant app.**
 > Upload this file alongside index.html (and optionally a JSON backup) at the start of every Claude session.
@@ -79,8 +79,25 @@ The core difference from existing apps: prayers are *living threads* that evolve
 - Each row shows: status emoji, prayer title, theme tags (up to 2), time since last entry, last entry snippet, entry count
 - Ongoing prayers shown with a blue left border accent
 
-### Searchable Prayer Picker (File Manually)
-- The "File to Prayer" modal uses a **searchable inline list** instead of a `<select>` dropdown
+### Inbox Categories
+- Every inbox item has a `category` field: `capture` (default) | `prayer` | `todo` | `gratitude`
+- **Home quick capture box** shows 3 small category pills below the textarea: ⚡ Capture · 🙏 Prayer · ☐ To-Do — tap to select before capturing; defaults back to Capture after each submission
+- **Inbox screen** shows a filter strip at the top: All · ⚡ Capture · 🙏 Prayer · ☐ To-Do · 💛 Gratitude — with live counts per category; filters the inbox list without affecting processing
+- Each inbox item shows its category badge in the top-right of its card
+- **Evening Routine**: Gratitude rows auto-tagged `gratitude`; Surrender rows auto-tagged `prayer` when filed to inbox
+- Category is stored on the inbox item and visible until the item is processed
+
+### Compact Thread UI (Prayer Detail)
+- Entries display as **compact message bubbles** — similar to a messaging app thread
+- Each bubble has a **coloured left border** indicating entry type (gold = request, blue = update/question, green = answer, purple = principle, pink = gratitude, muted = observation/todo)
+- Entry header: type label (icon + name) on the left, date/time on the right — small Lato caps
+- Entry content: Crimson Text 15px, tight 1.5 line-height
+- Scripture (when present): compact italic block with gold left border, 13px, below content
+- Entry actions (Edit · Delete · edited note): subtle, below content, stop propagation from bubble click
+- Tapping anywhere on the bubble opens the full entry detail modal
+- No thread line, no dots — clean vertical list of cards
+
+
 - Search input filters prayers live as you type
 - Results grouped by theme with sticky headers, scrollable to max 220px height
 - "Create New Prayer" option always shown at the top
@@ -309,7 +326,7 @@ Workflow: Edit → commit via GitHub Desktop or GitHub Mobile → push to main �
 | v1.5 | 2026-03-13 | Dismiss inbox confirmation; Custom theme editor rebuilt; File Manually retains AI context; AI scripture suggestion in 4 places; Entry editing with editedAt timestamp |
 | v1.6 | 2026-03-14 | AI prompts tightened; "Mark as Answered?" prompt on answer entries; Principle checkbox opt-in; Voice capture button; File Manually raw/AI distinction; Routine draft preserved during inbox navigation |
 | v1.7 | 2026-03-14 | All Prayers view — flat sorted list with filter strip and sort toggles |
-| v1.8 | 2026-04-11 | **Question entry type** (❓) + **To-Do entry type** (☐) — both appear in entry type selectors, thread filter bar, and AI inbox processing; **Ongoing prayer status** (🔄) — for long-running prayers with multiple answers over time, visible in filter strip, theme modal, all prayers view, and Testimony milestones; **Searchable prayer picker** in File Manually modal — replaces select dropdown with inline filtered list grouped by theme, max 220px scrollable, sticky group headers; **Voice capture rewrite** — `continuous:false` + `onend` auto-restart, interim transcription live in textarea, accumulated text committed on stop, properly handles Android Chrome behaviour |
+| v1.9 | 2026-04-11 | **Inbox categories** — Quick Capture, 🙏 Prayer, ☐ To-Do, 💛 Gratitude; category pills on home capture box; filter strip on Inbox screen; Routine auto-tags gratitude/surrender items; **Compact thread UI** — replaced dot/line thread with compact message bubbles; color-coded left border per entry type; tighter padding and typography; removed "Tap to expand" hint (tap anywhere on bubble opens detail) |
 
 ---
 
@@ -326,7 +343,6 @@ Workflow: Edit → commit via GitHub Desktop or GitHub Mobile → push to main �
 
 ## Planned Features
 
-- [ ] Inbox categories (quick capture, to-do, prayer requests)
 - [ ] Search across all prayers, entries, principles
 - [ ] Link prayers together
 - [ ] Export as PDF journal
@@ -338,4 +354,4 @@ Workflow: Edit → commit via GitHub Desktop or GitHub Mobile → push to main �
 
 ---
 
-*Covenant SPEC v1.8 — Built with Claude Sonnet, April 2026*
+*Covenant SPEC v1.9 — Built with Claude Sonnet, April 2026*
