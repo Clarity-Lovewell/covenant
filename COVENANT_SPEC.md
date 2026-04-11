@@ -1,4 +1,4 @@
-# Covenant — Prayer Journal · SPEC v1.7
+# Covenant — Prayer Journal · SPEC v1.8
 
 > **This document is the single source of truth for the Covenant app.**
 > Upload this file alongside index.html (and optionally a JSON backup) at the start of every Claude session.
@@ -26,10 +26,9 @@ The core difference from existing apps: prayers are *living threads* that evolve
   - **Horizon** (custom dark): user-defined bg + accent — defaults to dark navy + sky blue
   - **Dawn** (custom light): user-defined bg + accent — defaults to warm white + violet
 - Horizon and Dawn are fully user-customisable: background colour + accent colour
-- **Custom theme editor is only shown in Settings when Horizon or Dawn is the active theme** — no clutter for preset theme users
-- Custom theme editor uses native `<input type="color">` swatches (directly clickable, render as coloured squares) alongside editable hex text fields — changes apply live with no "Save" button needed
-- Custom theme colour math: surfaces derived by stepping bg brightness ±14 per level; cream/muted toggled by luminance threshold (< 0.5 = dark mode behaviour)
-- Preset themes use `[data-theme="..."]` CSS selectors; custom themes inject inline CSS vars on the html element
+- **Custom theme editor is only shown in Settings when Horizon or Dawn is the active theme**
+- Custom theme editor uses native `<input type="color">` swatches + editable hex text fields — changes apply live
+- Preset themes use `[data-theme="..."]` CSS selectors; custom themes inject inline CSS vars
 - Theme persists in `settings.theme`; custom colours in `settings.customTheme1` / `settings.customTheme2`
 - Fonts: Playfair Display (headings) + Crimson Text (body) + Lato (UI labels)
 - No gamification, no streaks, no badges
@@ -45,9 +44,26 @@ The core difference from existing apps: prayers are *living threads* that evolve
 - Each theme has a short description shown on its card
 - Prayers belong to one or more themes (multi-tag, not siloed)
 - Each prayer has an editable description. Editing it creates a new update entry so the change is tracked. AI can generate a description from prayer title + recent entries.
-- Prayer statuses: active | watching | dormant | answered
-- Entry types: request | update | observation | answer | principle | gratitude
+- Prayer statuses: active | watching | dormant | ongoing | answered
+- Entry types: request | update | observation | answer | principle | gratitude | question | todo
 - Each entry is tappable to open a full detail modal (date, time, scripture beautifully rendered)
+
+### Prayer Status
+- **Active** 🟢 — currently praying
+- **Watching** 👁️ — waiting on God's timing
+- **Ongoing** 🔄 — a long-running prayer with multiple answers over time (appears in Testimony milestones alongside answered prayers)
+- **Dormant** 💤 — paused for now
+- **Answered** ✅ — God has fully answered this prayer; moves to Testimonies
+
+### Entry Types
+- **request** 🙏 — a prayer request
+- **update** 📝 — a progress note
+- **observation** 👁 — something noticed or reflected on
+- **gratitude** 💛 — a moment of thanks
+- **answer** ✨ — an answered prayer moment (can mark prayer as Answered)
+- **principle** 📖 — a wisdom lesson extracted from the experience
+- **question** ❓ — a theological or spiritual question to sit with
+- **todo** ☐ — a practical action item arising from prayer
 
 ### Prayer Detail Header (redesigned)
 - Stacked column layout:
@@ -55,101 +71,86 @@ The core difference from existing apps: prayers are *living threads* that evolve
   - Row 2: Status badge (with emoji) + Theme tags (wrapping flex row)
   - Row 3: ✎ Edit · ⊟ Filter · + Entry action buttons
 
-
 ### All Prayers View
-- Accessible via "All Prayers" toggle on the Prayers screen (next to "By Theme")
-- Toggle persists within the session (`_prayerView` state)
-- **Filter strip**: All · 🟢 Active · 👁️ Watching · 💤 Dormant · ✅ Answered — with live counts
+- Accessible via "All Prayers" toggle on the Prayers screen
+- **Filter strip**: All · 🟢 Active · 👁️ Watching · 💤 Dormant · 🔄 Ongoing · ✅ Answered — with live counts
 - **Sort buttons**: Recent activity (default) · A → Z · Oldest first
-- Within each sort, primary grouping is always by status (active → watching → dormant → answered)
-- Each row shows: status emoji, prayer title, theme tags (up to 2), time since last entry, last entry snippet (2 lines), entry count
-- Answered prayers visually dimmed and title in green
-- Tapping any row navigates directly to prayer detail
-- Status groups shown as labelled headers with counts when "All" filter is active
+- Within each sort, primary grouping is always by status order
+- Each row shows: status emoji, prayer title, theme tags (up to 2), time since last entry, last entry snippet, entry count
+- Ongoing prayers shown with a blue left border accent
 
-### Prayer Tags / Edit
-- "✎ Edit" button (gold ghost style) in prayer detail header opens modal for: title, theme tags (multi-select), and status
-- Status badge in prayer detail is also directly tappable → opens quick status picker
+### Searchable Prayer Picker (File Manually)
+- The "File to Prayer" modal uses a **searchable inline list** instead of a `<select>` dropdown
+- Search input filters prayers live as you type
+- Results grouped by theme with sticky headers, scrollable to max 220px height
+- "Create New Prayer" option always shown at the top
+- Selected prayer highlighted in gold; tapping a row selects it and shows/hides the new prayer fields accordingly
+- Replaces the old `<optgroup>` select for much easier navigation when prayer list is long
 
 ### Entry Filtering
-- "⊟ Filter" button (gold ghost style) in prayer detail header
-- When active: button gains gold background tint (`.filter-btn-active`) to show state
-- Opens inline filter bar with pill buttons for each entry type
+- "⊟ Filter" button in prayer detail header
+- When active: button gains gold background tint to show state
+- Opens inline filter bar with pill buttons for each entry type (now includes question + todo)
 - Active filters highlighted in gold; "✕ Clear" button to reset
 
 ### Add Entry — Bottom CTA
-- A dashed "+ Add Entry" pill button at the bottom of the entry thread, in addition to the "+ Entry" button in the header
+- A dashed "+ Add Entry" pill button at the bottom of the entry thread
 
 ### Entry Editing
 - Every entry shows an **Edit** link in the thread (alongside Delete)
 - **✎ Edit Entry** button also in the entry detail modal
 - Edit modal allows changing: type, content, scripture
 - On save: `editedAt` timestamp recorded on the entry
-- Thread shows "· edited [relative date]" label in the entry meta row
-- Entry detail modal shows edited date in the timestamp line
-- No full edit history — simple overwrite with timestamp. `originalRaw` (inbox capture) still preserved where applicable.
 
 ### Prayer Status Emojis
-- Status displayed with emoji throughout the app: 🟢 Active · 👁️ Watching · 💤 Dormant · ✅ Answered
+- Status displayed with emoji throughout: 🟢 Active · 👁️ Watching · 💤 Dormant · 🔄 Ongoing · ✅ Answered
+
+### Testimony Screen
+- Fully answered prayers shown as testimony cards
+- **Ongoing prayers** now also appear in the "Along the Way" milestones section (alongside prayers with answer-type entries)
+- Ongoing prayers show a 🔄 icon and a count of answers recorded so far
 
 ### Dismiss Inbox Items — Confirmation
 - "Dismiss" button on inbox items shows a confirmation dialog before marking as processed
 
 ### Mark as Answered — Prompt on Answer Entry
-- When an entry of type "answer" is filed (via Add Entry or Edit Entry), a modal appears asking whether to also mark the prayer as **Answered** and move it to Testimonies
+- When an entry of type "answer" is filed (via Add Entry or Edit Entry), a modal asks whether to also mark the prayer as **Answered**
 - User chooses "Yes, it's answered ✅" or "Not yet"
-- The `markAnswered()` button (in prayer detail footer) still marks directly as before since it's already intentional
+
+### Voice Capture (rewritten for Android Chrome reliability)
+- 🎤 microphone button next to Capture button on the Home quick-capture area
+- Uses Web Speech API (`SpeechRecognition` / `webkitSpeechRecognition`)
+- **Android Chrome fix**: `continuous: false` + auto-restart on `onend` to simulate continuous mode
+- Live interim transcription shown in textarea as user speaks
+- Final transcripts accumulated across restart cycles in `_voiceAccumulated`
+- Original textarea value preserved in `_voiceOriginalValue` — appended to on commit
+- Tap ⏹ to stop: accumulated text committed to textarea
+- No separate "Listening…" status label — button state (red pulse) is the indicator
+- On genuine errors (not `no-speech` / `aborted`): stops gracefully and commits whatever was captured
 
 ### AI Layer
 - Requires Anthropic API key (stored in localStorage)
 - AI features:
-  - **Inbox processing**: processes raw capture → shows before/after comparison with editable draft textarea
+  - **Inbox processing**: processes raw capture → shows before/after comparison with editable draft textarea; AI now also suggests `question` and `todo` entry types
   - **Living summary**: summarises prayer thread in second person ("You began this prayer…")
-  - **Scripture suggestion** (available in four places):
-    - Inbox "File Manually" modal — "✦ Suggest Scripture" button below scripture field
-    - Add Entry modal — "✦ Suggest Scripture" button below scripture field
-    - Edit Entry modal — "✦ Suggest Scripture" button below scripture field
-    - Entry Detail modal — "✦ Suggest Scripture" button shown when no scripture exists; result can be added directly to the saved entry via "Add to Entry" button (persists immediately)
-  - **Principle extraction**: detected during inbox AI processing — shown with an **unchecked checkbox** asking "save to Wisdom?". User must explicitly tick to save. Not auto-saved.
+  - **Scripture suggestion** (available in four places): Add Entry, Edit Entry, Entry Detail, File Manually modals
+  - **Principle extraction**: shown with an **unchecked checkbox** — user must explicitly tick to save
   - **Prayer description generation**: "✦ AI Generate" in description area, Edit Description modal, and New Prayer modal
   - **Entry assist**: "✦ AI Assist" in Add Entry modal — polishes raw note, can suggest spinning off a new prayer
-- All AI prompts are tuned for concise, natural, direct output — no religious filler or formulaic language
+- All AI prompts tuned for concise, natural, direct output — no religious filler
 - All AI is assistive — user reviews/edits before anything is filed
-- Manual mode available for all features without API key
-
-### AI Prompt Style
-- All AI prompts instruct for: concise (1-3 sentences), first person, natural and direct — no religious clichés or filler
-- Entry drafts: 1-3 sentences
-- Descriptions: 1 sentence
-- Living summaries: 2-3 sentences
-- Scripture suggestions: reference + brief quote only
 
 ### File Manually — Retains AI Context or Raw Capture
-- "File Manually" button in the **AI suggestion panel**: pre-fills entry text from edited AI draft, type, prayer, and scripture from AI suggestion
-- "File Manually" button on the **original inbox item** (before/after AI runs): pre-fills entry text from the raw capture only — AI suggestion data is ignored
-- This lets the user always file from the raw original without AI contamination, even after AI has run
+- "File Manually" from the **AI suggestion panel**: pre-fills from edited AI draft, type, prayer, and scripture
+- "File Manually" from the **original inbox item** (before AI runs): pre-fills from raw capture only
 
-### Inbox — Before/After + Editable Draft
-- When AI processes an inbox item, the suggestion panel shows:
-  1. **Original capture** (read-only, italic, labelled "Original capture")
-  2. A "↓ refined" arrow divider
-  3. An **editable textarea** pre-filled with the AI draft — user can tweak before accepting
-- On "Accept & File": the edited draft text is used as entry content
-- The original raw capture is stored on the entry as `originalRaw`
-- In the entry detail modal, if `originalRaw` exists: a "📎 View original capture" toggle reveals the original text
-
-### Scripture Expansion
-- Entries with a scripture reference show a "📖 Load passage" button in the detail modal
-- Tapping it fetches the passage from bible-api.com (WEB translation) and displays it inline
-- No API key required for scripture expansion
-
-### Voice Capture
-- 🎤 microphone button next to Capture button on the Home quick-capture area
-- Uses Web Speech API (`SpeechRecognition` / `webkitSpeechRecognition`)
-- On tap: starts recording, button turns red with pulse animation
-- On result: appends transcribed text to the quick-capture textarea
-- If API not supported (non-Chrome): shows brief "✗" state and an alert
-- Language set to `en-AU`
+### Dev Notes (Settings)
+- Saved to `db.devNotes[]` — survives export/import
+- Each note has a **checkbox** to mark as tested/verified
+- Ticking a note strikes through its text and records `checkedAt` timestamp
+- Checked notes are grouped into a collapsible "✓ Show Archived (n)" section
+- Unchecked notes can be edited inline; checked notes show "tested" date
+- Notes are never auto-deleted — archive by ticking, remove manually
 
 ---
 
@@ -166,6 +167,7 @@ settings: {
   theme,
   customTheme1: { bg: hex, accent: hex },
   customTheme2: { bg: hex, accent: hex },
+  routineDraft: { date, thanks[], surrender[] } | null,
 }
 
 themes: [{ id, name, icon, description }]
@@ -176,9 +178,11 @@ prayers: [{
 }]
 
 entries: [{
-  id, type, content, scripture, createdAt,
-  editedAt (optional — timestamp of last edit),
-  originalRaw (optional — stores pre-AI raw capture for before/after view)
+  id,
+  type,       // request | update | observation | answer | principle | gratitude | question | todo
+  content, scripture, createdAt,
+  editedAt (optional),
+  originalRaw (optional — stores pre-AI raw capture)
 }]
 
 inbox:      [{ id, rawText, createdAt, processed }]
@@ -186,7 +190,7 @@ principles: [{ id, text, prayerIds[], createdAt }]
 
 devNotes: [{
   id, text, createdAt,
-  checked (bool — ticked when tested),
+  checked (bool),
   checkedAt (timestamp or null)
 }]
 ```
@@ -201,7 +205,7 @@ devNotes: [{
 | Inbox | Nav: Inbox | Unprocessed captures — file manually or with AI |
 | Prayers | Nav: Prayers | Toggle between "By Theme" (grid of 10 themes) and "All Prayers" (flat sorted list) |
 | Prayer Detail | Tap any prayer | Description + threaded entries + living summary |
-| Testimony | Nav: Testimony | Fully answered prayers + Along the Way milestones |
+| Testimony | Nav: Testimony | Fully answered prayers + Ongoing prayers + Along the Way milestones |
 | Principles | Nav: Wisdom | Personal wisdom library |
 | Evening Routine | Home routine card | 3-step guided overlay |
 | Settings | Gear on Home | Profile, appearance (incl. custom themes), data backup, dev notes |
@@ -212,53 +216,60 @@ devNotes: [{
 ## Key Flows
 
 ### Today's Focus (Home)
-- "Today's Focus" card shows current focus prayer
+- "Today's Focus" card shows current focus prayer (only active prayers)
 - "Change prayer" link opens picker modal grouped by theme category
 - Auto-rotate option returns to round-robin by day-of-year
-- Choice also settable in Step 3 of Evening Routine
 
-### Prayer Filing
-- Prayer picker in manual filing uses optgroup grouped by theme with status emoji shown
-- All entry types including gratitude available in all forms
+### Prayer Filing — Searchable Picker
+- File Manually modal shows an inline searchable prayer list (not a select dropdown)
+- Search input filters by title; results grouped by theme with sticky headers
+- Selecting a prayer highlights it gold and hides/shows the new prayer fields
 
 ### Entries
 - Tappable to open full detail modal (type icon, date, time, scripture)
 - Scripture reference shows "📖 Load passage" → fetches full passage from bible-api.com
 - If entry has `originalRaw`: "📎 View original capture" toggle shown in detail modal
 - Edit and Delete available from both thread view and detail modal
-- Edited entries show "· edited [date]" label in thread and detail modal
 - "+ Add Entry" button at both top (header) and bottom of thread
+- Filter bar now includes question and todo types
+
+### Testimony — Ongoing Prayers
+- Ongoing prayers (status = 'ongoing') appear in the "Along the Way" milestones section with a 🔄 icon
+- This section also shows active prayers that already have answer-type entries (partial answers)
+- Both groups link back to the prayer detail
 
 ### Dev Notes (Settings)
-- Saved to `db.devNotes[]` — survives export/import
-- Each note has a **checkbox** to mark as tested/verified
-- Ticking a note strikes through its text and records `checkedAt` timestamp
-- Checked notes are grouped into a collapsible "✓ Show Archived (n)" section below active notes
-- Unchecked notes can be edited inline; checked notes show "tested" date
-- Notes are never auto-deleted — archive by ticking, remove manually with the Remove button
-
-### App Icon
-- Generated at boot via Canvas API (candle with flame on dark background)
-- Used in apple-touch-icon and injected into a dynamically-created manifest Blob URL
-- Manifest includes icons array so Chrome Android shows the "Add to Home Screen" install prompt
+- Each note has a checkbox to mark as tested/verified; ticking archives it
+- Collapsible "✓ Show Archived" section below active notes
 
 ---
 
 ## Evening Routine (3 steps)
 1. **Give Thanks** — dynamic gratitude rows, each becomes [Gratitude] inbox capture
-2. **Inbox Review** — shows unprocessed count; "Review Inbox →" navigates to inbox **without closing or resetting the routine**. Re-opening the routine card shows the same state with inputs preserved.
+2. **Inbox Review** — shows unprocessed count; "Review Inbox →" navigates to inbox without closing the routine
 3. **Pray Forward** — shows current focus prayer, allows changing; surrender notes become [Surrender] captures
 - Stamps `routineCompletedDate`, saves focus choice to `tomorrowFocusPrayerId`
-- Closing via ✕ or completing the routine resets state; next open starts fresh
-- `_routineRendered` JS flag controls this: set `true` on open, cleared on ✕ close or complete
+- Draft preserved in `settings.routineDraft` when navigating away mid-routine
+- Next-day draft prompts user to keep or discard
+
+---
+
+## Voice Capture (Technical Detail)
+- `_voiceCapturing`: bool — controls whether auto-restart continues
+- `_voiceAccumulated`: string — running total of final transcripts across restart cycles
+- `_voiceOriginalValue`: string — textarea value at start of session; appended to on commit
+- `continuous: false` with `onend` auto-restart: required for Android Chrome
+- `interimResults: true`: live preview shown in textarea while speaking
+- On stop tap: `_voiceCapturing = false` → next `onend` commits text instead of restarting
+- No `getUserMedia` call needed (Web Speech API handles permissions internally)
 
 ---
 
 ## PWA / Mobile
 
-- **Manifest**: Dynamically generated as Blob URL at boot with proper icons array — Chrome Android shows "Add to Home Screen" install prompt
+- **Manifest**: Dynamically generated as Blob URL at boot with proper icons array
 - **Service Worker**: Registered at boot via Blob URL — caches the app for offline use
-- **Recommended install flow**: Open in Chrome on Android → tap ⋮ menu → "Add to Home Screen" → launches fullscreen, no browser chrome
+- **Recommended install flow**: Open in Chrome on Android → tap ⋮ menu → "Add to Home Screen"
 - Nav uses `padding-bottom: max(14px, env(safe-area-inset-bottom))`
 - Screen content uses `padding-bottom: 130px`
 - `min-height: 100dvh` on body
@@ -278,7 +289,7 @@ Workflow: Edit → commit via GitHub Desktop or GitHub Mobile → push to main �
 
 - Chris provides: `index.html` + `COVENANT_SPEC.md` + optional JSON backup at the start of each session
 - **For small changes (1–2 features):** single prompt is fine
-- **For larger batches (3+ dev notes):** split into two prompts — first handles code-heavy changes (theming, new modals, data structure), second handles lighter changes (copy tweaks, confirmation dialogs, UI polish). This avoids hitting output length limits mid-spec.
+- **For larger batches (3+ dev notes):** split into two prompts — first handles code-heavy changes, second handles lighter changes (copy, UI polish, confirmation dialogs)
 - Changes requested in plain language; Claude handles the code
 - Claude delivers: updated `index.html` + updated `COVENANT_SPEC.md`
 - Chris commits both files to GitHub
@@ -292,12 +303,13 @@ Workflow: Edit → commit via GitHub Desktop or GitHub Mobile → push to main �
 | v1.0 | 2026-03-11 | Initial build: all core features |
 | v1.1 | 2026-03-11 | Export/import backup |
 | v1.1 | 2026-03-12 | Quick capture top; routine tracking; multiple notes; focus picker; prayer descriptions; theme descriptions; testimony milestones; 16 verses; PWA meta tags |
-| v1.2 | 2026-03-12 | 10 prayer themes; 4 visual themes (Candlelight, Parchment, Midnight, Ember); canvas app icon; Settings screen; Today's Focus + change picker; prayer edit modal; gratitude entry type; grouped prayer picker; entry expansion modal with scripture; ENTRY_ICONS fix; Firefox nav fix |
-| v1.3 | 2026-03-12 | PWA: dynamic manifest + service worker; Cocoa theme; Focus picker grouped by theme; Entry filter bar; Scripture passage expansion (bible-api.com); Dev note editing inline; Status badge clickable; Edit button gold ghost style |
-| v1.4 | 2026-03-13 | Custom themes Horizon + Dawn with live colour pickers; Prayer detail header redesign (stacked layout); Filter button gold ghost style with active highlight; Add Entry button at bottom of thread; Status emojis throughout; Prayer list cards with emoji status; AI description generation; AI entry assist with new-prayer suggestion; Inbox before/after comparison with editable draft; Original capture stored on entry with toggle; Dev notes checkbox — tick to archive, collapsible archived section |
-| v1.5 | 2026-03-13 | Dismiss inbox confirmation dialog; Custom theme editor rebuilt — native colour inputs + hex text fields, live apply, only shown when Horizon/Dawn active; File Manually retains AI-suggested prayer/type/scripture; AI scripture suggestion in Add Entry, Edit Entry, Entry Detail (posted entries), and File Manually modals; Entry editing (type + content + scripture) with editedAt timestamp shown in thread and detail modal |
-| v1.7 | 2026-03-14 | All Prayers view — flat sorted list with filter strip and sort toggles, accessible via toggle on Prayers screen |
-| v1.6 | 2026-03-14 | AI prompts tightened — concise, natural, no filler; "Mark as Answered?" prompt when filing answer-type entries (submitEntry + submitEditEntry); AI-detected principles no longer auto-saved — shown with unchecked checkbox for user to opt in; Voice capture button (🎤) on home quick-capture using Web Speech API; "File Manually" from original inbox item uses raw capture text (ignores AI data); Evening routine state preserved when navigating to inbox mid-routine via `_routineRendered` flag |
+| v1.2 | 2026-03-12 | 10 prayer themes; 4 visual themes; canvas app icon; Settings screen; Today's Focus + change picker; prayer edit modal; gratitude entry type; grouped prayer picker; entry expansion modal with scripture; ENTRY_ICONS fix; Firefox nav fix |
+| v1.3 | 2026-03-12 | PWA: dynamic manifest + service worker; Cocoa theme; Focus picker grouped by theme; Entry filter bar; Scripture passage expansion; Dev note editing inline; Status badge clickable; Edit button gold ghost style |
+| v1.4 | 2026-03-13 | Custom themes Horizon + Dawn; Prayer detail header redesign; Filter button active highlight; Add Entry button at bottom of thread; Status emojis; Prayer list cards; AI description generation; AI entry assist; Inbox before/after comparison; Original capture stored; Dev notes checkbox archive |
+| v1.5 | 2026-03-13 | Dismiss inbox confirmation; Custom theme editor rebuilt; File Manually retains AI context; AI scripture suggestion in 4 places; Entry editing with editedAt timestamp |
+| v1.6 | 2026-03-14 | AI prompts tightened; "Mark as Answered?" prompt on answer entries; Principle checkbox opt-in; Voice capture button; File Manually raw/AI distinction; Routine draft preserved during inbox navigation |
+| v1.7 | 2026-03-14 | All Prayers view — flat sorted list with filter strip and sort toggles |
+| v1.8 | 2026-04-11 | **Question entry type** (❓) + **To-Do entry type** (☐) — both appear in entry type selectors, thread filter bar, and AI inbox processing; **Ongoing prayer status** (🔄) — for long-running prayers with multiple answers over time, visible in filter strip, theme modal, all prayers view, and Testimony milestones; **Searchable prayer picker** in File Manually modal — replaces select dropdown with inline filtered list grouped by theme, max 220px scrollable, sticky group headers; **Voice capture rewrite** — `continuous:false` + `onend` auto-restart, interim transcription live in textarea, accumulated text committed on stop, properly handles Android Chrome behaviour |
 
 ---
 
@@ -307,13 +319,14 @@ Workflow: Edit → commit via GitHub Desktop or GitHub Mobile → push to main �
 - No PDF or Markdown export (JSON backup only)
 - No search across all prayers yet
 - No prayer linking UI yet
-- Service worker Blob URL may not persist after page close on some browsers; full offline requires deploying a sw.js file alongside index.html
+- Service worker Blob URL may not persist after page close on some browsers
 - Voice capture (Web Speech API) works in Chrome only; not supported in Firefox or Safari
 
 ---
 
-## Planned v2 Features
+## Planned Features
 
+- [ ] Inbox categories (quick capture, to-do, prayer requests)
 - [ ] Search across all prayers, entries, principles
 - [ ] Link prayers together
 - [ ] Export as PDF journal
@@ -321,9 +334,8 @@ Workflow: Edit → commit via GitHub Desktop or GitHub Mobile → push to main �
 - [ ] Weekly review summary (AI-generated)
 - [ ] Doctrine & Theology section
 - [ ] Shared/exported testimony (anonymised)
-- [ ] Prayer groups (cross-category focused sessions)
 - [ ] Rename, reorder, customise prayer categories
 
 ---
 
-*Covenant SPEC v1.7 — Built with Claude Sonnet, March 2026*
+*Covenant SPEC v1.8 — Built with Claude Sonnet, April 2026*
