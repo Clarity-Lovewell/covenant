@@ -473,7 +473,7 @@ input[type="color"].theme-color-pick::-webkit-color-swatch{border:none;border-ra
     <div class="flex-between mb16">
       <div>
         <h2 style="font-size:24px;font-family:'Playfair Display',serif;">⚙️ Settings</h2>
-        <div style="font-family:'Lato',sans-serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-top:3px;">Covenant v1.9</div>
+        <div style="font-family:'Lato',sans-serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-top:3px;">Covenant v1.8</div>
       </div>
       <button class="routine-close" onclick="closeSettings()">✕</button>
     </div>
@@ -509,6 +509,7 @@ input[type="color"].theme-color-pick::-webkit-color-swatch{border:none;border-ra
       <div id="dev-notes-list" style="margin-bottom:12px;"></div>
       <textarea id="dev-note-input" rows="3" placeholder="e.g. The prayer list needs better search..."></textarea>
       <button class="btn btn-ghost btn-full" style="margin-top:8px;" onclick="addDevNote()">+ Add Note</button>
+      <button class="btn btn-dim btn-full" style="margin-top:8px;" onclick="exportDevNotes()">↓ Export as .txt</button>
     </div>
     <div class="settings-section">
       <div class="settings-section-title">🗺 Planned Improvements</div>
@@ -1308,6 +1309,30 @@ async function callAI(prompt){
   const key=db.settings.apiKey;if(!key)throw new Error('No API key');
   const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
   if(!res.ok)throw new Error('API '+res.status);const data=await res.json();return data.content.map(b=>b.type==='text'?b.text:'').join('');
+}
+
+// ── EXPORT DEV NOTES ──
+function exportDevNotes(){
+  const notes=db.devNotes||[];
+  if(!notes.length){alert('No dev notes to export.');return;}
+  const active=notes.filter(n=>!n.checked);
+  const archived=notes.filter(n=>n.checked);
+  let txt='COVENANT DEV NOTES\n';
+  txt+='Exported '+new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})+'\n';
+  txt+='═'.repeat(40)+'\n\n';
+  if(active.length){
+    txt+='ACTIVE\n'+'─'.repeat(20)+'\n';
+    active.forEach(n=>{txt+='☐  '+n.text+'\n    Added '+fmtDate(n.createdAt)+'\n\n';});
+  }
+  if(archived.length){
+    txt+='DONE\n'+'─'.repeat(20)+'\n';
+    archived.forEach(n=>{txt+='✓  '+n.text+'\n    Done '+fmtDate(n.checkedAt)+'\n\n';});
+  }
+  const blob=new Blob([txt],{type:'text/plain'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='covenant-dev-notes-'+new Date().toISOString().split('T')[0]+'.txt';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
 }
 
 window.addEventListener('DOMContentLoaded',boot);
